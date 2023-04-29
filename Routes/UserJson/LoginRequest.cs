@@ -1,0 +1,16 @@
+﻿namespace gaos.Routes.UserJson
+{
+
+    public class LoginRequest
+    {
+        public string? userName { get; set; }
+        
+        public string? email { get; set; }
+
+        public string? password { get; set; }
+
+        public string? deviceId { get; set; }
+
+        public string? deviceType { get; set; }
+    }
+}

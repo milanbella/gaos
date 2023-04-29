@@ -1,0 +1,99 @@
+﻿using Serilog;
+using gaos.Auth;
+
+namespace gaos.Middleware
+{
+    public class AuthMiddleware
+    {
+        public static string CLASS_NAME = typeof(AuthMiddleware).Name;
+
+        public static string HTTP_CONTEXT_KEY_TOKEN_CLAIMS = "token_claims";
+
+        private readonly RequestDelegate _next;
+
+        private string? ExtractBrearerToken(string authHeader)
+        {
+            string[] parts = authHeader.Split(' ');
+            if (parts.Length != 2)
+            {
+                return null;
+            }
+            if (parts[0] != "Bearer")
+            {
+                return null;
+            }
+            return parts[1];
+        }
+
+
+        public AuthMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            const string METHOD_NAME = "Invoke()";
+
+            string path = context.Request.Path.Value;
+
+            if (path == null || !path.StartsWith("/api"))
+            {
+                await _next(context);
+                return;
+            }
+
+            string? authHeader = context.Request.Headers["Authorization"];
+
+            if (authHeader == null)
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Unauthorized");
+                return;
+            }
+
+            string? jwt = ExtractBrearerToken(authHeader); 
+            if (jwt == null)
+            {
+                Log.Warning($"{CLASS_NAME}:{METHOD_NAME} no bearer token in Authorization header ");
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Unauthorized");
+                return;
+            }
+
+            TokenClaims claims = Token.GetClaimsFormJWT(jwt);
+
+            if (claims == null)
+            {
+                Log.Warning($"{CLASS_NAME}:{METHOD_NAME} could not decode claims");
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Unauthorized");
+                return;
+            }
+
+            long secondsNow = DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds();
+            if (secondsNow > claims.exp)
+            {
+                Log.Warning($"{CLASS_NAME}:{METHOD_NAME} could not decode claims");
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Unauthorized - token expired");
+                return;
+
+            }
+
+            context.Items.Add(HTTP_CONTEXT_KEY_TOKEN_CLAIMS, claims);
+
+
+            await _next(context);
+        }
+    }
+
+    public static class AuthMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseAuthMiddleware(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<AuthMiddleware>();
+        }
+    }
+
+}
