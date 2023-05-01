@@ -4,11 +4,20 @@ using Serilog;
 
 namespace gaos.Auth
 {
+    public enum UserType
+    {
+        RegisteredUser,
+        GuestUser,
+    }
+
     public class TokenClaims
     {
         public string? sub { get; set; }
-        public string? role { get; set; }
         public long exp { get; set; }
+
+        public UserType userType { get; set; }
+
+        public int deviceId { get; set; }
     }
 
     public class Token
@@ -20,14 +29,15 @@ namespace gaos.Auth
         private static string pkcs12KeyStoreFilePath = "/w1/gaos/scripts/out/key_store.pfx";
         private static string keyStorePassword = "changeit";
 
-        private static string GenerateJWT(RSA privateKey, string username)
+        private static string GenerateJWT(RSA privateKey, string username, int deviceId, UserType userType = UserType.RegisteredUser)
         {
             // Set JWT payload.
             var payload = new Dictionary<string, object>
             {
                 { "sub", username },
-                { "role", "regular_user" },
                 { "exp", DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds() },
+                { "user_type", userType.ToString()},
+                { "device_id", deviceId}
             };
 
             // Create and sign the JWT.
@@ -36,15 +46,15 @@ namespace gaos.Auth
             return jwt;
         }
 
-        public static string GenerateJWT(string username)
+        public static string GenerateJWT(string username, int deviceId, UserType userType = UserType.RegisteredUser)
         {
             if (Token.privateKey == null) { 
                 Token.privateKey = RSAKeys.ReadPrivateKey(Token.pkcs12KeyStoreFilePath, Token.keyStorePassword);
-                return Token.GenerateJWT(Token.privateKey, username);
+                return Token.GenerateJWT(Token.privateKey, username, deviceId, userType);
             } 
             else
             {
-                return Token.GenerateJWT(Token.privateKey, username);
+                return Token.GenerateJWT(Token.privateKey, username, deviceId, userType);
 
             }
         }
@@ -64,8 +74,17 @@ namespace gaos.Auth
 
                 TokenClaims claims = new TokenClaims();
                 claims.sub = (string)payload["sub"]; 
-                claims.role = (string)payload["role"];
                 claims.exp = (long)payload["exp"];
+
+                string userType = (string)payload["user_type"];
+                UserType userTypeEnum;
+                if (!Enum.TryParse(userType, out userTypeEnum)) {
+                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} JWT is not valid, userType is not valid: {userType}");
+                    return null;
+                } else {
+                    claims.userType = userTypeEnum;
+                }
+                claims.deviceId = (int)payload["device_id"];
 
                 return claims;
             }

@@ -4,7 +4,7 @@ using gaos.Routes;
 using Serilog;
 using gaos.Middleware;
 
-var dbConnectionString = "server=localhost;user=root;password=root;database=usrv";
+var dbConnectionString = "server=localhost;user=root;password=root;database=gaos";
 var dbServerVersion = new MariaDbServerVersion(new Version(10, 7));
 
 
@@ -34,6 +34,7 @@ app.UseMiddleware<AuthMiddleware>();
 app.Map("/", () => Results.Ok("hello!"));
 app.MapGroup("/todoitems").GroupTodosItems();
 app.MapGroup("/user").GroupUser();
+app.MapGroup("/device").GroupDevice();
 app.MapGroup("/api").GroupApi();
 
 

@@ -1,6 +1,7 @@
-﻿namespace gaos.Routes.UserJson
+
+namespace gaos.Routes.UserJson
 {
-    public class LoginResponse
+    public class GuestLoginResponse
     {
         public bool? isError { get; set; }
 

@@ -11,7 +11,7 @@ using gaos.Dbo;
 namespace gaos.Migrations
 {
     [DbContext(typeof(Db))]
-    [Migration("20230429142104_InitialCreate")]
+    [Migration("20230501094741_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -22,7 +22,7 @@ namespace gaos.Migrations
                 .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Usrv.Dbo.Device", b =>
+            modelBuilder.Entity("gaos.Dbo.Device", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,7 @@ namespace gaos.Migrations
                     b.ToTable("Devices");
                 });
 
-            modelBuilder.Entity("Usrv.Dbo.JWT", b =>
+            modelBuilder.Entity("gaos.Dbo.JWT", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,7 +119,7 @@ namespace gaos.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Usrv.Dbo.Todo", b =>
+            modelBuilder.Entity("gaos.Dbo.Todo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -136,7 +136,7 @@ namespace gaos.Migrations
                     b.ToTable("Todos");
                 });
 
-            modelBuilder.Entity("Usrv.Dbo.User", b =>
+            modelBuilder.Entity("gaos.Dbo.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -188,14 +188,14 @@ namespace gaos.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Usrv.Dbo.JWT", b =>
+            modelBuilder.Entity("gaos.Dbo.JWT", b =>
                 {
-                    b.HasOne("Usrv.Dbo.Device", "Device")
+                    b.HasOne("gaos.Dbo.Device", "Device")
                         .WithMany("JWTs")
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Usrv.Dbo.User", "User")
+                    b.HasOne("gaos.Dbo.User", "User")
                         .WithMany("JWTs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -205,12 +205,12 @@ namespace gaos.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Usrv.Dbo.Device", b =>
+            modelBuilder.Entity("gaos.Dbo.Device", b =>
                 {
                     b.Navigation("JWTs");
                 });
 
-            modelBuilder.Entity("Usrv.Dbo.User", b =>
+            modelBuilder.Entity("gaos.Dbo.User", b =>
                 {
                     b.Navigation("JWTs");
                 });

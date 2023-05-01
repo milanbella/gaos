@@ -1,12 +1,11 @@
-﻿namespace gaos.Routes.UserJson
+
+namespace gaos.Routes.DeviceJson
 {
-    public class LoginResponse
+    public class DeviceRegisterResponse
     {
         public bool? isError { get; set; }
 
         public string? errorMessage { get; set; }
-
-        public string? jwt { get; set; }
 
     }
 }

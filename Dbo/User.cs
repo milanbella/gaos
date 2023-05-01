@@ -13,6 +13,9 @@ namespace gaos.Dbo
         public string? PasswordHash { get; set; }
         public string? PasswordSalt { get; set; }
 
+        public int? UserSettingsId { get; set; }
+        public UserSettings? UserSettings { get; set; }
+
         public ICollection<JWT>? JWTs { get; }
     }
 }

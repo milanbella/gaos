@@ -6,8 +6,11 @@
         public string? Token { get; set; }
         public int? UserId { get; set; }
         public User? User { get; set; }
+        public int? GuestId { get; set; }
+        public Guest? Guest { get; set; }
+        public DateTime CreatedAt { get; set; }
+
         public int? DeviceId { get; set; }
         public Device? Device { get; set; }
-        public DateTime CreatedAt { get; set; }
     }
 }

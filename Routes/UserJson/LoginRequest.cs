@@ -1,4 +1,5 @@
-﻿namespace gaos.Routes.UserJson
+﻿using System.Security.Cryptography;
+namespace gaos.Routes.UserJson
 {
 
     public class LoginRequest
@@ -10,7 +11,5 @@
         public string? password { get; set; }
 
         public string? deviceId { get; set; }
-
-        public string? deviceType { get; set; }
     }
 }

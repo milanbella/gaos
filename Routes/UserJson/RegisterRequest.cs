@@ -12,10 +12,8 @@ namespace gaos.Routes.UserJson
         public string? password { get; set; }
 
         public string? passwordVerify { get; set; }
-
         public string? deviceId { get; set; }
 
-        public string? deviceType { get; set; }
     }
     
 }

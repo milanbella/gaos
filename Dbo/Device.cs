@@ -1,11 +1,11 @@
 ﻿namespace gaos.Dbo
 {
-    public enum DeviceType
+    public enum PlatformType
     {
-        Mobile,
-        Tablet,
-        Desktop,
-        Browser
+        WebGL,
+        PC,
+        Android,
+        IOS
     }
 
     public class Device
@@ -13,8 +13,10 @@
         public int Id { get; set; }
         public string? Identification { get; set; }
         
-        public DeviceType? DeviceType { get; set; }
+        public PlatformType? PlatformType { get; set; }
 
-        public ICollection<JWT>? JWTs { get; }
+        public int? BuildVersionId { get; set; }
+        public BuildVersion? BuildVersion { get; set; }
+        public DateTime RegisteredAt { get; set; }
     }
 }

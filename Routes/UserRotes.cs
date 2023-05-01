@@ -19,7 +19,7 @@ namespace gaos.Routes
 
             group.MapPost("/login", async (LoginRequest loginRequest, Db db) =>
             {
-                const string METHOD_NAME = "login";
+                const string METHOD_NAME = "user/login";
 
                 using (var transaction = db.Database.BeginTransaction())
                 {
@@ -34,7 +34,6 @@ namespace gaos.Routes
                             {
                                 isError = true,
                                 errorMessage = "missing user name (you may use also email in place of user name)",
-
                             };
                             var json = JsonSerializer.Serialize(response);
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
@@ -61,25 +60,53 @@ namespace gaos.Routes
 
                         }
 
-
-                        DeviceType deviceType;
-                        if (loginRequest.deviceType == null || loginRequest.deviceType.Trim().Length == 0)
+                        if (loginRequest.deviceId == null || loginRequest.deviceId.Trim().Length == 0)
                         {
                             response = new LoginResponse
                             {
                                 isError = true,
-                                errorMessage = "deviceType is empty",
+                                errorMessage = "deviceId is empty",
+
+                            };
+                            var json = JsonSerializer.Serialize(response);
+                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
+
+                        }
+
+                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == loginRequest.deviceId);
+                        if (device == null)
+                        {
+                            response = new LoginResponse
+                            {
+                                isError = true,
+                                errorMessage = "nu such deviceId",
+
+                            };
+                            var json = JsonSerializer.Serialize(response);
+                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                        } 
+                        int deviceId = device.Id;
+
+
+                        /*
+                        PlatformType platformType;
+                        if (loginRequest.platformType == null || loginRequest.platformType.Trim().Length == 0)
+                        {
+                            response = new LoginResponse
+                            {
+                                isError = true,
+                                errorMessage = "platformType is empty",
 
                             };
                             return Results.Json(response);
 
                         }
-                        if (!Enum.TryParse(loginRequest.deviceType, out deviceType))
+                        if (!Enum.TryParse(loginRequest.platformType, out platformType))
                         {
                             response = new LoginResponse
                             {
                                 isError = true,
-                                errorMessage = "unknown device type",
+                                errorMessage = "unknown platform type",
 
                             };
                             return Results.Json(response);
@@ -100,17 +127,28 @@ namespace gaos.Routes
                         Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == loginRequest.deviceId);
                         if (device == null)
                         {
-                            device = new Device
+                            response = new LoginResponse
                             {
-                                Identification = loginRequest.deviceId,
-                                DeviceType = deviceType,
+                                isError = true,
+                                errorMessage = "nu such deviceId",
 
                             };
-                            db.Devices.Add(device);
-                            db.SaveChanges();
-                            // after persisting the device entity device.Id should by automatically set by the framework
+                            return Results.Json(response);
+                        } else {
+                            if (device.PlatformType != platformType)
+                            {
+                                response = new LoginResponse
+                                {
+                                    isError = true,
+                                    errorMessage = "deviceId is already registered for another platform type",
+
+                                };
+                                return Results.Json(response);
+                            }
+
                         }
                         int deviceId = device.Id;
+                        */
 
 
                         if (!Password.verifyPassword(user.PasswordSalt, user.PasswordHash, loginRequest.password))
@@ -125,15 +163,15 @@ namespace gaos.Routes
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
                         }
 
-                        var jwtsToDelete = db.JWTs.Where(t => t.DeviceId == deviceId);
+                        var jwtsToDelete = db.JWTs.Where(t => t.UserId == user.Id);
                         db.JWTs.RemoveRange(jwtsToDelete);
 
-                        var jwtStr = Token.GenerateJWT(loginRequest.userName);
+                        var jwtStr = Token.GenerateJWT(loginRequest.userName, deviceId);
                         JWT jwt = new JWT
                         {
                             Token = jwtStr,
                             UserId = user.Id,
-                            DeviceId = device.Id,
+                            DeviceId = device.Id
                         };
                         await db.JWTs.AddAsync(jwt);
                         await db.SaveChangesAsync();
@@ -158,14 +196,144 @@ namespace gaos.Routes
                             isError = true,
                             errorMessage = "internal error",
                         };
+                        var json = JsonSerializer.Serialize(response);
+                        return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                    }
+                }
+            });
+
+            group.MapPost("/guestLogin", async (GuestLoginRequest guestLoginRequest, Db db) =>
+            {
+                const string METHOD_NAME = "user/guestLogin";
+
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    try 
+                    { 
+                        Guest guest = null;
+                        GuestLoginResponse response = null;
+
+                        if (guestLoginRequest.userName == null || guestLoginRequest.userName.Trim().Length == 0)
+                        {
+                            response = new GuestLoginResponse
+                            {
+                                isError = true,
+                                errorMessage = "missing user name",
+                            };
+                            var json = JsonSerializer.Serialize(response);
+                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                        }
+
+                        bool userExists = await db.Guests.AnyAsync(u => u.Name == guestLoginRequest.userName);
+                        if (userExists)
+                        {
+                            response = new GuestLoginResponse
+                            {
+                                isError = true,
+                                errorMessage = "guest user already exists",
+
+                            };
+                            var json = JsonSerializer.Serialize(response);
+                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                        }
+
+
+                        if (guestLoginRequest.deviceId == null || guestLoginRequest.deviceId.Trim().Length == 0)
+                        {
+                            response = new GuestLoginResponse
+                            {
+                                isError = true,
+                                errorMessage = "deviceId is empty",
+
+                            };
+                            var json = JsonSerializer.Serialize(response);
+                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
+
+                        }
+
+                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == guestLoginRequest.deviceId);
+                        if (device == null)
+                        {
+                            response = new GuestLoginResponse
+                            {
+                                isError = true,
+                                errorMessage = "nu such deviceId",
+
+                            };
+                            var json = JsonSerializer.Serialize(response);
+                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                        } 
+
+
+                        guest = await db.Guests.FirstOrDefaultAsync(g => g.Name == guestLoginRequest.userName);
+                        if (guest == null)
+                        {
+                            // Create new guest
+                            guest = new Guest
+                            {
+                                Name = guestLoginRequest.userName,
+                                DeviceId = device.Id,
+                            };
+                            await db.Guests.AddAsync(guest);
+                            await db.SaveChangesAsync();
+                            guest = await db.Guests.FirstOrDefaultAsync(g => g.Name == guestLoginRequest.userName);
+                            if (guest == null)
+                            {
+                                Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: can't create guest");
+                                response = new GuestLoginResponse
+                                {
+                                    isError = true,
+                                    errorMessage = "internal error - can't create guest",
+
+                                };
+                                var json = JsonSerializer.Serialize(response);
+                                return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                            }
+
+                        }
+
+                        var jwtsToDelete = db.JWTs.Where(t => t.GuestId == guest.Id);
+                        db.JWTs.RemoveRange(jwtsToDelete);
+
+                        var jwtStr = Token.GenerateJWT(guestLoginRequest.userName, device.Id, UserType.GuestUser);
+                        JWT jwt = new JWT
+                        {
+                            Token = jwtStr,
+                            GuestId = guest.Id,
+                            DeviceId = device.Id,
+                        };
+                        await db.JWTs.AddAsync(jwt);
+                        await db.SaveChangesAsync();
+
+                        transaction.Commit();
+
+                        response = new GuestLoginResponse
+                        {
+                            isError = false,
+                            errorMessage = null,
+                            jwt = jwtStr,
+                        };
+
                         return Results.Json(response);
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                        LoginResponse response = new LoginResponse
+                        {
+                            isError = true,
+                            errorMessage = "internal error",
+                        };
+                        var json = JsonSerializer.Serialize(response);
+                        return Results.Content(json, "application/json", Encoding.UTF8, 401);
                     }
                 }
             });
 
             group.MapPost("/register", async (RegisterRequest registerRequest, Db db) =>
             {
-                const string METHOD_NAME = "register";
+                const string METHOD_NAME = "user/register";
                 using (var transaction = db.Database.BeginTransaction())
                 {
                     try
@@ -246,30 +414,7 @@ namespace gaos.Routes
                                 return Results.Json(response);
                             }
 
-                        }
-
-                        DeviceType deviceType;
-                        if (registerRequest.deviceType == null || registerRequest.deviceType.Trim().Length == 0)
-                        {
-                            response = new RegisterResponse
-                            {
-                                isError = true,
-                                errorMessage = "deviceType is empty",
-
-                            };
-                            return Results.Json(response);
-
-                        }
-                        if (!Enum.TryParse(registerRequest.deviceType, out deviceType))
-                        {
-                            response = new RegisterResponse
-                            {
-                                isError = true,
-                                errorMessage = "unknown device type",
-
-                            };
-                            return Results.Json(response);
-                        }
+                        }  
 
                         if (registerRequest.deviceId == null || registerRequest.deviceId.Trim().Length == 0)
                         {
@@ -280,26 +425,21 @@ namespace gaos.Routes
 
                             };
                             return Results.Json(response);
-
                         }
 
                         Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == registerRequest.deviceId);
                         if (device == null)
                         {
-                            device = new Device
+                            response = new RegisterResponse
                             {
-                                Identification = registerRequest.deviceId,
-                                DeviceType = deviceType,
+                                isError = true,
+                                errorMessage = "nu such deviceId",
 
                             };
-                            db.Devices.Add(device);
-                            db.SaveChanges();
-                            // after persisting the device entity device.Id should by automatically set by the framework
-                        }
-                        int deviceId = device.Id;
+                            return Results.Json(response);
+                        } 
 
                         EncodedPassword encodedPassword = Password.getEncodedPassword(registerRequest.password);
-
 
                         User user = new User
                         {
@@ -312,8 +452,7 @@ namespace gaos.Routes
                         await db.Users.AddAsync(user);
                         await db.SaveChangesAsync();
 
-
-                        var jwtStr = Token.GenerateJWT(registerRequest.userName);
+                        var jwtStr = Token.GenerateJWT(registerRequest.userName, device.Id, UserType.RegisteredUser);
                         JWT jwt = new JWT
                         {
                             Token = jwtStr,
