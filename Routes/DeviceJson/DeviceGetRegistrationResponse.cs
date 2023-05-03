@@ -1,4 +1,5 @@
 
+using System.Data.Common;
 namespace gaos.Routes.DeviceJson
 {
     public class DeviceGetRegistrationByIdResponse
@@ -6,6 +7,8 @@ namespace gaos.Routes.DeviceJson
         public bool? isError { get; set; }
 
         public string? errorMessage { get; set; }
+
+        public bool? isFound { get; set; }
 
         public int? deviceId { get; set; }
         public string? identification { get; set; }

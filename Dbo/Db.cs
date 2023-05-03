@@ -13,6 +13,7 @@
         public DbSet<Guest> Guests => Set<Guest>();
         public DbSet<JWT> JWTs => Set<JWT>();
 
+        public DbSet<BuildVersion> BuildVersions => Set<BuildVersion>();
         public DbSet<Device> Devices => Set<Device>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

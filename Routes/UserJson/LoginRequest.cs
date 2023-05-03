@@ -10,6 +10,6 @@ namespace gaos.Routes.UserJson
 
         public string? password { get; set; }
 
-        public string? deviceId { get; set; }
+        public int? deviceId { get; set; }
     }
 }
