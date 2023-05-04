@@ -60,7 +60,7 @@ namespace gaos.Routes
 
                         }
 
-                        if (loginRequest.deviceId == null || loginRequest.deviceId.Trim().Length == 0)
+                        if (loginRequest.deviceId == null)
                         {
                             response = new LoginResponse
                             {
@@ -73,7 +73,7 @@ namespace gaos.Routes
 
                         }
 
-                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == loginRequest.deviceId);
+                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Id == loginRequest.deviceId);
                         if (device == null)
                         {
                             response = new LoginResponse
@@ -86,70 +86,6 @@ namespace gaos.Routes
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
                         } 
                         int deviceId = device.Id;
-
-
-                        /*
-                        PlatformType platformType;
-                        if (loginRequest.platformType == null || loginRequest.platformType.Trim().Length == 0)
-                        {
-                            response = new LoginResponse
-                            {
-                                isError = true,
-                                errorMessage = "platformType is empty",
-
-                            };
-                            return Results.Json(response);
-
-                        }
-                        if (!Enum.TryParse(loginRequest.platformType, out platformType))
-                        {
-                            response = new LoginResponse
-                            {
-                                isError = true,
-                                errorMessage = "unknown platform type",
-
-                            };
-                            return Results.Json(response);
-                        }
-
-                        if (loginRequest.deviceId == null || loginRequest.deviceId.Trim().Length == 0)
-                        {
-                            response = new LoginResponse
-                            {
-                                isError = true,
-                                errorMessage = "deviceId is empty",
-
-                            };
-                            return Results.Json(response);
-
-                        }
-
-                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == loginRequest.deviceId);
-                        if (device == null)
-                        {
-                            response = new LoginResponse
-                            {
-                                isError = true,
-                                errorMessage = "nu such deviceId",
-
-                            };
-                            return Results.Json(response);
-                        } else {
-                            if (device.PlatformType != platformType)
-                            {
-                                response = new LoginResponse
-                                {
-                                    isError = true,
-                                    errorMessage = "deviceId is already registered for another platform type",
-
-                                };
-                                return Results.Json(response);
-                            }
-
-                        }
-                        int deviceId = device.Id;
-                        */
-
 
                         if (!Password.verifyPassword(user.PasswordSalt, user.PasswordHash, loginRequest.password))
                         {
@@ -238,7 +174,7 @@ namespace gaos.Routes
                         }
 
 
-                        if (guestLoginRequest.deviceId == null || guestLoginRequest.deviceId.Trim().Length == 0)
+                        if (guestLoginRequest.deviceId == null)
                         {
                             response = new GuestLoginResponse
                             {
@@ -251,7 +187,7 @@ namespace gaos.Routes
 
                         }
 
-                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == guestLoginRequest.deviceId);
+                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Id == guestLoginRequest.deviceId);
                         if (device == null)
                         {
                             response = new GuestLoginResponse
@@ -416,7 +352,7 @@ namespace gaos.Routes
 
                         }  
 
-                        if (registerRequest.deviceId == null || registerRequest.deviceId.Trim().Length == 0)
+                        if (registerRequest.deviceId == null)
                         {
                             response = new RegisterResponse
                             {
@@ -427,7 +363,7 @@ namespace gaos.Routes
                             return Results.Json(response);
                         }
 
-                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == registerRequest.deviceId);
+                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Id == registerRequest.deviceId);
                         if (device == null)
                         {
                             response = new RegisterResponse

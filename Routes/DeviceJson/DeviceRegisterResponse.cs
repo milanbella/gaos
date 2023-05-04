@@ -1,7 +1,7 @@
 
 namespace gaos.Routes.DeviceJson
 {
-    public class DeviceGetRegistrationByIdResponse
+    public class DeviceRegisterResponse
     {
         public bool? isError { get; set; }
 

@@ -4,7 +4,8 @@ namespace gaos.Routes.DeviceJson
 
     public class DeviceGetRegistrationRequest
     {
-        public string? deviceId { get; set; }
+        public string? identification { get; set; }
+        public string? platformType { get; set; }
 
     }
 }
