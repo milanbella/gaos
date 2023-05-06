@@ -6,6 +6,7 @@ namespace gaos.Routes.UserJson
         public bool? isError { get; set; }
 
         public string? errorMessage { get; set; }
+        public string? userName { get; set; }
 
         public string? jwt { get; set; }
 

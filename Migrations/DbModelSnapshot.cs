@@ -19,23 +19,80 @@ namespace gaos.Migrations
                 .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("gaos.Dbo.BuildVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Version")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BuildVersions");
+                });
+
             modelBuilder.Entity("gaos.Dbo.Device", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("DeviceType")
+                    b.Property<int?>("BuildVersionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Identification")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<int?>("PlatformType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("datetime(6)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("BuildVersionId");
 
                     b.HasIndex("Identification");
 
                     b.ToTable("Devices");
+                });
+
+            modelBuilder.Entity("gaos.Dbo.Guest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DeviceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserSettingsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("UserSettingsId");
+
+                    b.ToTable("Guests");
+                });
+
+            modelBuilder.Entity("gaos.Dbo.GuestName", b =>
+                {
+                    b.Property<int>("Name")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("GuestNames");
                 });
 
             modelBuilder.Entity("gaos.Dbo.JWT", b =>
@@ -50,6 +107,9 @@ namespace gaos.Migrations
                     b.Property<int?>("DeviceId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("GuestId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Token")
                         .HasColumnType("longtext");
 
@@ -59,6 +119,8 @@ namespace gaos.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DeviceId");
+
+                    b.HasIndex("GuestId");
 
                     b.HasIndex("UserId");
 
@@ -151,12 +213,18 @@ namespace gaos.Migrations
                     b.Property<string>("PasswordSalt")
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("UserSettingsId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("UserSettingsId")
                         .IsUnique();
 
                     b.ToTable("Users");
@@ -185,12 +253,97 @@ namespace gaos.Migrations
                         });
                 });
 
+            modelBuilder.Entity("gaos.Dbo.UserSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("AchievementPoints")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Battery")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Biofuel")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Credits")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Hours")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Minutes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Planet0Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Plants")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Seconds")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ShowItemTypes")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Water")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Waterbottle")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserSettings");
+                });
+
+            modelBuilder.Entity("gaos.Dbo.Device", b =>
+                {
+                    b.HasOne("gaos.Dbo.BuildVersion", "BuildVersion")
+                        .WithMany()
+                        .HasForeignKey("BuildVersionId");
+
+                    b.Navigation("BuildVersion");
+                });
+
+            modelBuilder.Entity("gaos.Dbo.Guest", b =>
+                {
+                    b.HasOne("gaos.Dbo.Device", "Device")
+                        .WithMany()
+                        .HasForeignKey("DeviceId");
+
+                    b.HasOne("gaos.Dbo.UserSettings", "UserSettings")
+                        .WithMany()
+                        .HasForeignKey("UserSettingsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+
+                    b.Navigation("UserSettings");
+                });
+
             modelBuilder.Entity("gaos.Dbo.JWT", b =>
                 {
                     b.HasOne("gaos.Dbo.Device", "Device")
+                        .WithMany()
+                        .HasForeignKey("DeviceId");
+
+                    b.HasOne("gaos.Dbo.Guest", "Guest")
                         .WithMany("JWTs")
-                        .HasForeignKey("DeviceId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("GuestId");
 
                     b.HasOne("gaos.Dbo.User", "User")
                         .WithMany("JWTs")
@@ -199,10 +352,21 @@ namespace gaos.Migrations
 
                     b.Navigation("Device");
 
+                    b.Navigation("Guest");
+
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("gaos.Dbo.Device", b =>
+            modelBuilder.Entity("gaos.Dbo.User", b =>
+                {
+                    b.HasOne("gaos.Dbo.UserSettings", "UserSettings")
+                        .WithOne("User")
+                        .HasForeignKey("gaos.Dbo.User", "UserSettingsId");
+
+                    b.Navigation("UserSettings");
+                });
+
+            modelBuilder.Entity("gaos.Dbo.Guest", b =>
                 {
                     b.Navigation("JWTs");
                 });
@@ -210,6 +374,11 @@ namespace gaos.Migrations
             modelBuilder.Entity("gaos.Dbo.User", b =>
                 {
                     b.Navigation("JWTs");
+                });
+
+            modelBuilder.Entity("gaos.Dbo.UserSettings", b =>
+                {
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

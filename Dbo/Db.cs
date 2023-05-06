@@ -11,6 +11,7 @@
         public DbSet<Todo> Todos => Set<Todo>();
         public DbSet<User> Users => Set<User>();
         public DbSet<Guest> Guests => Set<Guest>();
+        public DbSet<GuestName> GuestNames => Set<GuestName>();
         public DbSet<JWT> JWTs => Set<JWT>();
 
         public DbSet<BuildVersion> BuildVersions => Set<BuildVersion>();
@@ -33,9 +34,8 @@
 
             // GuestJWT
 
-            modelBuilder.Entity<Guest>()
-                .HasIndex(g => new { g.DeviceId, g.JWTId })
-                .IsUnique();
+            modelBuilder.Entity<GuestName>()
+                .HasKey(gn => gn.Name);
 
             SeedAll.Seed(modelBuilder);
         }

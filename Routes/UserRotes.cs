@@ -99,7 +99,7 @@ namespace gaos.Routes
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
                         }
 
-                        var jwtsToDelete = db.JWTs.Where(t => t.UserId == user.Id);
+                        var jwtsToDelete = db.JWTs.Where(t => t.UserId == user.Id && t.DeviceId == deviceId);
                         db.JWTs.RemoveRange(jwtsToDelete);
 
                         var jwtStr = Token.GenerateJWT(loginRequest.userName, deviceId);
@@ -151,13 +151,7 @@ namespace gaos.Routes
 
                         if (guestLoginRequest.userName == null || guestLoginRequest.userName.Trim().Length == 0)
                         {
-                            response = new GuestLoginResponse
-                            {
-                                isError = true,
-                                errorMessage = "missing user name",
-                            };
-                            var json = JsonSerializer.Serialize(response);
-                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                            guestLoginRequest.userName = "guest_" + Guid.NewGuid().ToString();
                         }
 
                         bool userExists = await db.Guests.AnyAsync(u => u.Name == guestLoginRequest.userName);
@@ -247,6 +241,7 @@ namespace gaos.Routes
                         {
                             isError = false,
                             errorMessage = null,
+                            userName = guestLoginRequest.userName,
                             jwt = jwtStr,
                         };
 

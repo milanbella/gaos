@@ -7,7 +7,6 @@ namespace gaos.Dbo
 
         public string? Name { get; set; }
 
-        public int JWTId { get; set; }
         public JWT? JWT { get; set; }
         public int? DeviceId { get; set; }
         public Device? Device { get; set; }
