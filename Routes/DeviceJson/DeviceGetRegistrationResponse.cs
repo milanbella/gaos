@@ -2,7 +2,7 @@
 using System.Data.Common;
 namespace Gaos.Routes.DeviceJson
 {
-    public class DeviceGetRegistrationdResponse
+    public class DeviceGetRegistrationResponse
     {
         public bool? isError { get; set; }
 

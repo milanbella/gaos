@@ -125,10 +125,10 @@ namespace Gaos.Routes
                 const string METHOD_NAME = "device/getRegistartion";
                 try
                 {
-                    DeviceGetRegistrationdResponse response;
+                    DeviceGetRegistrationResponse response;
                     if (deviceGetRegistrationRequest.identification == null || deviceGetRegistrationRequest.identification.Trim().Length == 0)
                     {
-                        response = new DeviceGetRegistrationdResponse
+                        response = new DeviceGetRegistrationResponse
                         {
                             isError = true,
                             errorMessage = "deviceId is empty",
@@ -140,7 +140,7 @@ namespace Gaos.Routes
                     PlatformType platformType;
                     if (!Enum.TryParse(deviceGetRegistrationRequest.platformType, out platformType))
                     {
-                        response = new DeviceGetRegistrationdResponse
+                        response = new DeviceGetRegistrationResponse
                         {
                             isError = true,
                             errorMessage = "platformType is not found",
@@ -151,7 +151,7 @@ namespace Gaos.Routes
                     Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == deviceGetRegistrationRequest.identification && d.PlatformType == platformType);
                     if (device == null)
                     {
-                        response = new DeviceGetRegistrationdResponse
+                        response = new DeviceGetRegistrationResponse
                         {
                             isError = false,
                             isFound = false,
@@ -160,7 +160,7 @@ namespace Gaos.Routes
                     }
                     else
                     {
-                        response = new DeviceGetRegistrationdResponse
+                        response = new DeviceGetRegistrationResponse
                         {
                             isError = false,
                             isFound = true,
@@ -176,7 +176,7 @@ namespace Gaos.Routes
                 catch (Exception ex)
                 {
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
-                    DeviceGetRegistrationdResponse response = new DeviceGetRegistrationdResponse
+                    DeviceGetRegistrationResponse response = new DeviceGetRegistrationResponse
                     {
                         isError = true,
                         errorMessage = "internal error",
@@ -191,11 +191,11 @@ namespace Gaos.Routes
                 const string METHOD_NAME = "device/getRegistartion";
                 try
                 {
-                    DeviceGetRegistrationdResponse response;
+                    DeviceGetRegistrationResponse response;
 
                     if (deviceGetRegistrationByIdRequest.deviceId == null)
                     {
-                        response = new DeviceGetRegistrationdResponse
+                        response = new DeviceGetRegistrationResponse
                         {
                             isError = true,
                             errorMessage = "deviceId is empty",
@@ -207,7 +207,7 @@ namespace Gaos.Routes
                     Device device = await db.Devices.FirstOrDefaultAsync(d => d.Id == deviceGetRegistrationByIdRequest.deviceId);
                     if (device == null)
                     {
-                        response = new DeviceGetRegistrationdResponse
+                        response = new DeviceGetRegistrationResponse
                         {
                             isError = false,
                             isFound = false,
@@ -216,7 +216,7 @@ namespace Gaos.Routes
                     }
                     else
                     {
-                        response = new DeviceGetRegistrationdResponse
+                        response = new DeviceGetRegistrationResponse
                         {
                             isError = false,
                             isFound = true,
@@ -232,7 +232,7 @@ namespace Gaos.Routes
                 catch (Exception ex)
                 {
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
-                    DeviceGetRegistrationdResponse response = new DeviceGetRegistrationdResponse
+                    DeviceGetRegistrationResponse response = new DeviceGetRegistrationResponse
                     {
                         isError = true,
                         errorMessage = "internal error",
