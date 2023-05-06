@@ -1,6 +1,6 @@
-﻿using gaos.Dbo;
+﻿using Gaos.Dbo;
 
-namespace gaos.Routes.UserJson
+namespace Gaos.Routes.UserJson
 {
 
     public class RegisterRequest

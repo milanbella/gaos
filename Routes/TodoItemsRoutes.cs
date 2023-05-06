@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata.Ecma335;
-using gaos.Dbo;
+using Gaos.Dbo;
 
-namespace gaos.Routes
+namespace Gaos.Routes
 {
     public static class TodoItemsRoutes
     {

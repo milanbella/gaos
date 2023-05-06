@@ -1,8 +1,8 @@
-﻿namespace gaos.Dbo
+﻿namespace Gaos.Dbo
 {
     using Microsoft.EntityFrameworkCore;
     using System.Xml;
-    using gaos.Seed;
+    using Gaos.Seed;
 
     public class Db : DbContext
     {
@@ -35,7 +35,7 @@
             // GuestJWT
 
             modelBuilder.Entity<GuestName>()
-                .HasKey(gn => gn.Name);
+                .HasIndex(gn => gn.Name).IsUnique(true);
 
             SeedAll.Seed(modelBuilder);
         }

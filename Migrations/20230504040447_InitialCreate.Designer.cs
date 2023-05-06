@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using gaos.Dbo;
+using Gaos.Dbo;
 
 #nullable disable
 
-namespace gaos.Migrations
+namespace Gaos.Migrations
 {
     [DbContext(typeof(Db))]
     [Migration("20230504040447_InitialCreate")]

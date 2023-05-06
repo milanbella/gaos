@@ -1,5 +1,5 @@
 
-namespace gaos.Routes.DeviceJson
+namespace Gaos.Routes.DeviceJson
 {
 
     public class DeviceGetRegistrationRequest

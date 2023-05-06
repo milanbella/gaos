@@ -2,11 +2,11 @@
 using System.Text;
 using System.Text.Json;
 using Serilog;
-using gaos.Auth;
-using gaos.Dbo;
-using gaos.Routes.DeviceJson;
+using Gaos.Auth;
+using Gaos.Dbo;
+using Gaos.Routes.DeviceJson;
 
-namespace gaos.Routes
+namespace Gaos.Routes
 {
 
     public static class DeviceRoutes

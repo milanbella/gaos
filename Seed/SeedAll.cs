@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace gaos.Seed
+namespace Gaos.Seed
 {
     public class SeedAll
     {

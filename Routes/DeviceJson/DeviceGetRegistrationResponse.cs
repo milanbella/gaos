@@ -1,6 +1,6 @@
 
 using System.Data.Common;
-namespace gaos.Routes.DeviceJson
+namespace Gaos.Routes.DeviceJson
 {
     public class DeviceGetRegistrationdResponse
     {

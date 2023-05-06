@@ -1,6 +1,6 @@
-﻿using gaos.Auth;
+﻿using Gaos.Auth;
 
-namespace gaos.Routes.ApiJson
+namespace Gaos.Routes.ApiJson
 {
     public class TokenClaimsResponse
     {

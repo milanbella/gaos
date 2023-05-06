@@ -1,5 +1,5 @@
 
-namespace gaos.Routes.UserJson
+namespace Gaos.Routes.UserJson
 {
     public class GuestLoginResponse
     {

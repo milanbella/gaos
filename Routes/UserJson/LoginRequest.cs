@@ -1,5 +1,5 @@
 ﻿using System.Security.Cryptography;
-namespace gaos.Routes.UserJson
+namespace Gaos.Routes.UserJson
 {
 
     public class LoginRequest

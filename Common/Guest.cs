@@ -1,7 +1,7 @@
 using Serilog;
-using gaos.Dbo;
+using Gaos.Dbo;
 
-namespace gaos.Common
+namespace Gaos.Common
 {
     public class Guest
     {

@@ -1,4 +1,4 @@
-﻿namespace gaos.Auth
+﻿namespace Gaos.Auth
 {
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;

@@ -5,6 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0090:Use 'new(...)'", Justification = "<Pending>", Scope = "member", Target = "~M:gaos.Auth.RSAKeys.ReadPrivateKey(System.String,System.String)~System.Security.Cryptography.RSA")]
-[assembly: SuppressMessage("Style", "IDE0270:Use coalesce expression", Justification = "<Pending>", Scope = "member", Target = "~M:gaos.Auth.RSAKeys.ReadPrivateKey(System.String,System.String)~System.Security.Cryptography.RSA")]
-[assembly: SuppressMessage("Style", "IDE0270:Use coalesce expression", Justification = "<Pending>", Scope = "member", Target = "~M:gaos.Auth.RSAKeys.ReadPublicKey(System.String,System.String)~System.Security.Cryptography.RSA")]
+[assembly: SuppressMessage("Style", "IDE0090:Use 'new(...)'", Justification = "<Pending>", Scope = "member", Target = "~M:Gaos.Auth.RSAKeys.ReadPrivateKey(System.String,System.String)~System.Security.Cryptography.RSA")]
+[assembly: SuppressMessage("Style", "IDE0270:Use coalesce expression", Justification = "<Pending>", Scope = "member", Target = "~M:Gaos.Auth.RSAKeys.ReadPrivateKey(System.String,System.String)~System.Security.Cryptography.RSA")]
+[assembly: SuppressMessage("Style", "IDE0270:Use coalesce expression", Justification = "<Pending>", Scope = "member", Target = "~M:Gaos.Auth.RSAKeys.ReadPublicKey(System.String,System.String)~System.Security.Cryptography.RSA")]

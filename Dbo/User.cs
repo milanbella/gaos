@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using System.ComponentModel.DataAnnotations;
 
-namespace gaos.Dbo
+namespace Gaos.Dbo
 {
     public class User
     {

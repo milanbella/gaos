@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace gaos.Routes.UserJson
+namespace Gaos.Routes.UserJson
 {
     public class RegisterResponse
     {

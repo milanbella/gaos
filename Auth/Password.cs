@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.CompilerServices;
 
-namespace gaos.Auth
+namespace Gaos.Auth
 {
     public class EncodedPassword
     {

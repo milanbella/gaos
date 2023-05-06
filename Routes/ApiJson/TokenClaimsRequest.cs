@@ -1,4 +1,4 @@
-﻿namespace gaos.Routes.ApiJson
+﻿namespace Gaos.Routes.ApiJson
 {
     public class TokenClaimsRequest
     {

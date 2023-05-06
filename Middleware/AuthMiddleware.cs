@@ -1,7 +1,7 @@
 ﻿using Serilog;
-using gaos.Auth;
+using Gaos.Auth;
 
-namespace gaos.Middleware
+namespace Gaos.Middleware
 {
     public class AuthMiddleware
     {

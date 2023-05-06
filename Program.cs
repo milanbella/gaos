@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using gaos.Dbo;
-using gaos.Routes;
+using Gaos.Dbo;
+using Gaos.Routes;
 using Serilog;
-using gaos.Middleware;
+using Gaos.Middleware;
 
 var dbConnectionString = "server=localhost;user=root;password=root;database=gaos";
 var dbServerVersion = new MariaDbServerVersion(new Version(10, 7));
@@ -25,10 +25,10 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-builder.Services.AddSingleton<gaos.Common.Guest>(provider => {
+builder.Services.AddSingleton<Gaos.Common.Guest>(provider => {
     Db db = provider.GetService<Db>();
     string guestNamesFilePath = "py/guest_names.txt";
-    return new gaos.Common.Guest(db, guestNamesFilePath);
+    return new Gaos.Common.Guest(db, guestNamesFilePath);
 }); 
 
 

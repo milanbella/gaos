@@ -2,11 +2,11 @@
 using System.Text;
 using System.Text.Json;
 using Serilog;
-using gaos.Auth;
-using gaos.Dbo;
-using gaos.Routes.UserJson;
+using Gaos.Auth;
+using Gaos.Dbo;
+using Gaos.Routes.UserJson;
 
-namespace gaos.Routes
+namespace Gaos.Routes
 {
 
     public static class UserRoutes
@@ -138,7 +138,7 @@ namespace gaos.Routes
                 }
             });
 
-            group.MapPost("/guestLogin", async (GuestLoginRequest guestLoginRequest, Db db) =>
+            group.MapPost("/guestLogin", async (GuestLoginRequest guestLoginRequest, Db db, Gaos.Common.Guest commonGuest) =>
             {
                 const string METHOD_NAME = "user/guestLogin";
 
@@ -148,10 +148,11 @@ namespace gaos.Routes
                     { 
                         Guest guest = null;
                         GuestLoginResponse response = null;
+                        string guestName = guestLoginRequest.userName;
 
-                        if (guestLoginRequest.userName == null || guestLoginRequest.userName.Trim().Length == 0)
+                        if (guestName == null || guestName.Trim().Length == 0)
                         {
-                            guestLoginRequest.userName = "guest_" + Guid.NewGuid().ToString();
+                            guestLoginRequest.userName = commonGuest.GenerateGuestName();
                         }
 
                         bool userExists = await db.Guests.AnyAsync(u => u.Name == guestLoginRequest.userName);

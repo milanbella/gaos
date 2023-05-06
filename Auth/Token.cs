@@ -2,7 +2,7 @@
 using Jose;
 using Serilog;
 
-namespace gaos.Auth
+namespace Gaos.Auth
 {
     public enum UserType
     {

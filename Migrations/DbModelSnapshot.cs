@@ -3,11 +3,11 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using gaos.Dbo;
+using Gaos.Dbo;
 
 #nullable disable
 
-namespace gaos.Migrations
+namespace Gaos.Migrations
 {
     [DbContext(typeof(Db))]
     partial class DbModelSnapshot : ModelSnapshot

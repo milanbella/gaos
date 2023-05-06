@@ -1,5 +1,5 @@
 
-namespace gaos.Dbo
+namespace Gaos.Dbo
 {
     public class Guest
     { 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace gaos.Migrations
+namespace Gaos.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

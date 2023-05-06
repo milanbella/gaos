@@ -2,14 +2,14 @@
 using System.Text;
 using System.Text.Json;
 using Serilog;
-using gaos.Auth;
-using gaos.Dbo;
-using gaos.Routes.UserJson;
-using gaos.Middleware;
-using gaos.Routes.ApiJson;
+using Gaos.Auth;
+using Gaos.Dbo;
+using Gaos.Routes.UserJson;
+using Gaos.Middleware;
+using Gaos.Routes.ApiJson;
 using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
 
-namespace gaos.Routes
+namespace Gaos.Routes
 {
 
     public static class ApiRoutes
