@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#pragma warning disable 8600, 8602 // Disable null check warnings for fields that are initialized in the constructor
+
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.Json;
 using Serilog;

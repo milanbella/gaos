@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#pragma warning disable 8600, 8602, 8604
+
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.Json;
 using Serilog;
@@ -71,27 +73,21 @@ namespace Gaos.Routes
                         }
 
                         Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == deviceRegisterRequest.identification && d.PlatformType == platformType);
-                        if (device == null)
+                        if (device != null)
                         {
-                            device = new Device
-                            {
-                                Identification = deviceRegisterRequest.identification,
-                                PlatformType = platformType,
-                                BuildVersionId = buildVersion.Id,
-                            };
-                            db.Devices.Add(device);
+                            // Delete device from database
+                            db.Devices.Remove(device);
                             await db.SaveChangesAsync();
                         }
-                        else
+
+                        device = new Device
                         {
-                            // Device is already registered
-                            response = new DeviceRegisterResponse
-                            {
-                                isError = true,
-                                errorMessage = "device is already registered",
-                            };
-                            return Results.Json(response);
-                        }
+                            Identification = deviceRegisterRequest.identification,
+                            PlatformType = platformType,
+                            BuildVersionId = buildVersion.Id,
+                        };
+                        db.Devices.Add(device);
+                        await db.SaveChangesAsync();
 
                         transaction.Commit();
 
@@ -193,7 +189,7 @@ namespace Gaos.Routes
                 {
                     DeviceGetRegistrationResponse response;
 
-                    if (deviceGetRegistrationByIdRequest.deviceId == null)
+                    if (deviceGetRegistrationByIdRequest.deviceId == 0)
                     {
                         response = new DeviceGetRegistrationResponse
                         {

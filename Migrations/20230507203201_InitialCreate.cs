@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Gaos.Migrations
+namespace gaos.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -36,12 +36,14 @@ namespace Gaos.Migrations
                 name: "GuestNames",
                 columns: table => new
                 {
-                    Name = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GuestNames", x => x.Name);
+                    table.PrimaryKey("PK_GuestNames", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -242,6 +244,12 @@ namespace Gaos.Migrations
                 column: "Identification");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GuestNames_Name",
+                table: "GuestNames",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Guests_DeviceId",
                 table: "Guests",
                 column: "DeviceId");
@@ -259,7 +267,8 @@ namespace Gaos.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_JWTs_GuestId",
                 table: "JWTs",
-                column: "GuestId");
+                column: "GuestId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_JWTs_UserId",

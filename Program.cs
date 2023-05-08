@@ -1,3 +1,5 @@
+#pragma warning disable 8600, 8602, 8604
+
 using Microsoft.EntityFrameworkCore;
 using Gaos.Dbo;
 using Gaos.Routes;

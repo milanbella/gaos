@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#pragma warning disable 8600, 8602, 8604
+
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.Json;
 using Serilog;

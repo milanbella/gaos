@@ -1,4 +1,6 @@
-﻿namespace Gaos.Auth
+﻿#pragma warning disable 8600, 8602 // Disable null check warnings for fields that are initialized in the constructor
+
+namespace Gaos.Auth
 {
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;

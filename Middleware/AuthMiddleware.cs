@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿#pragma warning disable 8600, 8602 // Disable null check warnings for fields that are initialized in the constructor
+
+using Serilog;
 using Gaos.Auth;
 
 namespace Gaos.Middleware
