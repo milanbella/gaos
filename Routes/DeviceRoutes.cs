@@ -22,96 +22,79 @@ namespace Gaos.Routes
             group.MapPost("/register", async (DeviceRegisterRequest deviceRegisterRequest, Db db) =>
             {
                 const string METHOD_NAME = "device/register";
-                using (var transaction = db.Database.BeginTransaction())
+                try
                 {
-                    try
+                    DeviceRegisterResponse response;
+
+                    if (deviceRegisterRequest.identification == null || deviceRegisterRequest.identification.Trim().Length == 0)
                     {
-                        DeviceRegisterResponse response;
-
-                        if (deviceRegisterRequest.identification == null || deviceRegisterRequest.identification.Trim().Length == 0)
+                        response = new DeviceRegisterResponse
                         {
-                            response = new DeviceRegisterResponse
-                            {
-                                isError = true,
-                                errorMessage = "identification is empty",
+                            isError = true,
+                            errorMessage = "identification is empty",
 
-                            };
-                            return Results.Json(response);
-                        }
+                        };
+                        return Results.Json(response);
+                    }
 
-                        PlatformType platformType;
-                        if (!Enum.TryParse(deviceRegisterRequest.platformType, out platformType))
+                    string platformType = deviceRegisterRequest.platformType;
+
+                    if (deviceRegisterRequest.buildVersion == null || deviceRegisterRequest.buildVersion.Trim().Length == 0)
+                    {
+                        response = new DeviceRegisterResponse
                         {
-                            response = new DeviceRegisterResponse
-                            {
-                                isError = true,
-                                errorMessage = "platformType is not found",
-                            };
-                            return Results.Json(response);
-                        }
+                            isError = true,
+                            errorMessage = "buildVersion is empty",
 
-                        if (deviceRegisterRequest.buildVersion == null || deviceRegisterRequest.buildVersion.Trim().Length == 0)
-                        {
-                            response = new DeviceRegisterResponse
-                            {
-                                isError = true,
-                                errorMessage = "buildVersion is empty",
+                        };
+                        return Results.Json(response);
+                    }
 
-                            };
-                            return Results.Json(response);
-                        }
 
-                        BuildVersion buildVersion = await db.BuildVersions.FirstOrDefaultAsync(b => b.Version == deviceRegisterRequest.buildVersion);
-                        if (buildVersion == null)
-                        {
-                            response = new DeviceRegisterResponse
-                            {
-                                isError = true,
-                                errorMessage = "buildVersion is not found",
-                            };
-                            return Results.Json(response);
-                        }
+                    BuildVersion buildVersion = await db.BuildVersions.FirstOrDefaultAsync(b => b.Version == deviceRegisterRequest.buildVersion);
+                    Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == deviceRegisterRequest.identification && d.PlatformType == platformType);
 
-                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == deviceRegisterRequest.identification && d.PlatformType == platformType);
-                        if (device != null)
-                        {
-                            // Delete device from database
-                            db.Devices.Remove(device);
-                            await db.SaveChangesAsync();
-                        }
-
+                    if (device == null)
+                    {
                         device = new Device
                         {
                             Identification = deviceRegisterRequest.identification,
                             PlatformType = platformType,
-                            BuildVersionId = buildVersion.Id,
+                            BuildVersionId = (buildVersion != null) ? buildVersion.Id : null,
+                            BuildVersionReported = deviceRegisterRequest.buildVersion
                         };
                         db.Devices.Add(device);
                         await db.SaveChangesAsync();
 
-                        transaction.Commit();
+                    } else {
+                        device.Identification = deviceRegisterRequest.identification;
+                        device.PlatformType = platformType;
+                        device.BuildVersionId = (buildVersion != null) ? buildVersion.Id : null;
+                        device.BuildVersionReported = deviceRegisterRequest.buildVersion;
 
-                        response = new DeviceRegisterResponse
-                        {
-                            isError = false,
-                            deviceId = device.Id,
-                            identification = device.Identification,
-                            platformType = device.PlatformType.ToString(),
-                            buildVersion = device.BuildVersion.Version,
-                        };
-                        return Results.Json(response);
+                        await db.SaveChangesAsync();
                     }
-                    catch (Exception ex)
+
+
+                    response = new DeviceRegisterResponse
                     {
-                        transaction.Rollback();
-                        Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
-                        DeviceRegisterResponse response = new DeviceRegisterResponse
-                        {
-                            isError = true,
-                            errorMessage = "internal error",
-                        };
-                        return Results.Json(response);
-                    }
+                        isError = false,
+                        deviceId = device.Id,
+                        identification = device.Identification,
+                        platformType = device.PlatformType.ToString(),
+                        buildVersion = ( buildVersion != null ) ? buildVersion.Version : "unknown",
+                    };
+                    return Results.Json(response);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    DeviceRegisterResponse response = new DeviceRegisterResponse
+                    {
+                        isError = true,
+                        errorMessage = "internal error",
+                    };
+                    return Results.Json(response);
                 }
 
             });
@@ -133,16 +116,7 @@ namespace Gaos.Routes
                         return Results.Json(response);
                     }
 
-                    PlatformType platformType;
-                    if (!Enum.TryParse(deviceGetRegistrationRequest.platformType, out platformType))
-                    {
-                        response = new DeviceGetRegistrationResponse
-                        {
-                            isError = true,
-                            errorMessage = "platformType is not found",
-                        };
-                        return Results.Json(response);
-                    }
+                    string platformType = deviceGetRegistrationRequest.platformType;
 
                     Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == deviceGetRegistrationRequest.identification && d.PlatformType == platformType);
                     if (device == null)

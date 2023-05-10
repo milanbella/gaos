@@ -1,5 +1,6 @@
 ﻿namespace Gaos.Dbo
 {
+    /*
     public enum PlatformType
     {
         WebGL,
@@ -7,16 +8,21 @@
         Android,
         IOS
     }
+    */
+
 
     public class Device
     { 
         public int Id { get; set; }
         public string? Identification { get; set; }
         
-        public PlatformType? PlatformType { get; set; }
+        public string? PlatformType { get; set; }
 
         public int? BuildVersionId { get; set; }
         public BuildVersion? BuildVersion { get; set; }
+
+        public string? BuildVersionReported { get; set; }
+
         public DateTime RegisteredAt { get; set; }
     }
 }

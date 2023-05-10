@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace gaos.Migrations
 {
     [DbContext(typeof(Db))]
-    [Migration("20230507203201_InitialCreate")]
+    [Migration("20230510050431_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -45,11 +45,14 @@ namespace gaos.Migrations
                     b.Property<int?>("BuildVersionId")
                         .HasColumnType("int");
 
+                    b.Property<string>("BuildVersionReported")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Identification")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int?>("PlatformType")
-                        .HasColumnType("int");
+                    b.Property<string>("PlatformType")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("RegisteredAt")
                         .HasColumnType("datetime(6)");
