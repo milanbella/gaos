@@ -27,7 +27,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-builder.Services.AddSingleton<Gaos.Common.Guest>(provider => {
+builder.Services.AddScoped<Gaos.Common.Guest>(provider => {
     Db db = provider.GetService<Db>();
     string guestNamesFilePath = "py/guest_names.txt";
     return new Gaos.Common.Guest(db, guestNamesFilePath);

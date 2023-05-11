@@ -151,6 +151,7 @@ namespace Gaos.Routes
                         Guest guest = null;
                         GuestLoginResponse response = null;
                         string guestName = guestLoginRequest.userName;
+                        string json;
 
                         if (guestName == null || guestName.Trim().Length == 0)
                         {
@@ -166,37 +167,41 @@ namespace Gaos.Routes
                                 errorMessage = "guest user already exists",
 
                             };
-                            var json = JsonSerializer.Serialize(response);
+                            json = JsonSerializer.Serialize(response);
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
                         }
+
+                        Device device;
 
 
                         if (guestLoginRequest.deviceId == null)
                         {
+
                             response = new GuestLoginResponse
                             {
                                 isError = true,
-                                errorMessage = "deviceId is empty",
+                                errorMessage = "deviceId is missing",
 
                             };
-                            var json = JsonSerializer.Serialize(response);
+                            json = JsonSerializer.Serialize(response);
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
 
-                        }
-
-                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Id == guestLoginRequest.deviceId);
-                        if (device == null)
-                        {
-                            response = new GuestLoginResponse
-                            {
-                                isError = true,
-                                errorMessage = "nu such deviceId",
-
-                            };
-                            var json = JsonSerializer.Serialize(response);
-                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
                         } 
+                        else 
+                        {
+                            device = await db.Devices.FirstOrDefaultAsync(d => d.Id == guestLoginRequest.deviceId);
+                            if (device == null)
+                            {
+                                response = new GuestLoginResponse
+                                {
+                                    isError = true,
+                                    errorMessage = "no such device",
 
+                                };
+                                json = JsonSerializer.Serialize(response);
+                                return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                            } 
+                        }
 
                         guest = await db.Guests.FirstOrDefaultAsync(g => g.Name == guestLoginRequest.userName);
                         if (guest == null)
@@ -219,7 +224,7 @@ namespace Gaos.Routes
                                     errorMessage = "internal error - can't create guest",
 
                                 };
-                                var json = JsonSerializer.Serialize(response);
+                                json = JsonSerializer.Serialize(response);
                                 return Results.Content(json, "application/json", Encoding.UTF8, 401);
                             }
 
