@@ -158,7 +158,7 @@ namespace gaos.Migrations
                     Name = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DeviceId = table.Column<int>(type: "int", nullable: true),
-                    UserSettingsId = table.Column<int>(type: "int", nullable: false)
+                    UserSettingsId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -172,8 +172,7 @@ namespace gaos.Migrations
                         name: "FK_Guests_UserSettings_UserSettingsId",
                         column: x => x.UserSettingsId,
                         principalTable: "UserSettings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 

@@ -11,7 +11,7 @@ namespace Gaos.Dbo
         public int? DeviceId { get; set; }
         public Device? Device { get; set; }
 
-        public int UserSettingsId { get; set; }
+        public int? UserSettingsId { get; set; }
         public UserSettings? UserSettings { get; set; }
     }
 }

@@ -25,8 +25,12 @@
             modelBuilder.Entity<User>()
                 .HasIndex(e => e.Email).IsUnique(true);
             modelBuilder.Entity<User>()
-                .HasMany(u => u.JWTs)
+                .HasMany(e => e.JWTs)
                 .WithOne(jwt => jwt.User).OnDelete(DeleteBehavior.Cascade);
+
+            // Guest
+            modelBuilder.Entity<Guest>()
+                .Property(e => e.UserSettingsId).IsRequired(false);
             
             // Device
             modelBuilder.Entity<Device>()
@@ -35,7 +39,7 @@
             // GuestJWT
 
             modelBuilder.Entity<GuestName>()
-                .HasIndex(gn => gn.Name).IsUnique(true);
+                .HasIndex(e => e.Name).IsUnique(true);
 
             SeedAll.Seed(modelBuilder);
         }

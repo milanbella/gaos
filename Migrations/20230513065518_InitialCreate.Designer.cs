@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace gaos.Migrations
 {
     [DbContext(typeof(Db))]
-    [Migration("20230510050431_InitialCreate")]
+    [Migration("20230513065518_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -78,7 +78,7 @@ namespace gaos.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("UserSettingsId")
+                    b.Property<int?>("UserSettingsId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -339,9 +339,7 @@ namespace gaos.Migrations
 
                     b.HasOne("Gaos.Dbo.UserSettings", "UserSettings")
                         .WithMany()
-                        .HasForeignKey("UserSettingsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserSettingsId");
 
                     b.Navigation("Device");
 
