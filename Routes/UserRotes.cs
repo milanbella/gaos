@@ -19,7 +19,7 @@ namespace Gaos.Routes
         {
             group.MapGet("/hello", (Db db) => "hello");
 
-            group.MapPost("/login", async (LoginRequest loginRequest, Db db) =>
+            group.MapPost("/login", async (LoginRequest loginRequest, Db db, Token tokenService) =>
             {
                 const string METHOD_NAME = "user/login";
 
@@ -101,18 +101,7 @@ namespace Gaos.Routes
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
                         }
 
-                        var jwtsToDelete = db.JWTs.Where(t => t.UserId == user.Id && t.DeviceId == deviceId);
-                        db.JWTs.RemoveRange(jwtsToDelete);
-
-                        var jwtStr = Token.GenerateJWT(loginRequest.userName, deviceId);
-                        JWT jwt = new JWT
-                        {
-                            Token = jwtStr,
-                            UserId = user.Id,
-                            DeviceId = device.Id
-                        };
-                        await db.JWTs.AddAsync(jwt);
-                        await db.SaveChangesAsync();
+                        var jwtStr = tokenService.GenerateJWT(loginRequest.userName, user.Id, deviceId);
 
                         transaction.Commit();
 
@@ -140,7 +129,7 @@ namespace Gaos.Routes
                 }
             });
 
-            group.MapPost("/guestLogin", async (GuestLoginRequest guestLoginRequest, Db db, Gaos.Common.Guest commonGuest) =>
+            group.MapPost("/guestLogin", async (GuestLoginRequest guestLoginRequest, Db db, Gaos.Common.Guest commonGuest, Token tokenService) =>
             {
                 const string METHOD_NAME = "user/guestLogin";
 
@@ -230,18 +219,7 @@ namespace Gaos.Routes
 
                         }
 
-                        var jwtsToDelete = db.JWTs.Where(t => t.GuestId == guest.Id);
-                        db.JWTs.RemoveRange(jwtsToDelete);
-
-                        var jwtStr = Token.GenerateJWT(guestLoginRequest.userName, device.Id, UserType.GuestUser);
-                        JWT jwt = new JWT
-                        {
-                            Token = jwtStr,
-                            GuestId = guest.Id,
-                            DeviceId = device.Id,
-                        };
-                        await db.JWTs.AddAsync(jwt);
-                        await db.SaveChangesAsync();
+                        var jwtStr = tokenService.GenerateJWT(guestLoginRequest.userName, guest.Id, device.Id, UserType.GuestUser);
 
                         transaction.Commit();
 
@@ -270,7 +248,7 @@ namespace Gaos.Routes
                 }
             });
 
-            group.MapPost("/register", async (RegisterRequest registerRequest, Db db) =>
+            group.MapPost("/register", async (RegisterRequest registerRequest, Db db, Token tokenService) =>
             {
                 const string METHOD_NAME = "user/register";
                 using (var transaction = db.Database.BeginTransaction())
@@ -341,7 +319,7 @@ namespace Gaos.Routes
 
                         }
 
-                        if (registerRequest.passwordVerify != null)
+                        if (registerRequest.passwordVerify != null && registerRequest.passwordVerify.Trim().Length > 0)
                         {
                             if (!string.Equals(registerRequest.password, registerRequest.passwordVerify))
                             {
@@ -391,15 +369,7 @@ namespace Gaos.Routes
                         await db.Users.AddAsync(user);
                         await db.SaveChangesAsync();
 
-                        var jwtStr = Token.GenerateJWT(registerRequest.userName, device.Id, UserType.RegisteredUser);
-                        JWT jwt = new JWT
-                        {
-                            Token = jwtStr,
-                            UserId = user.Id,
-                            DeviceId = device.Id,
-                        };
-                        await db.JWTs.AddAsync(jwt);
-                        await db.SaveChangesAsync();
+                        var jwtStr = tokenService.GenerateJWT(registerRequest.userName, user.Id, device.Id, UserType.RegisteredUser);
 
                         transaction.Commit();
 
