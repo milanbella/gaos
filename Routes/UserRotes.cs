@@ -35,7 +35,7 @@ namespace Gaos.Routes
                             response = new LoginResponse
                             {
                                 isError = true,
-                                errorMessage = "missing user name (you may use also email in place of user name)",
+                                errorMessage = "missing user name (you may use also email instead of user name)",
                             };
                             var json = JsonSerializer.Serialize(response);
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
@@ -53,7 +53,7 @@ namespace Gaos.Routes
                                 response = new LoginResponse
                                 {
                                     isError = true,
-                                    errorMessage = "incorrect user name (you may use also email in place of user name)",
+                                    errorMessage = "incorrect user name (you may use also email instead of user name)",
 
                                 };
                                 var json = JsonSerializer.Serialize(response);
