@@ -1,4 +1,4 @@
-﻿# database
+﻿# Database
 
 See [https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli] (https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli)
 See [https://learn.microsoft.com/en-us/ef/core/cli/dotnet] (https://learn.microsoft.com/en-us/ef/core/cli/dotnet)
@@ -15,6 +15,12 @@ See [https://learn.microsoft.com/en-us/ef/core/cli/dotnet] (https://learn.micros
 > rm -r Migrations
 > dotnet ef migrations add InitialCreate
 > dotnet ef database update
+```
+
+# Run
+
+```
+> dotnet run --launch-profile https
 ```
 
 
