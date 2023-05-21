@@ -5,12 +5,40 @@ using Gaos.Dbo;
 using Gaos.Routes;
 using Serilog;
 using Gaos.Middleware;
+using System.Diagnostics;
 
-var dbConnectionString = "server=localhost;user=root;password=root;database=gaos";
-var dbServerVersion = new MariaDbServerVersion(new Version(10, 7));
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+//builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddEnvironmentVariables();
+
+
+if (builder.Configuration["db_connection_string"] == null)
+{
+    throw new Exception("missing configuration value: db_connection_string");
+
+}
+var dbConnectionString = builder.Configuration.GetValue<string>("db_connection_string");
+
+if (builder.Configuration["db_major_version"] == null)
+{
+    throw new Exception("missing configuration value: db_major_version");
+}
+var dbMajorVersion = builder.Configuration.GetValue<int>("db_major_version");
+
+if (builder.Configuration["db_minor_version"] == null)
+{
+    throw new Exception("missing configuration value: db_minor_version");
+}
+var dbMinorVersion = builder.Configuration.GetValue<int>("db_minor_version");
+
+
+var dbServerVersion = new MariaDbServerVersion(new Version(dbMajorVersion, dbMinorVersion));
+
 
 builder.Services.AddDbContext<Db>(opt => 
     opt.UseMySql(dbConnectionString, dbServerVersion)
@@ -46,7 +74,10 @@ var app = builder.Build();
 app.UseMiddleware<AuthMiddleware>();
 
 
-app.Map("/", () => Results.Ok("hello!"));
+app.Map("/", (IConfiguration configuration) => {
+    Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ cp 200: db_connection_string:  {configuration["db_connection_string"]}");
+    return Results.Ok("hello!");
+});
 app.MapGroup("/todoitems").GroupTodosItems();
 app.MapGroup("/user").GroupUser();
 app.MapGroup("/device").GroupDevice();
