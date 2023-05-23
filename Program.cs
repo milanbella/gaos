@@ -55,9 +55,14 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
+if (builder.Configuration["guest_names_file_path"] == null)
+{
+    throw new Exception("missing configuration value: guest_names_file_path");
+}
+string guestNamesFilePath = builder.Configuration.GetValue<string>("guest_names_file_path");
+
 builder.Services.AddScoped<Gaos.Common.Guest>(provider => {
     Db db = provider.GetService<Db>();
-    string guestNamesFilePath = "py/guest_names.txt";
     return new Gaos.Common.Guest(db, guestNamesFilePath);
 }); 
 
