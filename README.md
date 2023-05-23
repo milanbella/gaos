@@ -3,13 +3,13 @@
 See [https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli] (https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli)
 See [https://learn.microsoft.com/en-us/ef/core/cli/dotnet] (https://learn.microsoft.com/en-us/ef/core/cli/dotnet)
 
-## drop existing database
+## Drop Existing Database
 
 ```
 > dotnet ef database drop
 ```
 
-## migrate database
+## Migrate Database
 
 ```
 > rm -r Migrations
@@ -23,4 +23,17 @@ See [https://learn.microsoft.com/en-us/ef/core/cli/dotnet] (https://learn.micros
 > dotnet run --launch-profile https
 ```
 
+or
+
+```
+$Env:ASPNETCORE_ENVIRONMENT = "Development"
+dotnet run --no-launch-profile --urls="https://localhost:7070"
+```
+
+
+# Build Release
+
+```
+> dotnet publish --configuration Release
+```
 
