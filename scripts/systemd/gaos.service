@@ -2,8 +2,8 @@
 Description=MyService Description
 
 [Service]
-WorkingDirectory=/path/to/app/
-ExecStart=/usr/bin/dotnet /opt/gaos/publish/gaos.dll
+WorkingDirectory=/opt/gaos/bin/Release/net7.0/publish
+ExecStart=/usr/bin/dotnet /opt/gaos/bin/Release/net7.0/publish/gaos.dll
 Restart=always
 # Restart service after 10 seconds if the dotnet service crashes:
 RestartSec=10

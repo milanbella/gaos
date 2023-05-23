@@ -35,5 +35,6 @@ dotnet run --no-launch-profile --urls="https://localhost:7070"
 
 ```
 > dotnet publish --configuration Release
+> chown -R gaos:gaos /opt/gaos/bin/Release/net7.0/publish
 ```
 
