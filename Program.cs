@@ -66,11 +66,10 @@ builder.Services.AddScoped<Gaos.Common.Guest>(provider => {
     return new Gaos.Common.Guest(db, guestNamesFilePath);
 }); 
 
+
 builder.Services.AddScoped<Gaos.Auth.Token>(provider => {
     Db db = provider.GetService<Db>();
-    string pkcs12KeyStoreFilePath = "/w1/gaos/scripts/out/key_store.pfx";
-    string keyStorePassword = "changeit";
-    return new Gaos.Auth.Token(pkcs12KeyStoreFilePath, keyStorePassword, db);
+    return new Gaos.Auth.Token(builder.Configuration,  db);
 }); 
 
 

@@ -1,4 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿#pragma warning disable 8600, 8602, 8603 
+
+using System.Security.Cryptography;
 using Jose;
 using Serilog;
 using Gaos.Dbo;
@@ -27,14 +29,36 @@ namespace Gaos.Auth
 
         private static RSA? privateKey = null;
         private static RSA? publicKey = null;
-        private static string pkcs12KeyStoreFilePath = "/w1/gaos/scripts/out/key_store.pfx";
-        private static string keyStorePassword = "changeit";
+        private IConfiguration Configuration;
 
         private Db db;
 
-        public Token(string pkcs12KeyStoreFilePath, string keyStorePassword, Db db)
+        public Token(IConfiguration configuration, Db db)
         {
+            this.Configuration = configuration;
             this.db = db;
+        }
+
+        private string GetPkcs12KeyStoreFilePath()
+        {
+            if (Configuration["pkcs12_key_store_file_path"] == null)
+            {
+                throw new Exception("missing configuration value: pkcs12_key_store_file_path");
+            }
+            string pkcs12KeyStoreFilePath = Configuration.GetValue<string>("pkcs12_key_store_file_path");
+            return pkcs12KeyStoreFilePath;   
+
+        }
+
+        private string GetKeyStorePassword()
+        {
+            if (Configuration["key_store_password"] == null)
+            {
+                throw new Exception("missing configuration value: key_store_password");
+            }
+            string keyStorePassword = Configuration.GetValue<string>("key_store_password");
+            return keyStorePassword; 
+
         }
 
         private string GenerateJWT(RSA privateKey, string username, int deviceId, UserType userType = UserType.RegisteredUser)
@@ -65,7 +89,7 @@ namespace Gaos.Auth
             db.SaveChanges();
 
             if (privateKey == null) { 
-                privateKey = RSAKeys.ReadPrivateKey(pkcs12KeyStoreFilePath, keyStorePassword);
+                privateKey = RSAKeys.ReadPrivateKey(GetPkcs12KeyStoreFilePath(), GetKeyStorePassword());
                 jwtStr = GenerateJWT(privateKey, username, deviceId, userType);
             } 
             else
@@ -105,14 +129,14 @@ namespace Gaos.Auth
             return jwtStr;
         }
 
-        public static TokenClaims? GetClaimsFormJWT(string jwt)
+        public TokenClaims? GetClaimsFormJWT(string jwt)
         {
             const string METHOD_NAME = "GetClaimsFormJWT()";
             try
             {
                 if (publicKey == null)
                 {
-                    publicKey = RSAKeys.ReadPublicKey(pkcs12KeyStoreFilePath, keyStorePassword);
+                    publicKey = RSAKeys.ReadPublicKey(GetPkcs12KeyStoreFilePath(), GetKeyStorePassword());
 
                 }
 

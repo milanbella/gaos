@@ -1,4 +1,4 @@
-﻿#pragma warning disable 8600, 8602 // Disable null check warnings for fields that are initialized in the constructor
+﻿#pragma warning disable 8600, 8602 
 
 using Serilog;
 using Gaos.Auth;
@@ -33,7 +33,7 @@ namespace Gaos.Middleware
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, Token token)
         {
             const string METHOD_NAME = "Invoke()";
 
@@ -63,7 +63,7 @@ namespace Gaos.Middleware
                 return;
             }
 
-            TokenClaims claims = Token.GetClaimsFormJWT(jwt);
+            TokenClaims claims = token.GetClaimsFormJWT(jwt);
 
             if (claims == null)
             {
