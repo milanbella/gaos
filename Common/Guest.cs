@@ -63,12 +63,13 @@ namespace Gaos.Common
 
             int index = new Random().Next(0, NamesList.Count - 1);
 
-            return NamesList[index];
+            string name =  $"${NamesList[index]}{new Random().Next(10000, 99999)}";
+            return name;
         }
 
         private bool IsGuestNameAlreadyTaken(string name)
         {
-            bool isExists = Db.GuestNames.Any(gn => gn.Name == name);
+            bool isExists = Db.Users.Any(u => u.Name == name);
             return isExists;
         }
 
@@ -77,7 +78,7 @@ namespace Gaos.Common
             const string METHOD_NAME = "GenerateGuestName()";
             bool isFound = false;
 
-            string name = $"{GetRandomName()}{GetRandomName()}{new Random().Next(1000, 9999)}";
+            string name = GetRandomName();
 
             int n = 5;
             while (n > 0)
@@ -96,7 +97,7 @@ namespace Gaos.Common
             {
                 // generate string uuid
                 string uuid = Guid.NewGuid().ToString();
-                name = $"{GetRandomName()}_{uuid}";
+                name = $"{uuid}";
 
                 if (IsGuestNameAlreadyTaken(name))
                 {

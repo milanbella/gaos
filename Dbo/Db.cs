@@ -10,8 +10,6 @@
 
         public DbSet<Todo> Todos => Set<Todo>();
         public DbSet<User> Users => Set<User>();
-        public DbSet<Guest> Guests => Set<Guest>();
-        public DbSet<GuestName> GuestNames => Set<GuestName>();
         public DbSet<JWT> JWTs => Set<JWT>();
 
         public DbSet<BuildVersion> BuildVersions => Set<BuildVersion>();
@@ -28,18 +26,10 @@
                 .HasMany(e => e.JWTs)
                 .WithOne(jwt => jwt.User).OnDelete(DeleteBehavior.Cascade);
 
-            // Guest
-            modelBuilder.Entity<Guest>()
-                .Property(e => e.UserSettingsId).IsRequired(false);
-            
             // Device
             modelBuilder.Entity<Device>()
                 .HasIndex(e => e.Identification).IsUnique(false);
 
-            // GuestJWT
-
-            modelBuilder.Entity<GuestName>()
-                .HasIndex(e => e.Name).IsUnique(true);
 
             SeedAll.Seed(modelBuilder);
         }

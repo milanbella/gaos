@@ -137,7 +137,7 @@ namespace Gaos.Routes
                 {
                     try 
                     { 
-                        Guest guest = null;
+                        User guest = null;
                         GuestLoginResponse response = null;
                         string guestName = guestLoginRequest.userName;
                         string json;
@@ -158,7 +158,6 @@ namespace Gaos.Routes
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
 
                         } 
-
                         else 
                         {
                             device = await db.Devices.FirstOrDefaultAsync(d => d.Id == guestLoginRequest.deviceId);
@@ -175,42 +174,24 @@ namespace Gaos.Routes
                             } 
 
                             // Seach if guest already exists for this device
-                            guest = await db.Guests.FirstOrDefaultAsync(g => g.DeviceId == device.Id);
+                            guest = await db.Users.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
                             if (guest == null)
                             {
 
                                 // Create new guest
                                 if (guestName == null || guestName.Trim().Length == 0)
                                 {
-                                    guestLoginRequest.userName = commonGuest.GenerateGuestName();
-                                }
-
-                                bool userExists = await db.Guests.AnyAsync(u => u.Name == guestLoginRequest.userName);
-                                if (userExists)
-                                {
-                                    response = new GuestLoginResponse
-                                    {
-                                        isError = true,
-                                        errorMessage = "guest user already exists",
-
-                                    };
-                                    json = JsonSerializer.Serialize(response);
-                                    return Results.Content(json, "application/json", Encoding.UTF8, 401);
-                                }
-
-
-                                guest = await db.Guests.FirstOrDefaultAsync(g => g.Name == guestLoginRequest.userName);
-                                if (guest == null)
-                                {
+                                    guestName = commonGuest.GenerateGuestName();
                                     // Create new guest
-                                    guest = new Guest
+                                    guest = new User()
                                     {
-                                        Name = guestLoginRequest.userName,
+                                        Name = guestName,
+                                        IsGuest = true,
                                         DeviceId = device.Id,
                                     };
-                                    await db.Guests.AddAsync(guest);
+                                    await db.Users.AddAsync(guest);
                                     await db.SaveChangesAsync();
-                                    guest = await db.Guests.FirstOrDefaultAsync(g => g.Name == guestLoginRequest.userName);
+                                    guest = await db.Users.FirstOrDefaultAsync(g => g.Name == guestName);
                                     if (guest == null)
                                     {
                                         Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: can't create guest");
@@ -223,11 +204,38 @@ namespace Gaos.Routes
                                         json = JsonSerializer.Serialize(response);
                                         return Results.Content(json, "application/json", Encoding.UTF8, 401);
                                     }
+                                }
+                                else
+                                {
+                                    guest = await db.Users.FirstOrDefaultAsync(u => u.IsGuest == true && u.Name == guestName);
+                                    if (guest == null)
+                                    {
+                                        // Create new guest
+                                        guest = new User()
+                                        {
+                                            Name = guestName,
+                                            IsGuest = true,
+                                            DeviceId = device.Id,
+                                        };
+                                        await db.Users.AddAsync(guest);
+                                        await db.SaveChangesAsync();
+                                        if (guest == null)
+                                        {
+                                            Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: can't create guest");
+                                            response = new GuestLoginResponse
+                                            {
+                                                isError = true,
+                                                errorMessage = "internal error - can't create guest",
 
+                                            };
+                                            json = JsonSerializer.Serialize(response);
+                                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                                        }
+
+                                    }
                                 }
                             }
                         }
-
 
                         var jwtStr = tokenService.GenerateJWT(guestLoginRequest.userName, guest.Id, device.Id, UserType.GuestUser);
 
@@ -368,18 +376,41 @@ namespace Gaos.Routes
 
                         EncodedPassword encodedPassword = Password.getEncodedPassword(registerRequest.password);
 
-                        User user = new User
+                        // Search for guest user with this device
+                        User guest = await db.Users.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
+                        User user;
+                        string jwtStr;
+
+                        if (guest != null)
                         {
-                            Name = registerRequest.userName,
-                            Email = registerRequest.email,
-                            PasswordHash = encodedPassword.PasswordHash,
-                            PasswordSalt = encodedPassword.Salt,
+                            user = new User
+                            {
+                                Name = registerRequest.userName,
+                                IsGuest = false,
+                                Email = registerRequest.email,
+                                PasswordHash = encodedPassword.PasswordHash,
+                                PasswordSalt = encodedPassword.Salt,
+                                DeviceId = device.Id,
 
-                        };
-                        await db.Users.AddAsync(user);
-                        await db.SaveChangesAsync();
+                            };
+                            await db.Users.AddAsync(user);
+                            await db.SaveChangesAsync();
+                            jwtStr = tokenService.GenerateJWT(registerRequest.userName, user.Id, device.Id, UserType.RegisteredUser);
+                        }
+                        else
+                        {
+                            // Trurn the guest user into a registered user
+                            guest.Name = registerRequest.userName;
+                            guest.IsGuest = false;
+                            guest.Email = registerRequest.email;
+                            guest.PasswordHash = encodedPassword.PasswordHash;
+                            guest.PasswordSalt = encodedPassword.Salt;
+                            guest.DeviceId = device.Id;
+                            await db.SaveChangesAsync();
+                            jwtStr = tokenService.GenerateJWT(registerRequest.userName, guest.Id, device.Id, UserType.RegisteredUser);
+                        }
 
-                        var jwtStr = tokenService.GenerateJWT(registerRequest.userName, user.Id, device.Id, UserType.RegisteredUser);
+
 
                         transaction.Commit();
 
