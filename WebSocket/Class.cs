@@ -1,0 +1,144 @@
+﻿using Serilog;
+
+namespace gaos.WebSocket
+{
+    public class Message
+    {
+        public string Key1;
+        public string Key2;
+        public string Key3;
+        public string Key4;
+
+        public string payload;
+    }
+
+    public class WebSocket
+    {
+        private static string CLASS_NAME = typeof(WebSocket).Name;
+
+        public static int MAX_MESSAGE_LENGTH = 1024 * 4;
+
+        public static List<WebSocket> Connections = new List<WebSocket>();
+        public string Id;
+
+        public System.Net.WebSockets.WebSocket Socket;
+
+        WebSocket(System.Net.WebSockets.WebSocket socket)
+        {
+            this.Socket = socket;
+
+        }
+
+        public static void Add(System.Net.WebSockets.WebSocket socket)
+        {
+            Connections.Add(new WebSocket(socket));
+        }
+
+        public static void Remove(System.Net.WebSockets.WebSocket socket)
+        {
+            // Remove socket from conections
+            Connections.RemoveAll(c => c.Socket == socket);
+        }
+
+        public static async Task HandleMessages(System.Net.WebSockets.WebSocket socket)
+        {
+            const string METHOD_NAME = "HandleMessages()";
+
+            var buffer = new byte[MAX_MESSAGE_LENGTH];
+
+            while (socket.State == System.Net.WebSockets.WebSocketState.Open)
+            {
+                var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                if (result.MessageType == System.Net.WebSockets.WebSocketMessageType.Close)
+                {
+                    await socket.CloseAsync(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                    Remove(socket);
+                    break;
+                }
+                else if (result.MessageType == System.Net.WebSockets.WebSocketMessageType.Binary)
+                {
+                    Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: message in binary format received, ignoring the message ...");
+                    continue;
+                }
+                else if (result.MessageType == System.Net.WebSockets.WebSocketMessageType.Text)
+                {
+                    if (result.EndOfMessage)
+                    {
+                        string message = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count);
+                        RouteMessage(message);
+                        continue;
+                    }
+                    else
+                    {
+                        Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: message is too long, ignoring the message ...");
+                        await IgnoreMessage(socket);
+                        continue;
+                    }
+
+                }
+                else
+                {
+                    Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: unknow MessageType");
+                    throw new Exception("unknow MessageType");
+                }
+            }
+        }
+
+        public static async Task IgnoreMessage(System.Net.WebSockets.WebSocket socket)
+        {
+            const string METHOD_NAME = "IgnoreMessage()";
+
+            var buffer = new byte[MAX_MESSAGE_LENGTH];
+
+            while (socket.State == System.Net.WebSockets.WebSocketState.Open)
+            {
+                var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                if (result.MessageType == System.Net.WebSockets.WebSocketMessageType.Close)
+                {
+                    await socket.CloseAsync(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                    Remove(socket);
+                    break;
+                }
+                else if (result.MessageType == System.Net.WebSockets.WebSocketMessageType.Binary)
+                {
+                    continue;
+                }
+                else if (result.MessageType == System.Net.WebSockets.WebSocketMessageType.Text)
+                {
+                    if (result.EndOfMessage)
+                    {
+                        break;
+                        
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                }
+                else
+                {
+                    Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: unknow MessageType");
+                    throw new Exception("unknow MessageType");
+                }
+            }
+
+        }
+
+        public static async Task RouteMessage(string message)
+        {
+            const string METHOD_NAME = "RouteMessage()";
+            try
+            {
+                Message msg = System.Text.Json.JsonSerializer.Deserialize<Message>(message);
+            } 
+            catch (Exception e)
+            {
+                Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: {e.Message}, message cannot be deserialized, message is ignored ......");
+                return;
+            }
+            return;
+       
+        }
+    }
+}
