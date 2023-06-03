@@ -109,6 +109,8 @@ namespace Gaos.Routes
                         {
                             isError = false,
                             errorMessage = null,
+                            userId = user.Id,
+                            isGuest = false,
                             jwt = jwtStr,
                         };
 
@@ -246,6 +248,8 @@ namespace Gaos.Routes
                             isError = false,
                             errorMessage = null,
                             userName = guest.Name,
+                            userId = guest.Id,
+                            isGuest = true,
                             jwt = jwtStr,
                         };
 
