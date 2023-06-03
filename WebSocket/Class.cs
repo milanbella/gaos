@@ -2,15 +2,6 @@
 
 namespace gaos.WebSocket
 {
-    public class Message
-    {
-        public string Key1;
-        public string Key2;
-        public string Key3;
-        public string Key4;
-
-        public string payload;
-    }
 
     public class WebSocket
     {
@@ -19,7 +10,6 @@ namespace gaos.WebSocket
         public static int MAX_MESSAGE_LENGTH = 1024 * 4;
 
         public static List<WebSocket> Connections = new List<WebSocket>();
-        public string Id;
 
         public System.Net.WebSockets.WebSocket Socket;
 
@@ -125,12 +115,12 @@ namespace gaos.WebSocket
 
         }
 
-        public static async Task RouteMessage(string message)
+        public static void RouteMessage(string message)
         {
             const string METHOD_NAME = "RouteMessage()";
             try
             {
-                Message msg = System.Text.Json.JsonSerializer.Deserialize<Message>(message);
+                Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ received message: {message}");
             } 
             catch (Exception e)
             {

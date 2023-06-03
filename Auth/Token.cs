@@ -114,7 +114,7 @@ namespace Gaos.Auth
                 Gaos.Dbo.JWT jwt = new Gaos.Dbo.JWT
                 {
                     Token = jwtStr,
-                    GuestId = userId,
+                    UserId = userId,
                     DeviceId = deviceId,
                 };
                 db.JWTs.Add(jwt);

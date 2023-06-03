@@ -6,6 +6,7 @@ using Gaos.Routes;
 using Serilog;
 using Gaos.Middleware;
 using System.Diagnostics;
+using System.Net.WebSockets;
 
 
 
@@ -75,6 +76,10 @@ builder.Services.AddScoped<Gaos.Auth.Token>(provider => {
 
 var app = builder.Build();
 
+if (false) { 
+    app.UseWebSockets();
+    app.UseMiddleware<WebSocketMiddleware>();
+}
 app.UseMiddleware<AuthMiddleware>();
 
 
