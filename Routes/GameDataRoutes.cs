@@ -22,7 +22,7 @@ namespace Gaos.Routes
 
                     // GameData
 
-                    GameData? gameData = db.GameDatas.Join(db.UserSlots,
+                    GameData? gameData = db.GameData.Join(db.UserSlot,
                         gd => gd.UserSlotId,
                         us => us.Id,
                         (gd, us) => new { GameData = gd, UserSlot = us })
@@ -33,12 +33,12 @@ namespace Gaos.Routes
                     // InventoryItemData
                     Dictionary<string, InventoryItemData[]>  enumKindToInventoryItemDataDict = new Dictionary<string, InventoryItemData[]>();
 
-                    var InventoryItemDataGroupsByKind = db.InventoryItemDatas
-                    .Join(db.UserSlots,
+                    var InventoryItemDataGroupsByKind = db.InventoryItemData
+                    .Join(db.UserSlot,
                         iid => iid.UserSlotId,
                         us => us.Id,
                         (iid, us) => new { InventoryItemData = iid })
-                    .Join(db.InventoryItemDataKinds,
+                    .Join(db.InventoryItemDataKind,
                         joined => joined.InventoryItemData.InventoryItemDataKindId,
                         iidk => iidk.Id,
                        (joined, iidk) => new { InventoryItemData = joined.InventoryItemData, InventoryItemDataKind = iidk.Name })
@@ -54,12 +54,12 @@ namespace Gaos.Routes
                     // RecipeData
                     Dictionary<string, RecipeData[]>  enumKindToRecipeDataDict = new Dictionary<string, RecipeData[]>();
 
-                    var RecipeDataDataGroupsByKind = db.RecipeDatas
-                    .Join(db.UserSlots,
+                    var RecipeDataDataGroupsByKind = db.RecipeData
+                    .Join(db.UserSlot,
                         rd => rd.UserSlotId,
                         us => us.Id,
                         (rd, us) => new { RecipeData = rd })
-                    .Join(db.RecipeDataKinds,
+                    .Join(db.RecipeDataKind,
                         joined => joined.RecipeData.RecipeDataKindId,
                         rdk => rdk.Id,
                         (joined, rdk) => new { RecipeData = joined.RecipeData, RecipeDataKind = rdk.Name })

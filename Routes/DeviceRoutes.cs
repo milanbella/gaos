@@ -51,8 +51,8 @@ namespace Gaos.Routes
                     }
 
 
-                    BuildVersion buildVersion = await db.BuildVersions.FirstOrDefaultAsync(b => b.Version == deviceRegisterRequest.buildVersion);
-                    Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == deviceRegisterRequest.identification && d.PlatformType == platformType);
+                    BuildVersion buildVersion = await db.BuildVersion.FirstOrDefaultAsync(b => b.Version == deviceRegisterRequest.buildVersion);
+                    Device device = await db.Device.FirstOrDefaultAsync(d => d.Identification == deviceRegisterRequest.identification && d.PlatformType == platformType);
 
                     if (device == null)
                     {
@@ -63,7 +63,7 @@ namespace Gaos.Routes
                             BuildVersionId = (buildVersion != null) ? buildVersion.Id : null,
                             BuildVersionReported = deviceRegisterRequest.buildVersion
                         };
-                        db.Devices.Add(device);
+                        db.Device.Add(device);
                         await db.SaveChangesAsync();
 
                     } else {
@@ -118,7 +118,7 @@ namespace Gaos.Routes
 
                     string platformType = deviceGetRegistrationRequest.platformType;
 
-                    Device device = await db.Devices.FirstOrDefaultAsync(d => d.Identification == deviceGetRegistrationRequest.identification && d.PlatformType == platformType);
+                    Device device = await db.Device.FirstOrDefaultAsync(d => d.Identification == deviceGetRegistrationRequest.identification && d.PlatformType == platformType);
                     if (device == null)
                     {
                         response = new DeviceGetRegistrationResponse
@@ -174,7 +174,7 @@ namespace Gaos.Routes
                         return Results.Json(response);
                     }
 
-                    Device device = await db.Devices.FirstOrDefaultAsync(d => d.Id == deviceGetRegistrationByIdRequest.deviceId);
+                    Device device = await db.Device.FirstOrDefaultAsync(d => d.Id == deviceGetRegistrationByIdRequest.deviceId);
                     if (device == null)
                     {
                         response = new DeviceGetRegistrationResponse

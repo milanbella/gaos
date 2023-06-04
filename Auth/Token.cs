@@ -85,7 +85,7 @@ namespace Gaos.Auth
             string jwtStr;
 
             // Remove all tokens for the device.
-            db.JWTs.RemoveRange(db.JWTs.Where(t => t.DeviceId == deviceId));
+            db.JWT.RemoveRange(db.JWT.Where(t => t.DeviceId == deviceId));
             db.SaveChanges();
 
             if (privateKey == null) { 
@@ -106,7 +106,7 @@ namespace Gaos.Auth
                     UserId = userId,
                     DeviceId = deviceId,
                 };
-                db.JWTs.Add(jwt);
+                db.JWT.Add(jwt);
                 db.SaveChanges();
             }
             else if (userType == UserType.GuestUser)
@@ -117,7 +117,7 @@ namespace Gaos.Auth
                     UserId = userId,
                     DeviceId = deviceId,
                 };
-                db.JWTs.Add(jwt);
+                db.JWT.Add(jwt);
                 db.SaveChanges();
             }
             else

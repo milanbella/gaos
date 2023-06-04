@@ -69,7 +69,7 @@ namespace Gaos.Common
 
         private bool IsGuestNameAlreadyTaken(string name)
         {
-            bool isExists = Db.Users.Any(u => u.Name == name);
+            bool isExists = Db.User.Any(u => u.Name == name);
             return isExists;
         }
 

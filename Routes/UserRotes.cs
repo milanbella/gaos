@@ -43,11 +43,11 @@ namespace Gaos.Routes
                         }
 
 
-                        user = await db.Users.FirstOrDefaultAsync(u => u.Name == loginRequest.userName);
+                        user = await db.User.FirstOrDefaultAsync(u => u.Name == loginRequest.userName);
                         if (user == null)
                         {
                             // Instead of user name user's email may be used in place of user name
-                            user = await db.Users.FirstOrDefaultAsync(u => u.Email == loginRequest.userName);
+                            user = await db.User.FirstOrDefaultAsync(u => u.Email == loginRequest.userName);
                             if (user == null)
                             {
                                 response = new LoginResponse
@@ -75,7 +75,7 @@ namespace Gaos.Routes
 
                         }
 
-                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Id == loginRequest.deviceId);
+                        Device device = await db.Device.FirstOrDefaultAsync(d => d.Id == loginRequest.deviceId);
                         if (device == null)
                         {
                             response = new LoginResponse
@@ -162,7 +162,7 @@ namespace Gaos.Routes
                         } 
                         else 
                         {
-                            device = await db.Devices.FirstOrDefaultAsync(d => d.Id == guestLoginRequest.deviceId);
+                            device = await db.Device.FirstOrDefaultAsync(d => d.Id == guestLoginRequest.deviceId);
                             if (device == null)
                             {
                                 response = new GuestLoginResponse
@@ -176,7 +176,7 @@ namespace Gaos.Routes
                             } 
 
                             // Seach if guest already exists for this device
-                            guest = await db.Users.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
+                            guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
                             if (guest == null)
                             {
 
@@ -191,9 +191,9 @@ namespace Gaos.Routes
                                         IsGuest = true,
                                         DeviceId = device.Id,
                                     };
-                                    await db.Users.AddAsync(guest);
+                                    await db.User.AddAsync(guest);
                                     await db.SaveChangesAsync();
-                                    guest = await db.Users.FirstOrDefaultAsync(g => g.Name == guestName);
+                                    guest = await db.User.FirstOrDefaultAsync(g => g.Name == guestName);
                                     if (guest == null)
                                     {
                                         Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: can't create guest");
@@ -209,7 +209,7 @@ namespace Gaos.Routes
                                 }
                                 else
                                 {
-                                    guest = await db.Users.FirstOrDefaultAsync(u => u.IsGuest == true && u.Name == guestName);
+                                    guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.Name == guestName);
                                     if (guest == null)
                                     {
                                         // Create new guest
@@ -219,7 +219,7 @@ namespace Gaos.Routes
                                             IsGuest = true,
                                             DeviceId = device.Id,
                                         };
-                                        await db.Users.AddAsync(guest);
+                                        await db.User.AddAsync(guest);
                                         await db.SaveChangesAsync();
                                         if (guest == null)
                                         {
@@ -291,7 +291,7 @@ namespace Gaos.Routes
 
                         }
 
-                        bool userExists = await db.Users.AnyAsync(u => u.Name == registerRequest.userName);
+                        bool userExists = await db.User.AnyAsync(u => u.Name == registerRequest.userName);
                         if (userExists)
                         {
                             response = new RegisterResponse
@@ -316,7 +316,7 @@ namespace Gaos.Routes
 
                         }
 
-                        bool emailExists = await db.Users.AnyAsync(u => u.Email == registerRequest.email);
+                        bool emailExists = await db.User.AnyAsync(u => u.Email == registerRequest.email);
                         if (emailExists)
                         {
                             response = new RegisterResponse
@@ -366,7 +366,7 @@ namespace Gaos.Routes
                             return Results.Json(response);
                         }
 
-                        Device device = await db.Devices.FirstOrDefaultAsync(d => d.Id == registerRequest.deviceId);
+                        Device device = await db.Device.FirstOrDefaultAsync(d => d.Id == registerRequest.deviceId);
                         if (device == null)
                         {
                             response = new RegisterResponse
@@ -381,7 +381,7 @@ namespace Gaos.Routes
                         EncodedPassword encodedPassword = Password.getEncodedPassword(registerRequest.password);
 
                         // Search for guest user with this device
-                        User guest = await db.Users.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
+                        User guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
                         User user;
                         string jwtStr;
 
@@ -397,7 +397,7 @@ namespace Gaos.Routes
                                 DeviceId = device.Id,
 
                             };
-                            await db.Users.AddAsync(user);
+                            await db.User.AddAsync(user);
                             await db.SaveChangesAsync();
                             jwtStr = tokenService.GenerateJWT(registerRequest.userName, user.Id, device.Id, UserType.RegisteredUser);
                         }

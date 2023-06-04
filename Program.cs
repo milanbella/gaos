@@ -1,4 +1,4 @@
-#pragma warning disable 8600, 8602, 8604
+#pragma warning disable 8600, 8602, 8604, 0162
 
 using Microsoft.EntityFrameworkCore;
 using Gaos.Dbo;

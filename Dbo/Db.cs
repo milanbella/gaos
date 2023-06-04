@@ -9,18 +9,18 @@
         public Db(DbContextOptions<Db> options) : base(options) { }
 
         public DbSet<Todo> Todos => Set<Todo>();
-        public DbSet<User> Users => Set<User>();
-        public DbSet<JWT> JWTs => Set<JWT>();
+        public DbSet<User> User => Set<User>();
+        public DbSet<JWT> JWT => Set<JWT>();
 
-        public DbSet<BuildVersion> BuildVersions => Set<BuildVersion>();
-        public DbSet<Device> Devices => Set<Device>();
-        public DbSet<Slot> Slots => Set<Slot>();
-        public DbSet<UserSlot> UserSlots => Set<UserSlot>();
-        public DbSet<GameData> GameDatas => Set<GameData>();
-        public DbSet<InventoryItemData> InventoryItemDatas => Set<InventoryItemData>();
-        public DbSet<InventoryItemDataKind> InventoryItemDataKinds => Set<InventoryItemDataKind>();
-        public DbSet<RecipeData> RecipeDatas => Set<RecipeData>();
-        public DbSet<RecipeDataKind> RecipeDataKinds => Set<RecipeDataKind>();
+        public DbSet<BuildVersion> BuildVersion => Set<BuildVersion>();
+        public DbSet<Device> Device => Set<Device>();
+        public DbSet<Slot> Slot => Set<Slot>();
+        public DbSet<UserSlot> UserSlot => Set<UserSlot>();
+        public DbSet<GameData> GameData => Set<GameData>();
+        public DbSet<InventoryItemData> InventoryItemData => Set<InventoryItemData>();
+        public DbSet<InventoryItemDataKind> InventoryItemDataKind => Set<InventoryItemDataKind>();
+        public DbSet<RecipeData> RecipeData => Set<RecipeData>();
+        public DbSet<RecipeDataKind> RecipeDataKind => Set<RecipeDataKind>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
