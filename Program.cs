@@ -91,6 +91,5 @@ app.MapGroup("/todoitems").GroupTodosItems();
 app.MapGroup("/user").GroupUser();
 app.MapGroup("/device").GroupDevice();
 app.MapGroup("/api").GroupApi();
-
-
+app.MapGroup("/api/gameData").GroupGameData();
 app.Run();

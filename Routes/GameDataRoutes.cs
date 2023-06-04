@@ -4,14 +4,14 @@ using Gaos.Routes.UserGameDataJson;
 using Serilog;
 namespace Gaos.Routes
 {
-    public class UserGameData
+    public static class GameDataRoutes
     {
 
-        public static string CLASS_NAME = typeof(UserGameData).Name;
-        public static RouteGroupBuilder GroupApi(this RouteGroupBuilder group)
+        public static string CLASS_NAME = typeof(GameDataRoutes).Name;
+        public static RouteGroupBuilder GroupGameData(this RouteGroupBuilder group)
         {
 
-            group.MapPost("/gameDataGet", (UserGameDataGetRequest request, Db db) => 
+            group.MapPost("/userGameDataGet", (UserGameDataGetRequest request, Db db) => 
             {
                 const string METHOD_NAME = "gameDataGet";
                 try 
@@ -70,6 +70,16 @@ namespace Gaos.Routes
                     {
                         enumKindToRecipeDataDict[enumKind] = RecipeDataDataGroupsByKind.TryGetValue(enumKind, out var foundValue) ? foundValue.Select(v => v.RecipeData).ToArray() : new RecipeData[0];
                     }
+
+                    UserGameDataGetResponse response = new UserGameDataGetResponse
+                    {
+                        isError = false,
+                        errorMessage = "",
+                        gameData = gameData,
+                        inventoryItemData = enumKindToInventoryItemDataDict,
+                        recipeData = enumKindToRecipeDataDict
+                    };
+                    return Results.Json(response);
 
                 }
                 catch (Exception ex)
