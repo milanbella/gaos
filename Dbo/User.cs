@@ -17,6 +17,10 @@ namespace Gaos.Dbo
         public int? UserSettingsId { get; set; }
         public UserSettings? UserSettings { get; set; }
 
+        public int UserSlotId { get; set; }
+        public UserSlot? UserSlot { get; set; }
+
+
         public ICollection<JWT>? JWTs { get; }
     }
 }

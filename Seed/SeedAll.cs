@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Gaos.Dbo;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gaos.Seed
 {
@@ -8,6 +9,8 @@ namespace Gaos.Seed
         {
             User.Seed(modelBuilder);
             JWT.Seed(modelBuilder);
+            InventoryItemDataKind.Seed(modelBuilder);
+            RecipeDataKind.Seed(modelBuilder);
         }
     }
 }
