@@ -1,7 +1,8 @@
 ﻿#pragma warning disable 8600, 8602, 8604, 8714
 using Gaos.Dbo;
-using Gaos.Routes.UserGameDataJson;
+using Gaos.Routes.GameDataJson;
 using Serilog;
+
 namespace Gaos.Routes
 {
     public static class GameDataRoutes
@@ -13,7 +14,7 @@ namespace Gaos.Routes
 
             group.MapPost("/userGameDataGet", (UserGameDataGetRequest request, Db db) => 
             {
-                const string METHOD_NAME = "gameDataGet";
+                const string METHOD_NAME = "userGameDataGet()";
                 try 
                 { 
                     int userId = request.userId;
@@ -86,6 +87,110 @@ namespace Gaos.Routes
                 {
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                     UserGameDataGetResponse response = new UserGameDataGetResponse
+                    {
+                        isError = true,
+                        errorMessage = "internal error",
+                    };
+                    return Results.Json(response);
+                }
+
+            });
+
+            group.MapPost("/userGameDataSave", (UserGameDataSaveRequest request, Db db) => 
+            {
+                const string METHOD_NAME = "userGameDataSave()";
+                try 
+                { 
+                    if (request.gameData != null)
+                    {
+                        GameData gameData = request.gameData;
+                        db.GameData.Update(gameData);
+                    }
+
+                    foreach (string key in request.inventoryItemData.Keys)
+                    {
+                        InventoryItemData[] inventoryItemData = request.inventoryItemData[key];
+                        foreach (InventoryItemData iid in inventoryItemData)
+                        {
+                            db.InventoryItemData.Update(iid);
+                        }
+                    }
+
+                    foreach (string key in request.recipeData.Keys)
+                    {
+                        RecipeData[] recipeData = request.recipeData[key];
+                        foreach (RecipeData rd in recipeData)
+                        {
+                            db.RecipeData.Update(rd);
+                        }
+                    }
+
+                    db.SaveChanges();
+
+                    UserGameDataGetResponse response = new UserGameDataGetResponse
+                    {
+                        isError = false,
+                        errorMessage = "",
+                    };
+                    return Results.Json(response);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    UserGameDataGetResponse response = new UserGameDataGetResponse
+                    {
+                        isError = true,
+                        errorMessage = "internal error",
+                    };
+                    return Results.Json(response);
+                }
+            });
+
+            group.MapPost("/inventoryItemDataKindsGet", (InventoryItemDataKindsGetRequest request, Db db) => 
+            {
+                const string METHOD_NAME = "inventoryItemDataKindsGet()";
+                try 
+                {
+                    InventoryItemDataKind[] inventoryItemDataKinds = db.InventoryItemDataKind.ToArray();
+                    InventoryItemDataKindsGetResponse response = new InventoryItemDataKindsGetResponse
+                    {
+                        isError = false,
+                        errorMessage = "",
+                        inventoryItemDataKinds = inventoryItemDataKinds
+                    };
+                    return Results.Json(response);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    InventoryItemDataKindsGetResponse response = new InventoryItemDataKindsGetResponse
+                    {
+                        isError = true,
+                        errorMessage = "internal error",
+                    };
+                    return Results.Json(response);
+                }
+
+            });
+
+            group.MapPost("/recipeDataKindsGet", (RecipeDataKindsGetReqest request, Db db) => 
+            {
+                const string METHOD_NAME = "recipeDataKindsGet()";
+                try
+                {
+                    RecipeDataKind[] recipeDataKinds = db.RecipeDataKind.ToArray();
+                    RecipeDataKindsGetResponse response = new RecipeDataKindsGetResponse
+                    {
+                        isError = false,
+                        errorMessage = "",
+                        recipeDataKinds = recipeDataKinds
+                    };
+                    return Results.Json(response);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    InventoryItemDataKindsGetResponse response = new InventoryItemDataKindsGetResponse
                     {
                         isError = true,
                         errorMessage = "internal error",

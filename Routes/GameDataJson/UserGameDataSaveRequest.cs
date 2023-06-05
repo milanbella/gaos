@@ -1,11 +1,10 @@
 ﻿using Gaos.Dbo;
-namespace Gaos.Routes.UserGameDataJson
+namespace Gaos.Routes.GameDataJson
 {
-    public class UserGameDataGetResponse
+    public class UserGameDataSaveRequest
     {
-        public bool? isError { get; set; }
-        public string? errorMessage { get; set; }
-
+        public int userId;
+        public int slotId;
         public GameData? gameData { get; set; }
 
         public Dictionary<string, InventoryItemData[]>? inventoryItemData { get; set; }

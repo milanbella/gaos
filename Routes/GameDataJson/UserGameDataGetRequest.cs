@@ -1,4 +1,4 @@
-﻿namespace Gaos.Routes.UserGameDataJson
+﻿namespace Gaos.Routes.GameDataJson
 {
     public class UserGameDataGetRequest
     {
