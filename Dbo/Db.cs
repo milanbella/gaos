@@ -15,7 +15,7 @@
         public DbSet<BuildVersion> BuildVersion => Set<BuildVersion>();
         public DbSet<Device> Device => Set<Device>();
         public DbSet<Slot> Slot => Set<Slot>();
-        public DbSet<UserSlot> UserSlots => Set<UserSlot>();
+        public DbSet<UserSlot> UserSlot => Set<UserSlot>();
         public DbSet<GameData> GameData => Set<GameData>();
         public DbSet<InventoryItemData> InventoryItemData => Set<InventoryItemData>();
         public DbSet<InventoryItemDataKind> InventoryItemDataKind => Set<InventoryItemDataKind>();
@@ -35,12 +35,9 @@
             modelBuilder.Entity<Device>()
                 .HasIndex(e => new { e.Identification, e.PlatformType }).IsUnique(true);
 
-            modelBuilder.Entity<UserSlot>()
-                .HasIndex(e => new { e.User, e.Slot }).IsUnique(true);
+            modelBuilder.Entity<UserSlot>().HasIndex(e => new { e.UserId, e.SlotId }).IsUnique(true);
 
-            modelBuilder.Entity<GameData>()
-                .HasIndex(e => e.UserSlot).IsUnique(true);
-
+            modelBuilder.Entity<GameData>().HasIndex(e => e.UserSlotId).IsUnique(true);
 
             SeedAll.Seed(modelBuilder);
         }
