@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Routes\TodoItemsJson\" />
+    <Folder Include="Routes\Model\TodoItemsJson\" />
   </ItemGroup>
 
 </Project>
