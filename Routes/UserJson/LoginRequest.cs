@@ -4,10 +4,10 @@ namespace Gaos.Routes.UserJson
 
     public class LoginRequest
     {
-        public string? userName { get; set; }
+        public string? userName;
         
-        public string? password { get; set; }
+        public string? password;
 
-        public int? deviceId { get; set; }
+        public int? deviceId;
     }
 }

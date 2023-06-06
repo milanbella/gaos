@@ -3,16 +3,16 @@ namespace Gaos.Routes.UserJson
 {
     public class GuestLoginResponse
     {
-        public bool? isError { get; set; }
+        public bool? isError;
 
-        public string? errorMessage { get; set; }
-        public string? userName { get; set; }
+        public string? errorMessage;
+        public string? userName;
 
-        public int? userId { get; set; }
+        public int? userId;
 
-        public bool? isGuest { get; set; }
+        public bool? isGuest;
 
-        public string? jwt { get; set; }
+        public string? jwt;
 
     }
 }

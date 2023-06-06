@@ -2,7 +2,7 @@
 {
     public class UserGameDataSaveResponse
     {
-        public bool? isError { get; set; }
-        public string? errorMessage { get; set; }
+        public bool? isError;
+        public string? errorMessage;
     }
 }

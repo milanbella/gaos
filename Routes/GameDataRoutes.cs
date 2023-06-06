@@ -23,7 +23,7 @@ namespace Gaos.Routes
 
                     // GameData
 
-                    GameData? gameData = db.GameData.Join(db.UserSlot,
+                    GameData? gameData = db.GameData.Join(db.UserSlots,
                         gd => gd.UserSlotId,
                         us => us.Id,
                         (gd, us) => new { GameData = gd, UserSlot = us })
@@ -35,7 +35,7 @@ namespace Gaos.Routes
                     Dictionary<string, InventoryItemData[]>  enumKindToInventoryItemDataDict = new Dictionary<string, InventoryItemData[]>();
 
                     var InventoryItemDataGroupsByKind = db.InventoryItemData
-                    .Join(db.UserSlot,
+                    .Join(db.UserSlots,
                         iid => iid.UserSlotId,
                         us => us.Id,
                         (iid, us) => new { InventoryItemData = iid })
@@ -56,7 +56,7 @@ namespace Gaos.Routes
                     Dictionary<string, RecipeData[]>  enumKindToRecipeDataDict = new Dictionary<string, RecipeData[]>();
 
                     var RecipeDataDataGroupsByKind = db.RecipeData
-                    .Join(db.UserSlot,
+                    .Join(db.UserSlots,
                         rd => rd.UserSlotId,
                         us => us.Id,
                         (rd, us) => new { RecipeData = rd })

@@ -3,9 +3,9 @@ namespace Gaos.Routes.GameDataJson
 {
     public class RecipeDataKindsGetResponse
     {
-        public bool? isError { get; set; }
-        public string? errorMessage { get; set; }
+        public bool? isError;
+        public string? errorMessage;
 
-        public RecipeDataKind[]? recipeDataKinds { get; set; }
+        public RecipeDataKind[]? recipeDataKinds;
     }
 }

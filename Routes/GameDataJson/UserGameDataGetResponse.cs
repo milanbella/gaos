@@ -3,13 +3,13 @@ namespace Gaos.Routes.GameDataJson
 {
     public class UserGameDataGetResponse
     {
-        public bool? isError { get; set; }
-        public string? errorMessage { get; set; }
+        public bool? isError;
+        public string? errorMessage;
 
-        public GameData? gameData { get; set; }
+        public GameData? gameData;
 
-        public Dictionary<string, InventoryItemData[]>? inventoryItemData { get; set; }
+        public Dictionary<string, InventoryItemData[]>? inventoryItemData;
 
-        public Dictionary<string, RecipeData[]>? recipeData { get; set; }
+        public Dictionary<string, RecipeData[]>? recipeData;
     }
 }

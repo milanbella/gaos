@@ -5,10 +5,10 @@ namespace Gaos.Routes.GameDataJson
     {
         public int userId;
         public int slotId;
-        public GameData? gameData { get; set; }
+        public GameData? gameData;
 
-        public Dictionary<string, InventoryItemData[]>? inventoryItemData { get; set; }
+        public Dictionary<string, InventoryItemData[]>? inventoryItemData;
 
-        public Dictionary<string, RecipeData[]>? recipeData { get; set; }
+        public Dictionary<string, RecipeData[]>? recipeData;
     }
 }
