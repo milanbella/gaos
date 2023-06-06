@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata.Ecma335;
 using Gaos.Dbo;
+using gaos.Dbo.Model;
 
 namespace Gaos.Routes
 {

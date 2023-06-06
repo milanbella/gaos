@@ -15,7 +15,7 @@ namespace Gaos.Seed
         public static void Seed(ModelBuilder modelBuilder)
         {
             // seed Dbo.User
-            modelBuilder.Entity<Gaos.Dbo.InventoryItemDataKind>().HasData(
+            modelBuilder.Entity<gaos.Dbo.Model.InventoryItemDataKind>().HasData(
                 new Gaos.Dbo.User { Id = 1, Name = InventoryItemDataKindEnum.BasicInventoryObjects.ToString() },
                 new Gaos.Dbo.User { Id = 2, Name = InventoryItemDataKindEnum.ProcessedInventoryObjects.ToString() },
                 new Gaos.Dbo.User { Id = 3, Name = InventoryItemDataKindEnum.RefinedInventoryObjects.ToString() },

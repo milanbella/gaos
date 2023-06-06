@@ -3,6 +3,7 @@
     using Microsoft.EntityFrameworkCore;
     using System.Xml;
     using Gaos.Seed;
+    using gaos.Dbo.Model;
 
     public class Db : DbContext
     {

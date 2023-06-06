@@ -1,6 +1,7 @@
 ﻿#pragma warning disable 8600, 8602, 8604, 8714
+using gaos.Dbo.Model;
+using gaos.Routes.Model.GameDataJson;
 using Gaos.Dbo;
-using Gaos.Routes.GameDataJson;
 using Serilog;
 
 namespace Gaos.Routes

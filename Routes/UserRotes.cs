@@ -6,7 +6,8 @@ using System.Text.Json;
 using Serilog;
 using Gaos.Auth;
 using Gaos.Dbo;
-using Gaos.Routes.UserJson;
+using gaos.Routes.Model.UserJson;
+using gaos.Dbo.Model;
 
 namespace Gaos.Routes
 {

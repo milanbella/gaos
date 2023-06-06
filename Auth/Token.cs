@@ -100,7 +100,7 @@ namespace Gaos.Auth
 
             if (userType == UserType.RegisteredUser)
             {
-                Gaos.Dbo.JWT jwt = new Gaos.Dbo.JWT
+                gaos.Dbo.Model.JWT jwt = new Gaos.Dbo.JWT
                 {
                     Token = jwtStr,
                     UserId = userId,
@@ -111,7 +111,7 @@ namespace Gaos.Auth
             }
             else if (userType == UserType.GuestUser)
             {
-                Gaos.Dbo.JWT jwt = new Gaos.Dbo.JWT
+                gaos.Dbo.Model.JWT jwt = new Gaos.Dbo.JWT
                 {
                     Token = jwtStr,
                     UserId = userId,

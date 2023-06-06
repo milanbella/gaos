@@ -8,8 +8,8 @@ using Gaos.Auth;
 using Gaos.Dbo;
 using Gaos.Routes.UserJson;
 using Gaos.Middleware;
-using Gaos.Routes.ApiJson;
 using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
+using gaos.Routes.Model.ApiJson;
 
 namespace Gaos.Routes
 {
