@@ -31,12 +31,12 @@ namespace Gaos.Routes
                         User user = null;
                         LoginResponse response = null;
 
-                        if (loginRequest.userName == null || loginRequest.userName.Trim().Length == 0)
+                        if (loginRequest.UserName == null || loginRequest.UserName.Trim().Length == 0)
                         {
                             response = new LoginResponse
                             {
-                                isError = true,
-                                errorMessage = "missing user name (you may use also email instead of user name)",
+                                IsError = true,
+                                ErrorMessage = "missing user name (you may use also email instead of user name)",
                             };
                             var json = JsonSerializer.Serialize(response);
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
@@ -44,17 +44,17 @@ namespace Gaos.Routes
                         }
 
 
-                        user = await db.User.FirstOrDefaultAsync(u => u.Name == loginRequest.userName);
+                        user = await db.User.FirstOrDefaultAsync(u => u.Name == loginRequest.UserName);
                         if (user == null)
                         {
                             // Instead of user name user's email may be used in place of user name
-                            user = await db.User.FirstOrDefaultAsync(u => u.Email == loginRequest.userName);
+                            user = await db.User.FirstOrDefaultAsync(u => u.Email == loginRequest.UserName);
                             if (user == null)
                             {
                                 response = new LoginResponse
                                 {
-                                    isError = true,
-                                    errorMessage = "incorrect user name (you may use also email instead of user name)",
+                                    IsError = true,
+                                    ErrorMessage = "incorrect user name (you may use also email instead of user name)",
 
                                 };
                                 var json = JsonSerializer.Serialize(response);
@@ -63,12 +63,12 @@ namespace Gaos.Routes
 
                         }
 
-                        if (loginRequest.deviceId == null)
+                        if (loginRequest.DeviceId == null)
                         {
                             response = new LoginResponse
                             {
-                                isError = true,
-                                errorMessage = "deviceId is empty",
+                                IsError = true,
+                                ErrorMessage = "deviceId is empty",
 
                             };
                             var json = JsonSerializer.Serialize(response);
@@ -76,13 +76,13 @@ namespace Gaos.Routes
 
                         }
 
-                        Device device = await db.Device.FirstOrDefaultAsync(d => d.Id == loginRequest.deviceId);
+                        Device device = await db.Device.FirstOrDefaultAsync(d => d.Id == loginRequest.DeviceId);
                         if (device == null)
                         {
                             response = new LoginResponse
                             {
-                                isError = true,
-                                errorMessage = "nu such deviceId",
+                                IsError = true,
+                                ErrorMessage = "nu such deviceId",
 
                             };
                             var json = JsonSerializer.Serialize(response);
@@ -90,29 +90,29 @@ namespace Gaos.Routes
                         } 
                         int deviceId = device.Id;
 
-                        if (!Password.verifyPassword(user.PasswordSalt, user.PasswordHash, loginRequest.password))
+                        if (!Password.verifyPassword(user.PasswordSalt, user.PasswordHash, loginRequest.Password))
                         {
                             response = new LoginResponse
                             {
-                                isError = true,
-                                errorMessage = "incorrect password",
+                                IsError = true,
+                                ErrorMessage = "incorrect password",
 
                             };
                             var json = JsonSerializer.Serialize(response);
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
                         }
 
-                        var jwtStr = tokenService.GenerateJWT(loginRequest.userName, user.Id, deviceId);
+                        var jwtStr = tokenService.GenerateJWT(loginRequest.UserName, user.Id, deviceId);
 
                         transaction.Commit();
 
                         response = new LoginResponse
                         {
-                            isError = false,
-                            errorMessage = null,
-                            userId = user.Id,
-                            isGuest = false,
-                            jwt = jwtStr,
+                            IsError = false,
+                            ErrorMessage = null,
+                            UserId = user.Id,
+                            IsGuest = false,
+                            Jwt = jwtStr,
                         };
 
                         return Results.Json(response);
@@ -123,8 +123,8 @@ namespace Gaos.Routes
                         Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                         LoginResponse response = new LoginResponse
                         {
-                            isError = true,
-                            errorMessage = "internal error",
+                            IsError = true,
+                            ErrorMessage = "internal error",
                         };
                         var json = JsonSerializer.Serialize(response);
                         return Results.Content(json, "application/json", Encoding.UTF8, 401);
@@ -142,19 +142,19 @@ namespace Gaos.Routes
                     { 
                         User guest = null;
                         GuestLoginResponse response = null;
-                        string guestName = guestLoginRequest.userName;
+                        string guestName = guestLoginRequest.UserName;
                         string json;
 
                         Device device;
 
 
-                        if (guestLoginRequest.deviceId == null)
+                        if (guestLoginRequest.DeviceId == null)
                         {
 
                             response = new GuestLoginResponse
                             {
-                                isError = true,
-                                errorMessage = "deviceId is missing",
+                                IsError = true,
+                                ErrorMessage = "deviceId is missing",
 
                             };
                             json = JsonSerializer.Serialize(response);
@@ -163,13 +163,13 @@ namespace Gaos.Routes
                         } 
                         else 
                         {
-                            device = await db.Device.FirstOrDefaultAsync(d => d.Id == guestLoginRequest.deviceId);
+                            device = await db.Device.FirstOrDefaultAsync(d => d.Id == guestLoginRequest.DeviceId);
                             if (device == null)
                             {
                                 response = new GuestLoginResponse
                                 {
-                                    isError = true,
-                                    errorMessage = "no such device",
+                                    IsError = true,
+                                    ErrorMessage = "no such device",
 
                                 };
                                 json = JsonSerializer.Serialize(response);
@@ -200,8 +200,8 @@ namespace Gaos.Routes
                                         Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: can't create guest");
                                         response = new GuestLoginResponse
                                         {
-                                            isError = true,
-                                            errorMessage = "internal error - can't create guest",
+                                            IsError = true,
+                                            ErrorMessage = "internal error - can't create guest",
 
                                         };
                                         json = JsonSerializer.Serialize(response);
@@ -227,8 +227,8 @@ namespace Gaos.Routes
                                             Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: can't create guest");
                                             response = new GuestLoginResponse
                                             {
-                                                isError = true,
-                                                errorMessage = "internal error - can't create guest",
+                                                IsError = true,
+                                                ErrorMessage = "internal error - can't create guest",
 
                                             };
                                             json = JsonSerializer.Serialize(response);
@@ -240,18 +240,18 @@ namespace Gaos.Routes
                             }
                         }
 
-                        var jwtStr = tokenService.GenerateJWT(guestLoginRequest.userName, guest.Id, device.Id, UserType.GuestUser);
+                        var jwtStr = tokenService.GenerateJWT(guestLoginRequest.UserName, guest.Id, device.Id, UserType.GuestUser);
 
                         transaction.Commit();
 
                         response = new GuestLoginResponse
                         {
-                            isError = false,
-                            errorMessage = null,
-                            userName = guest.Name,
-                            userId = guest.Id,
-                            isGuest = true,
-                            jwt = jwtStr,
+                            IsError = false,
+                            ErrorMessage = null,
+                            UserName = guest.Name,
+                            UserId = guest.Id,
+                            IsGuest = true,
+                            Jwt = jwtStr,
                         };
 
                         return Results.Json(response);
@@ -262,8 +262,8 @@ namespace Gaos.Routes
                         Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                         LoginResponse response = new LoginResponse
                         {
-                            isError = true,
-                            errorMessage = "internal error",
+                            IsError = true,
+                            ErrorMessage = "internal error",
                         };
                         var json = JsonSerializer.Serialize(response);
                         return Results.Content(json, "application/json", Encoding.UTF8, 401);
@@ -280,106 +280,106 @@ namespace Gaos.Routes
                     {
                         RegisterResponse response;
 
-                        if (registerRequest.userName == null || registerRequest.userName.Trim().Length == 0)
+                        if (registerRequest.UserName == null || registerRequest.UserName.Trim().Length == 0)
                         {
                             response = new RegisterResponse
                             {
-                                isError = true,
-                                errorMessage = "userName is empty",
+                                IsError = true,
+                                ErrorMessage = "userName is empty",
 
                             };
                             return Results.Json(response);
 
                         }
 
-                        bool userExists = await db.User.AnyAsync(u => u.Name == registerRequest.userName);
+                        bool userExists = await db.User.AnyAsync(u => u.Name == registerRequest.UserName);
                         if (userExists)
                         {
                             response = new RegisterResponse
                             {
-                                isError = true,
-                                errorMessage = "user already exists",
+                                IsError = true,
+                                ErrorMessage = "user already exists",
 
                             };
                             return Results.Json(response);
 
                         }
 
-                        if (registerRequest.email == null || registerRequest.email.Trim().Length == 0)
+                        if (registerRequest.Email == null || registerRequest.Email.Trim().Length == 0)
                         {
                             response = new RegisterResponse
                             {
-                                isError = true,
-                                errorMessage = "email is empty",
+                                IsError = true,
+                                ErrorMessage = "email is empty",
 
                             };
                             return Results.Json(response);
 
                         }
 
-                        bool emailExists = await db.User.AnyAsync(u => u.Email == registerRequest.email);
+                        bool emailExists = await db.User.AnyAsync(u => u.Email == registerRequest.Email);
                         if (emailExists)
                         {
                             response = new RegisterResponse
                             {
-                                isError = true,
-                                errorMessage = "email already exists",
+                                IsError = true,
+                                ErrorMessage = "email already exists",
 
                             };
                             return Results.Json(response);
 
                         }
 
-                        if (registerRequest.password == null || registerRequest.password.Trim().Length == 0)
+                        if (registerRequest.Password == null || registerRequest.Password.Trim().Length == 0)
                         {
                             response = new RegisterResponse
                             {
-                                isError = true,
-                                errorMessage = "password is empty",
+                                IsError = true,
+                                ErrorMessage = "password is empty",
 
                             };
                             return Results.Json(response);
 
                         }
 
-                        if (registerRequest.passwordVerify != null && registerRequest.passwordVerify.Trim().Length > 0)
+                        if (registerRequest.PasswordVerify != null && registerRequest.PasswordVerify.Trim().Length > 0)
                         {
-                            if (!string.Equals(registerRequest.password, registerRequest.passwordVerify))
+                            if (!string.Equals(registerRequest.Password, registerRequest.PasswordVerify))
                             {
                                 response = new RegisterResponse
                                 {
-                                    isError = true,
-                                    errorMessage = "passwords do not match",
+                                    IsError = true,
+                                    ErrorMessage = "passwords do not match",
                                 };
                                 return Results.Json(response);
                             }
 
                         }  
 
-                        if (registerRequest.deviceId == null)
+                        if (registerRequest.DeviceId == null)
                         {
                             response = new RegisterResponse
                             {
-                                isError = true,
-                                errorMessage = "deviceId is empty",
+                                IsError = true,
+                                ErrorMessage = "deviceId is empty",
 
                             };
                             return Results.Json(response);
                         }
 
-                        Device device = await db.Device.FirstOrDefaultAsync(d => d.Id == registerRequest.deviceId);
+                        Device device = await db.Device.FirstOrDefaultAsync(d => d.Id == registerRequest.DeviceId);
                         if (device == null)
                         {
                             response = new RegisterResponse
                             {
-                                isError = true,
-                                errorMessage = "nu such deviceId",
+                                IsError = true,
+                                ErrorMessage = "nu such deviceId",
 
                             };
                             return Results.Json(response);
                         } 
 
-                        EncodedPassword encodedPassword = Password.getEncodedPassword(registerRequest.password);
+                        EncodedPassword encodedPassword = Password.getEncodedPassword(registerRequest.Password);
 
                         // Search for guest user with this device
                         User guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
@@ -390,9 +390,9 @@ namespace Gaos.Routes
                         {
                             user = new User
                             {
-                                Name = registerRequest.userName,
+                                Name = registerRequest.UserName,
                                 IsGuest = false,
-                                Email = registerRequest.email,
+                                Email = registerRequest.Email,
                                 PasswordHash = encodedPassword.PasswordHash,
                                 PasswordSalt = encodedPassword.Salt,
                                 DeviceId = device.Id,
@@ -400,19 +400,19 @@ namespace Gaos.Routes
                             };
                             await db.User.AddAsync(user);
                             await db.SaveChangesAsync();
-                            jwtStr = tokenService.GenerateJWT(registerRequest.userName, user.Id, device.Id, UserType.RegisteredUser);
+                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, user.Id, device.Id, UserType.RegisteredUser);
                         }
                         else
                         {
                             // Trurn the guest user into a registered user
-                            guest.Name = registerRequest.userName;
+                            guest.Name = registerRequest.UserName;
                             guest.IsGuest = false;
-                            guest.Email = registerRequest.email;
+                            guest.Email = registerRequest.Email;
                             guest.PasswordHash = encodedPassword.PasswordHash;
                             guest.PasswordSalt = encodedPassword.Salt;
                             guest.DeviceId = device.Id;
                             await db.SaveChangesAsync();
-                            jwtStr = tokenService.GenerateJWT(registerRequest.userName, guest.Id, device.Id, UserType.RegisteredUser);
+                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, guest.Id, device.Id, UserType.RegisteredUser);
                         }
 
 
@@ -421,8 +421,8 @@ namespace Gaos.Routes
 
                         response = new RegisterResponse
                         {
-                            isError = false,
-                            jwt = jwtStr,
+                            IsError = false,
+                            Jwt = jwtStr,
                         };
                         return Results.Json(response);
                     }
@@ -432,8 +432,8 @@ namespace Gaos.Routes
                         Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                         RegisterResponse response = new RegisterResponse
                         {
-                            isError = true,
-                            errorMessage = "internal error",
+                            IsError = true,
+                            ErrorMessage = "internal error",
                         };
                         return Results.Json(response);
                     }

@@ -4,10 +4,10 @@ namespace gaos.Routes.Model.UserJson
 {
     public class RegisterResponse
     {
-        public bool? isError;
+        public bool? IsError;
 
-        public string? errorMessage;
+        public string? ErrorMessage;
 
-        public string? jwt;
+        public string? Jwt;
     }
 }

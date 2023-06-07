@@ -2,16 +2,16 @@ namespace gaos.Routes.Model.UserJson
 {
     public class GuestLoginResponse
     {
-        public bool? isError;
+        public bool? IsError;
 
-        public string? errorMessage;
-        public string? userName;
+        public string? ErrorMessage;
+        public string? UserName;
 
-        public int? userId;
+        public int? UserId;
 
-        public bool? isGuest;
+        public bool? IsGuest;
 
-        public string? jwt;
+        public string? Jwt;
 
     }
 }

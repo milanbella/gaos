@@ -4,11 +4,11 @@ namespace gaos.Routes.Model.ApiJson
 {
     public class TokenClaimsResponse
     {
-        public bool? isError { get; set; }
+        public bool? IsError;
 
-        public string? errorMessage { get; set; }
+        public string? ErrorMessage;
 
-        public TokenClaims? tokenClaims { get; set; }
+        public TokenClaims? TokenClaims;
 
 
     }

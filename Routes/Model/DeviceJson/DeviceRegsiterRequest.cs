@@ -3,10 +3,10 @@ namespace gaos.Routes.Model.DeviceJson
 
     public class DeviceRegisterRequest
     {
-        public string? identification;
+        public string? Identification;
 
-        public string? platformType;
-        public string? buildVersion;
+        public string? PlatformType;
+        public string? BuildVersion;
 
     }
 }

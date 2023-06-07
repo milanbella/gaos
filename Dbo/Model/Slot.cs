@@ -2,9 +2,9 @@
 {
     public class Slot
     {
-        public int Id { get; set; }
-        public string? Name { get; set; }
+        public int Id;
+        public string? Name;
 
-        public UserSlot[]? UserSlots { get; set; }
+        public UserSlot[]? UserSlots;
     }
 }

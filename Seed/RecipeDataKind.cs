@@ -16,10 +16,10 @@ namespace Gaos.Seed
         {
             // seed Dbo.User
             modelBuilder.Entity<gaos.Dbo.Model.RecipeDataKind>().HasData(
-                new Gaos.Dbo.RecipeDataKind { Id = 1, Name = RecipeDataKindEnum.BasicRecipeObjects.ToString() },
-                new Gaos.Dbo.RecipeDataKind { Id = 2, Name = RecipeDataKindEnum.ProcessedRecipeObjects.ToString() },
-                new Gaos.Dbo.RecipeDataKind { Id = 3, Name = RecipeDataKindEnum.RefinedRecipeObjects.ToString() },
-                new Gaos.Dbo.User { Id = 4, Name = RecipeDataKindEnum.AssembledRecipeObjects.ToString() }
+                new gaos.Dbo.Model.RecipeDataKind { Id = 1, Name = RecipeDataKindEnum.BasicRecipeObjects.ToString() },
+                new gaos.Dbo.Model.RecipeDataKind { Id = 2, Name = RecipeDataKindEnum.ProcessedRecipeObjects.ToString() },
+                new gaos.Dbo.Model.RecipeDataKind { Id = 3, Name = RecipeDataKindEnum.RefinedRecipeObjects.ToString() },
+                new gaos.Dbo.Model.RecipeDataKind { Id = 4, Name = RecipeDataKindEnum.AssembledRecipeObjects.ToString() }
             );
         } 
     }

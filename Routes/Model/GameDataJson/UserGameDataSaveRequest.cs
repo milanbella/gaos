@@ -4,12 +4,12 @@ namespace gaos.Routes.Model.GameDataJson
 {
     public class UserGameDataSaveRequest
     {
-        public int userId;
-        public int slotId;
-        public GameData? gameData;
+        public int UserId;
+        public int SlotId;
+        public GameData? GameData;
 
-        public Dictionary<string, InventoryItemData[]>? inventoryItemData;
+        public Dictionary<string, InventoryItemData[]>? InventoryItemData;
 
-        public Dictionary<string, RecipeData[]>? recipeData;
+        public Dictionary<string, RecipeData[]>? RecipeData;
     }
 }

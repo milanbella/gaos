@@ -5,19 +5,19 @@ namespace gaos.Dbo.Model
 {
     public class User
     {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public bool? IsGuest { get; set; }
-        public string? Email { get; set; }
-        public string? PasswordHash { get; set; }
-        public string? PasswordSalt { get; set; }
-        public int? DeviceId { get; set; }
-        public Device? Device { get; set; }
-        public int? UserSettingsId { get; set; }
-        public UserSettings? UserSettings { get; set; }
+        public int Id;
+        public string? Name;
+        public bool? IsGuest;
+        public string? Email;
+        public string? PasswordHash;
+        public string? PasswordSalt;
+        public int? DeviceId;
+        public Device? Device;
+        public int? UserSettingsId;
+        public UserSettings? UserSettings;
 
-        public UserSlot[]? UserSlots { get; set; }
+        public UserSlot[]? UserSlots;
 
-        public ICollection<JWT>? JWTs { get; }
+        public ICollection<JWT>? JWTs;
     }
 }

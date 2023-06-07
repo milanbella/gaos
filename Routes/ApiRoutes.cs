@@ -1,14 +1,9 @@
 ﻿#pragma warning disable 8600, 8602 // Disable null check warnings for fields that are initialized in the constructor
 
-using Microsoft.EntityFrameworkCore;
-using System.Text;
-using System.Text.Json;
 using Serilog;
 using Gaos.Auth;
 using Gaos.Dbo;
-using Gaos.Routes.UserJson;
 using Gaos.Middleware;
-using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
 using gaos.Routes.Model.ApiJson;
 
 namespace Gaos.Routes
@@ -30,8 +25,8 @@ namespace Gaos.Routes
                     TokenClaims claims = context.Items[AuthMiddleware.HTTP_CONTEXT_KEY_TOKEN_CLAIMS] as TokenClaims;
                     TokenClaimsResponse  response = new TokenClaimsResponse
                     {
-                        isError = false,
-                        tokenClaims = claims,
+                        IsError = false,
+                        TokenClaims = claims,
 
                     };
                     return Results.Json(response);
@@ -41,8 +36,8 @@ namespace Gaos.Routes
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                     TokenClaimsResponse response = new TokenClaimsResponse
                     {
-                        isError = true,
-                        errorMessage = "internal error",
+                        IsError = true,
+                        ErrorMessage = "internal error",
                     };
                     return Results.Json(response);
                 }

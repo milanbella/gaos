@@ -2,7 +2,7 @@
 {
     public class UserGameDataGetRequest
     {
-        public int userId;
-        public int slotId;
+        public int UserId;
+        public int SlotId;
     }
 }

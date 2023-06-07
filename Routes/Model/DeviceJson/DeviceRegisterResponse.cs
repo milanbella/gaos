@@ -2,13 +2,13 @@ namespace gaos.Routes.Model.DeviceJson
 {
     public class DeviceRegisterResponse
     {
-        public bool? isError;
-        public string? errorMessage;
+        public bool? IsError;
+        public string? ErrorMessage;
 
-        public int? deviceId;
-        public string? identification;
-        public string? platformType;
-        public string? buildVersion;
+        public int? DeviceId;
+        public string? Identification;
+        public string? PlatformType;
+        public string? BuildVersion;
 
     }
 }

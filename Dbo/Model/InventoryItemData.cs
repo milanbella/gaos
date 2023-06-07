@@ -2,20 +2,20 @@
 {
     public class InventoryItemData
     {
-        public int Id { get; set; }
-        public int? UserSlotId { get; set; }
-        public UserSlot? UserSlot { get; set; }
-        public int? InventoryItemDataKindId { get; set; }
-        public InventoryItemDataKind? InventoryItemDataKind { get; set; }
+        public int Id;
+        public int? UserSlotId;
+        public UserSlot? UserSlot;
+        public int? InventoryItemDataKindId;
+        public InventoryItemDataKind? InventoryItemDataKind;
 
-        public string? ItemName { get; set; }
-        public string? ItemType { get; set; }
-        public string? ItemClass { get; set; }
-        public string? ItemProduct { get; set; }
-        public int? ItemQuantity { get; set; }
-        public string? OxygenTimer { get; set; }
-        public string? EnergyTimer { get; set; }
-        public string? WaterTimer { get; set; }
+        public string? ItemName;
+        public string? ItemType;
+        public string? ItemClass;
+        public string? ItemProduct;
+        public int? ItemQuantity;
+        public string? OxygenTime;
+        public string? EnergyTime;
+        public string? WaterTime;
 
     }
 }

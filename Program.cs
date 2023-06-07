@@ -87,7 +87,6 @@ app.Map("/", (IConfiguration configuration) => {
     Console.WriteLine($"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ cp 200: db_connection_string:  {configuration["db_connection_string"]}");
     return Results.Ok("hello!");
 });
-app.MapGroup("/todoitems").GroupTodosItems();
 app.MapGroup("/user").GroupUser();
 app.MapGroup("/device").GroupDevice();
 app.MapGroup("/api").GroupApi();

@@ -5,16 +5,16 @@ namespace gaos.Routes.Model.DeviceJson
 {
     public class DeviceGetRegistrationResponse
     {
-        public bool? isError;
+        public bool? IsError;
 
-        public string? errorMessage;
+        public string? ErrorMessage;
 
-        public bool? isFound;
+        public bool? IsFound;
 
-        public int? deviceId;
-        public string? identification;
-        public string? platformType;
-        public string? buildVersion;
+        public int? DeviceId;
+        public string? Identification;
+        public string? PlatformType;
+        public string? BuildVersion;
 
     }
 }

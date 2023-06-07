@@ -27,51 +27,51 @@ namespace Gaos.Routes
                 {
                     DeviceRegisterResponse response;
 
-                    if (deviceRegisterRequest.identification == null || deviceRegisterRequest.identification.Trim().Length == 0)
+                    if (deviceRegisterRequest.Identification == null || deviceRegisterRequest.Identification.Trim().Length == 0)
                     {
                         response = new DeviceRegisterResponse
                         {
-                            isError = true,
-                            errorMessage = "identification is empty",
+                            IsError = true,
+                            ErrorMessage = "identification is empty",
 
                         };
                         return Results.Json(response);
                     }
 
-                    string platformType = deviceRegisterRequest.platformType;
+                    string platformType = deviceRegisterRequest.PlatformType;
 
-                    if (deviceRegisterRequest.buildVersion == null || deviceRegisterRequest.buildVersion.Trim().Length == 0)
+                    if (deviceRegisterRequest.BuildVersion == null || deviceRegisterRequest.BuildVersion.Trim().Length == 0)
                     {
                         response = new DeviceRegisterResponse
                         {
-                            isError = true,
-                            errorMessage = "buildVersion is empty",
+                            IsError = true,
+                            ErrorMessage = "buildVersion is empty",
 
                         };
                         return Results.Json(response);
                     }
 
 
-                    BuildVersion buildVersion = await db.BuildVersion.FirstOrDefaultAsync(b => b.Version == deviceRegisterRequest.buildVersion);
-                    Device device = await db.Device.FirstOrDefaultAsync(d => d.Identification == deviceRegisterRequest.identification && d.PlatformType == platformType);
+                    BuildVersion buildVersion = await db.BuildVersion.FirstOrDefaultAsync(b => b.Version == deviceRegisterRequest.BuildVersion);
+                    Device device = await db.Device.FirstOrDefaultAsync(d => d.Identification == deviceRegisterRequest.Identification && d.PlatformType == platformType);
 
                     if (device == null)
                     {
                         device = new Device
                         {
-                            Identification = deviceRegisterRequest.identification,
+                            Identification = deviceRegisterRequest.Identification,
                             PlatformType = platformType,
                             BuildVersionId = (buildVersion != null) ? buildVersion.Id : null,
-                            BuildVersionReported = deviceRegisterRequest.buildVersion
+                            BuildVersionReported = deviceRegisterRequest.BuildVersion
                         };
                         db.Device.Add(device);
                         await db.SaveChangesAsync();
 
                     } else {
-                        device.Identification = deviceRegisterRequest.identification;
+                        device.Identification = deviceRegisterRequest.Identification;
                         device.PlatformType = platformType;
                         device.BuildVersionId = (buildVersion != null) ? buildVersion.Id : null;
-                        device.BuildVersionReported = deviceRegisterRequest.buildVersion;
+                        device.BuildVersionReported = deviceRegisterRequest.BuildVersion;
 
                         await db.SaveChangesAsync();
                     }
@@ -79,11 +79,11 @@ namespace Gaos.Routes
 
                     response = new DeviceRegisterResponse
                     {
-                        isError = false,
-                        deviceId = device.Id,
-                        identification = device.Identification,
-                        platformType = device.PlatformType.ToString(),
-                        buildVersion = ( buildVersion != null ) ? buildVersion.Version : "unknown",
+                        IsError = false,
+                        DeviceId = device.Id,
+                        Identification = device.Identification,
+                        PlatformType = device.PlatformType.ToString(),
+                        BuildVersion = ( buildVersion != null ) ? buildVersion.Version : "unknown",
                     };
                     return Results.Json(response);
                 }
@@ -92,8 +92,8 @@ namespace Gaos.Routes
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                     DeviceRegisterResponse response = new DeviceRegisterResponse
                     {
-                        isError = true,
-                        errorMessage = "internal error",
+                        IsError = true,
+                        ErrorMessage = "internal error",
                     };
                     return Results.Json(response);
                 }
@@ -106,26 +106,26 @@ namespace Gaos.Routes
                 try
                 {
                     DeviceGetRegistrationResponse response;
-                    if (deviceGetRegistrationRequest.identification == null || deviceGetRegistrationRequest.identification.Trim().Length == 0)
+                    if (deviceGetRegistrationRequest.Identification == null || deviceGetRegistrationRequest.Identification.Trim().Length == 0)
                     {
                         response = new DeviceGetRegistrationResponse
                         {
-                            isError = true,
-                            errorMessage = "deviceId is empty",
+                            IsError = true,
+                            ErrorMessage = "deviceId is empty",
 
                         };
                         return Results.Json(response);
                     }
 
-                    string platformType = deviceGetRegistrationRequest.platformType;
+                    string platformType = deviceGetRegistrationRequest.PlatformType;
 
-                    Device device = await db.Device.FirstOrDefaultAsync(d => d.Identification == deviceGetRegistrationRequest.identification && d.PlatformType == platformType);
+                    Device device = await db.Device.FirstOrDefaultAsync(d => d.Identification == deviceGetRegistrationRequest.Identification && d.PlatformType == platformType);
                     if (device == null)
                     {
                         response = new DeviceGetRegistrationResponse
                         {
-                            isError = false,
-                            isFound = false,
+                            IsError = false,
+                            IsFound = false,
                         };
                         return Results.Json(response);
                     }
@@ -133,12 +133,12 @@ namespace Gaos.Routes
                     {
                         response = new DeviceGetRegistrationResponse
                         {
-                            isError = false,
-                            isFound = true,
-                            deviceId = device.Id,
-                            identification = device.Identification,
-                            platformType = device.PlatformType.ToString(),
-                            buildVersion = device.BuildVersion.Version,
+                            IsError = false,
+                            IsFound = true,
+                            DeviceId = device.Id,
+                            Identification = device.Identification,
+                            PlatformType = device.PlatformType.ToString(),
+                            BuildVersion = device.BuildVersion.Version,
                         };
                         return Results.Json(response);
                     }
@@ -149,8 +149,8 @@ namespace Gaos.Routes
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                     DeviceGetRegistrationResponse response = new DeviceGetRegistrationResponse
                     {
-                        isError = true,
-                        errorMessage = "internal error",
+                        IsError = true,
+                        ErrorMessage = "internal error",
                     };
                     return Results.Json(response);
                 }
@@ -164,24 +164,24 @@ namespace Gaos.Routes
                 {
                     DeviceGetRegistrationResponse response;
 
-                    if (deviceGetRegistrationByIdRequest.deviceId == 0)
+                    if (deviceGetRegistrationByIdRequest.DeviceId == 0)
                     {
                         response = new DeviceGetRegistrationResponse
                         {
-                            isError = true,
-                            errorMessage = "deviceId is empty",
+                            IsError = true,
+                            ErrorMessage = "deviceId is empty",
 
                         };
                         return Results.Json(response);
                     }
 
-                    Device device = await db.Device.FirstOrDefaultAsync(d => d.Id == deviceGetRegistrationByIdRequest.deviceId);
+                    Device device = await db.Device.FirstOrDefaultAsync(d => d.Id == deviceGetRegistrationByIdRequest.DeviceId);
                     if (device == null)
                     {
                         response = new DeviceGetRegistrationResponse
                         {
-                            isError = false,
-                            isFound = false,
+                            IsError = false,
+                            IsFound = false,
                         };
                         return Results.Json(response);
                     }
@@ -189,12 +189,12 @@ namespace Gaos.Routes
                     {
                         response = new DeviceGetRegistrationResponse
                         {
-                            isError = false,
-                            isFound = true,
-                            deviceId = device.Id,
-                            identification = device.Identification,
-                            platformType = device.PlatformType.ToString(),
-                            buildVersion = device.BuildVersion.Version,
+                            IsError = false,
+                            IsFound = true,
+                            DeviceId = device.Id,
+                            Identification = device.Identification,
+                            PlatformType = device.PlatformType.ToString(),
+                            BuildVersion = device.BuildVersion.Version,
                         };
                         return Results.Json(response);
                     }
@@ -205,8 +205,8 @@ namespace Gaos.Routes
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                     DeviceGetRegistrationResponse response = new DeviceGetRegistrationResponse
                     {
-                        isError = true,
-                        errorMessage = "internal error",
+                        IsError = true,
+                        ErrorMessage = "internal error",
                     };
                     return Results.Json(response);
                 }

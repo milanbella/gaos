@@ -18,8 +18,8 @@ namespace Gaos.Routes
                 const string METHOD_NAME = "userGameDataGet()";
                 try 
                 { 
-                    int userId = request.userId;
-                    int slotId = request.slotId;
+                    int userId = request.UserId;
+                    int slotId = request.SlotId;
 
 
                     // GameData
@@ -75,11 +75,11 @@ namespace Gaos.Routes
 
                     UserGameDataGetResponse response = new UserGameDataGetResponse
                     {
-                        isError = false,
-                        errorMessage = "",
-                        gameData = gameData,
-                        inventoryItemData = enumKindToInventoryItemDataDict,
-                        recipeData = enumKindToRecipeDataDict
+                        IsError = false,
+                        ErrorMessage = "",
+                        GameData = gameData,
+                        InventoryItemData = enumKindToInventoryItemDataDict,
+                        RecipeData = enumKindToRecipeDataDict
                     };
                     return Results.Json(response);
 
@@ -89,8 +89,8 @@ namespace Gaos.Routes
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                     UserGameDataGetResponse response = new UserGameDataGetResponse
                     {
-                        isError = true,
-                        errorMessage = "internal error",
+                        IsError = true,
+                        ErrorMessage = "internal error",
                     };
                     return Results.Json(response);
                 }
@@ -102,24 +102,24 @@ namespace Gaos.Routes
                 const string METHOD_NAME = "userGameDataSave()";
                 try 
                 { 
-                    if (request.gameData != null)
+                    if (request.GameData != null)
                     {
-                        GameData gameData = request.gameData;
+                        GameData gameData = request.GameData;
                         db.GameData.Update(gameData);
                     }
 
-                    foreach (string key in request.inventoryItemData.Keys)
+                    foreach (string key in request.InventoryItemData.Keys)
                     {
-                        InventoryItemData[] inventoryItemData = request.inventoryItemData[key];
+                        InventoryItemData[] inventoryItemData = request.InventoryItemData[key];
                         foreach (InventoryItemData iid in inventoryItemData)
                         {
                             db.InventoryItemData.Update(iid);
                         }
                     }
 
-                    foreach (string key in request.recipeData.Keys)
+                    foreach (string key in request.RecipeData.Keys)
                     {
-                        RecipeData[] recipeData = request.recipeData[key];
+                        RecipeData[] recipeData = request.RecipeData[key];
                         foreach (RecipeData rd in recipeData)
                         {
                             db.RecipeData.Update(rd);
@@ -130,8 +130,8 @@ namespace Gaos.Routes
 
                     UserGameDataGetResponse response = new UserGameDataGetResponse
                     {
-                        isError = false,
-                        errorMessage = "",
+                        IsError = false,
+                        ErrorMessage = "",
                     };
                     return Results.Json(response);
                 }
@@ -140,8 +140,8 @@ namespace Gaos.Routes
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                     UserGameDataGetResponse response = new UserGameDataGetResponse
                     {
-                        isError = true,
-                        errorMessage = "internal error",
+                        IsError = true,
+                        ErrorMessage = "internal error",
                     };
                     return Results.Json(response);
                 }
@@ -155,9 +155,9 @@ namespace Gaos.Routes
                     InventoryItemDataKind[] inventoryItemDataKinds = db.InventoryItemDataKind.ToArray();
                     InventoryItemDataKindsGetResponse response = new InventoryItemDataKindsGetResponse
                     {
-                        isError = false,
-                        errorMessage = "",
-                        inventoryItemDataKinds = inventoryItemDataKinds
+                        IsError = false,
+                        ErrorMessage = "",
+                        InventoryItemDataKinds = inventoryItemDataKinds
                     };
                     return Results.Json(response);
                 }
@@ -166,8 +166,8 @@ namespace Gaos.Routes
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                     InventoryItemDataKindsGetResponse response = new InventoryItemDataKindsGetResponse
                     {
-                        isError = true,
-                        errorMessage = "internal error",
+                        IsError = true,
+                        ErrorMessage = "internal error",
                     };
                     return Results.Json(response);
                 }
@@ -182,9 +182,9 @@ namespace Gaos.Routes
                     RecipeDataKind[] recipeDataKinds = db.RecipeDataKind.ToArray();
                     RecipeDataKindsGetResponse response = new RecipeDataKindsGetResponse
                     {
-                        isError = false,
-                        errorMessage = "",
-                        recipeDataKinds = recipeDataKinds
+                        IsError = false,
+                        ErrorMessage = "",
+                        RecipeDataKinds = recipeDataKinds
                     };
                     return Results.Json(response);
                 }
@@ -193,8 +193,8 @@ namespace Gaos.Routes
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
                     InventoryItemDataKindsGetResponse response = new InventoryItemDataKindsGetResponse
                     {
-                        isError = true,
-                        errorMessage = "internal error",
+                        IsError = true,
+                        ErrorMessage = "internal error",
                     };
                     return Results.Json(response);
                 }

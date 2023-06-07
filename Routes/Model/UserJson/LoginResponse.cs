@@ -2,15 +2,15 @@
 {
     public class LoginResponse
     {
-        public bool? isError;
+        public bool? IsError;
 
-        public string? errorMessage;
+        public string? ErrorMessage;
 
-        public int? userId;
+        public int? UserId;
 
-        public bool? isGuest;
+        public bool? IsGuest;
 
-        public string? jwt;
+        public string? Jwt;
 
     }
 }

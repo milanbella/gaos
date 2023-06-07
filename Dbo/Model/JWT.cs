@@ -2,13 +2,13 @@
 {
     public class JWT
     {
-        public int Id { get; set; }
-        public string? Token { get; set; }
-        public int? UserId { get; set; }
-        public User? User { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public int Id;
+        public string? Token;
+        public int? UserId;
+        public User? User;
+        public DateTime CreatedAt;
 
-        public int? DeviceId { get; set; }
-        public Device? Device { get; set; }
+        public int? DeviceId;
+        public Device? Device;
     }
 }
