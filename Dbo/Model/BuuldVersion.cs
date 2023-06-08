@@ -1,3 +1,4 @@
+#pragma warning disable 8632
 namespace gaos.Dbo.Model
 {
     public class BuildVersion

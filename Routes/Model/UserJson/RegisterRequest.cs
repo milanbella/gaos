@@ -1,4 +1,4 @@
-﻿using Gaos.Dbo;
+﻿#pragma warning disable 8632
 
 namespace gaos.Routes.Model.UserJson
 {

@@ -1,4 +1,5 @@
-﻿namespace gaos.Dbo.Model
+﻿#pragma warning disable 8632
+namespace gaos.Dbo.Model
 {
     public class JWT
     {
@@ -6,7 +7,8 @@
         public string? Token;
         public int? UserId;
         public User? User;
-        public DateTime CreatedAt;
+        // Do not remove unused System namespace or else it will not compile in Gao  
+        public System.DateTime CreatedAt;
 
         public int? DeviceId;
         public Device? Device;

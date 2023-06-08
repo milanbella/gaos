@@ -63,7 +63,7 @@ namespace Gaos.Middleware
                 return;
             }
 
-            TokenClaims claims = token.GetClaimsFormJWT(jwt);
+            Gaos.Model.Token.TokenClaims claims = token.GetClaimsFormJWT(jwt);
 
             if (claims == null)
             {

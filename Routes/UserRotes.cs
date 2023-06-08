@@ -240,7 +240,7 @@ namespace Gaos.Routes
                             }
                         }
 
-                        var jwtStr = tokenService.GenerateJWT(guestLoginRequest.UserName, guest.Id, device.Id, UserType.GuestUser);
+                        var jwtStr = tokenService.GenerateJWT(guestLoginRequest.UserName, guest.Id, device.Id, Gaos.Model.Token.UserType.GuestUser);
 
                         transaction.Commit();
 
@@ -400,7 +400,7 @@ namespace Gaos.Routes
                             };
                             await db.User.AddAsync(user);
                             await db.SaveChangesAsync();
-                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, user.Id, device.Id, UserType.RegisteredUser);
+                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, user.Id, device.Id, Gaos.Model.Token.UserType.RegisteredUser);
                         }
                         else
                         {
@@ -412,7 +412,7 @@ namespace Gaos.Routes
                             guest.PasswordSalt = encodedPassword.Salt;
                             guest.DeviceId = device.Id;
                             await db.SaveChangesAsync();
-                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, guest.Id, device.Id, UserType.RegisteredUser);
+                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, guest.Id, device.Id, Gaos.Model.Token.UserType.RegisteredUser);
                         }
 
 

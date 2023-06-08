@@ -1,4 +1,4 @@
-﻿using Gaos.Auth;
+﻿#pragma warning disable 8632
 
 namespace gaos.Routes.Model.ApiJson
 {
@@ -8,7 +8,7 @@ namespace gaos.Routes.Model.ApiJson
 
         public string? ErrorMessage;
 
-        public TokenClaims? TokenClaims;
+        public Gaos.Model.Token.TokenClaims? TokenClaims;
 
 
     }

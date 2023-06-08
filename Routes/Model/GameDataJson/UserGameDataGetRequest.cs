@@ -1,4 +1,5 @@
-﻿namespace gaos.Routes.Model.GameDataJson
+﻿#pragma warning disable 8632
+namespace gaos.Routes.Model.GameDataJson
 {
     public class UserGameDataGetRequest
     {

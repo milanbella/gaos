@@ -1,4 +1,5 @@
-﻿namespace gaos.Dbo.Model
+﻿#pragma warning disable 8632
+namespace gaos.Dbo.Model
 {
     /*
     public enum PlatformType

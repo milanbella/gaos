@@ -1,4 +1,5 @@
-﻿namespace gaos.Routes.Model.UserJson
+﻿#pragma warning disable 8632
+namespace gaos.Routes.Model.UserJson
 {
     public class LoginResponse
     {

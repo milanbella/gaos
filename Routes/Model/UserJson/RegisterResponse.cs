@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿#pragma warning disable 8632
 
 namespace gaos.Routes.Model.UserJson
 {

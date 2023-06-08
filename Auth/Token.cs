@@ -7,6 +7,7 @@ using Gaos.Dbo;
 
 namespace Gaos.Auth
 {
+    /*
     public enum UserType
     {
         RegisteredUser,
@@ -15,13 +16,14 @@ namespace Gaos.Auth
 
     public class TokenClaims
     {
-        public string? sub { get; set; }
-        public long exp { get; set; }
+        public string sub;
+        public long exp;
 
-        public UserType userType { get; set; }
+        public UserType userType;
 
-        public int deviceId { get; set; }
+        public int deviceId;
     }
+    */
 
     public class Token
     {
@@ -61,7 +63,7 @@ namespace Gaos.Auth
 
         }
 
-        private string GenerateJWT(RSA privateKey, string username, int deviceId, UserType userType = UserType.RegisteredUser)
+        private string GenerateJWT(RSA privateKey, string username, int deviceId, Gaos.Model.Token.UserType userType = Gaos.Model.Token.UserType.RegisteredUser)
         {
 
             // Set JWT payload.
@@ -79,7 +81,7 @@ namespace Gaos.Auth
             return jwt;
         }
 
-        public string GenerateJWT(string username, int userId, int deviceId, UserType userType = UserType.RegisteredUser)
+        public string GenerateJWT(string username, int userId, int deviceId, Gaos.Model.Token.UserType userType = Gaos.Model.Token.UserType.RegisteredUser)
         {
             const string METHOD_NAME = "GenerateJWT()";
             string jwtStr;
@@ -98,7 +100,7 @@ namespace Gaos.Auth
 
             }
 
-            if (userType == UserType.RegisteredUser)
+            if (userType == Gaos.Model.Token.UserType.RegisteredUser)
             {
                 gaos.Dbo.Model.JWT jwt = new gaos.Dbo.Model.JWT
                 {
@@ -109,7 +111,7 @@ namespace Gaos.Auth
                 db.JWT.Add(jwt);
                 db.SaveChanges();
             }
-            else if (userType == UserType.GuestUser)
+            else if (userType == Gaos.Model.Token.UserType.GuestUser)
             {
                 gaos.Dbo.Model.JWT jwt = new gaos.Dbo.Model.JWT
                 {
@@ -129,7 +131,7 @@ namespace Gaos.Auth
             return jwtStr;
         }
 
-        public TokenClaims? GetClaimsFormJWT(string jwt)
+        public Gaos.Model.Token.TokenClaims? GetClaimsFormJWT(string jwt)
         {
             const string METHOD_NAME = "GetClaimsFormJWT()";
             try
@@ -142,12 +144,12 @@ namespace Gaos.Auth
 
                 IDictionary<string, object> payload = Jose.JWT.Decode<IDictionary<string, object>>(jwt, publicKey, JwsAlgorithm.RS256);
 
-                TokenClaims claims = new TokenClaims();
+                Gaos.Model.Token.TokenClaims claims = new Gaos.Model.Token.TokenClaims();
                 claims.sub = (string)payload["sub"]; 
                 claims.exp = (long)payload["exp"];
 
                 string userType = (string)payload["user_type"];
-                UserType userTypeEnum;
+                Gaos.Model.Token.UserType userTypeEnum;
                 if (!Enum.TryParse(userType, out userTypeEnum)) {
                     Log.Warning($"{CLASS_NAME}:{METHOD_NAME} JWT is not valid, userType is not valid: {userType}");
                     return null;

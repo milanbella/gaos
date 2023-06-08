@@ -1,4 +1,5 @@
-﻿using gaos.Dbo.Model;
+﻿#pragma warning disable 8632
+using gaos.Dbo.Model;
 
 namespace gaos.Routes.Model.GameDataJson
 {

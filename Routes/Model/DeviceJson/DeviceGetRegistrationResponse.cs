@@ -1,3 +1,4 @@
+#pragma warning disable 8632
 
 using System.Data.Common;
 

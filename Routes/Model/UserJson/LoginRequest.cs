@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿#pragma warning disable 8632
+using System.Security.Cryptography;
 
 namespace gaos.Routes.Model.UserJson
 {
