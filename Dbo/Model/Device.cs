@@ -23,6 +23,6 @@
 
         public string? BuildVersionReported;
 
-        public DateTime RegisteredAt;
+        public System.DateTime RegisteredAt;
     }
 }

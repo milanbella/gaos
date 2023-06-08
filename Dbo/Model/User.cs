@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using System.ComponentModel.DataAnnotations;
-
-namespace gaos.Dbo.Model
+﻿namespace gaos.Dbo.Model
 {
     public class User
     {
@@ -13,11 +10,7 @@ namespace gaos.Dbo.Model
         public string? PasswordSalt;
         public int? DeviceId;
         public Device? Device;
-        public int? UserSettingsId;
-        public UserSettings? UserSettings;
 
-        public UserSlot[]? UserSlots;
 
-        public ICollection<JWT>? JWTs;
     }
 }

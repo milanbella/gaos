@@ -5,6 +5,5 @@
         public int Id;
         public string? Name;
 
-        public UserSlot[]? UserSlots;
     }
 }

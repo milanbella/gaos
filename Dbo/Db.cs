@@ -29,12 +29,12 @@
                 .HasIndex(e => e.Name).IsUnique(true);
             modelBuilder.Entity<User>()
                 .HasIndex(e => e.Email).IsUnique(true);
-            modelBuilder.Entity<User>()
-                .HasMany(e => e.JWTs)
-                .WithOne(jwt => jwt.User).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<User>().HasOne(e => e.Device).WithMany().HasForeignKey(e => e.DeviceId);
 
             // JWT
             modelBuilder.Entity<JWT>().HasKey(e => e.Id);
+            modelBuilder.Entity<JWT>().HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
+            modelBuilder.Entity<JWT>().HasOne(e => e.Device).WithMany().HasForeignKey(e => e.DeviceId);
 
             // BuildVersion
             modelBuilder.Entity<BuildVersion>().HasKey(e => e.Id);
@@ -44,28 +44,32 @@
             modelBuilder.Entity<Device>().HasKey(e => e.Id);
             modelBuilder.Entity<Device>()
                 .HasIndex(e => new { e.Identification, e.PlatformType }).IsUnique(true);
+            modelBuilder.Entity<Device>().HasOne(e => e.BuildVersion).WithMany().HasForeignKey(e => e.BuildVersionId);
 
-            modelBuilder.Entity<UserSlot>().HasIndex(e => new { e.UserId, e.SlotId }).IsUnique(true);
-
-            modelBuilder.Entity<GameData>().HasIndex(e => e.UserSlotId).IsUnique(true);
 
             // Slot
             modelBuilder.Entity<Slot>().HasKey(e => e.Id);
 
             // UserSlot
             modelBuilder.Entity<UserSlot>().HasKey(e => e.Id);
+            modelBuilder.Entity<UserSlot>().HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
+            modelBuilder.Entity<UserSlot>().HasOne(e => e.Slot).WithMany().HasForeignKey(e => e.SlotId);
+            modelBuilder.Entity<UserSlot>().HasIndex(e => new { e.UserId, e.SlotId }).IsUnique(true);
 
             // GameData
             modelBuilder.Entity<GameData>().HasKey(e => e.Id);
+            modelBuilder.Entity<GameData>().HasOne(e => e.UserSlot).WithMany().HasForeignKey(e => e.UserSlotId);
 
             // InventoryItemData
             modelBuilder.Entity<InventoryItemData>().HasKey(e => e.Id);
+            modelBuilder.Entity<InventoryItemData>().HasOne(e => e.UserSlot).WithMany().HasForeignKey(e => e.UserSlotId);
 
             // InventoryItemDataKind
             modelBuilder.Entity<InventoryItemDataKind>().HasKey(e => e.Id);
 
             // RecipeData
             modelBuilder.Entity<RecipeData>().HasKey(e => e.Id);
+            modelBuilder.Entity<RecipeData>().HasOne(e => e.UserSlot).WithMany().HasForeignKey(e => e.UserSlotId);
 
             // RecipeDataKind
             modelBuilder.Entity<RecipeDataKind>().HasKey(e => e.Id);
