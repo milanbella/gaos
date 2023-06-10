@@ -102,7 +102,7 @@ namespace Gaos.Auth
 
             if (userType == Gaos.Model.Token.UserType.RegisteredUser)
             {
-                gaos.Dbo.Model.JWT jwt = new gaos.Dbo.Model.JWT
+                Gaos.Dbo.Model.JWT jwt = new Gaos.Dbo.Model.JWT
                 {
                     Token = jwtStr,
                     UserId = userId,
@@ -113,7 +113,7 @@ namespace Gaos.Auth
             }
             else if (userType == Gaos.Model.Token.UserType.GuestUser)
             {
-                gaos.Dbo.Model.JWT jwt = new gaos.Dbo.Model.JWT
+                Gaos.Dbo.Model.JWT jwt = new Gaos.Dbo.Model.JWT
                 {
                     Token = jwtStr,
                     UserId = userId,
@@ -145,8 +145,8 @@ namespace Gaos.Auth
                 IDictionary<string, object> payload = Jose.JWT.Decode<IDictionary<string, object>>(jwt, publicKey, JwsAlgorithm.RS256);
 
                 Gaos.Model.Token.TokenClaims claims = new Gaos.Model.Token.TokenClaims();
-                claims.sub = (string)payload["sub"]; 
-                claims.exp = (long)payload["exp"];
+                claims.Sub = (string)payload["sub"]; 
+                claims.Exp = (long)payload["exp"];
 
                 string userType = (string)payload["user_type"];
                 Gaos.Model.Token.UserType userTypeEnum;
@@ -154,9 +154,9 @@ namespace Gaos.Auth
                     Log.Warning($"{CLASS_NAME}:{METHOD_NAME} JWT is not valid, userType is not valid: {userType}");
                     return null;
                 } else {
-                    claims.userType = userTypeEnum;
+                    claims.UserType = userTypeEnum;
                 }
-                claims.deviceId = (int)payload["device_id"];
+                claims.DeviceId = (int)payload["device_id"];
 
                 return claims;
             }

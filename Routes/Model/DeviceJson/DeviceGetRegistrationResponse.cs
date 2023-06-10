@@ -2,8 +2,9 @@
 
 using System.Data.Common;
 
-namespace gaos.Routes.Model.DeviceJson
+namespace Gaos.Routes.Model.DeviceJson
 {
+    [System.Serializable]
     public class DeviceGetRegistrationResponse
     {
         public bool? IsError;

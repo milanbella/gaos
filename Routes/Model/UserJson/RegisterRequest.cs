@@ -1,8 +1,9 @@
 ﻿#pragma warning disable 8632
 
-namespace gaos.Routes.Model.UserJson
+namespace Gaos.Routes.Model.UserJson
 {
 
+    [System.Serializable]
     public class RegisterRequest
     {
         public string? UserName;

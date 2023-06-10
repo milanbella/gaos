@@ -1,7 +1,8 @@
 #pragma warning disable 8632
-namespace gaos.Routes.Model.DeviceJson
+namespace Gaos.Routes.Model.DeviceJson
 {
 
+    [System.Serializable]
     public class DeviceGetRegistrationRequest
     {
         public string? Identification;

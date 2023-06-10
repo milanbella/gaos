@@ -1,6 +1,7 @@
 #pragma warning disable 8632
-namespace gaos.Dbo.Model
+namespace Gaos.Dbo.Model
 {
+    [System.Serializable]
     public class BuildVersion
     {
         public int Id;

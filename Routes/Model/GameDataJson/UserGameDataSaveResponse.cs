@@ -1,6 +1,7 @@
 ﻿#pragma warning disable 8632
-namespace gaos.Routes.Model.GameDataJson
+namespace Gaos.Routes.Model.GameDataJson
 {
+    [System.Serializable]
     public class UserGameDataSaveResponse
     {
         public bool? IsError;

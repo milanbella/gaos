@@ -4,7 +4,7 @@ using Serilog;
 using Gaos.Auth;
 using Gaos.Dbo;
 using Gaos.Middleware;
-using gaos.Routes.Model.ApiJson;
+using Gaos.Routes.Model.ApiJson;
 
 namespace Gaos.Routes
 {

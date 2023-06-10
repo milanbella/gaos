@@ -2,7 +2,7 @@
 {
     using Microsoft.EntityFrameworkCore;
     using System.Xml;
-    using gaos.Dbo.Model;
+    using Gaos.Dbo.Model;
 
     public class Db : DbContext
     {

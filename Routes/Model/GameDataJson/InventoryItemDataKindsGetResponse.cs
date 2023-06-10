@@ -1,8 +1,9 @@
 ﻿#pragma warning disable 8632
-using gaos.Dbo.Model;
+using Gaos.Dbo.Model;
 
-namespace gaos.Routes.Model.GameDataJson
+namespace Gaos.Routes.Model.GameDataJson
 {
+    [System.Serializable]
     public class InventoryItemDataKindsGetResponse
     {
         public bool? IsError;

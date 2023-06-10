@@ -1,17 +1,17 @@
 ﻿#pragma warning disable 8632
 using System.Collections.Generic;
-using gaos.Dbo.Model;
 
-namespace gaos.Routes.Model.GameDataJson
+namespace Gaos.Routes.Model.GameDataJson
 {
+    [System.Serializable]
     public class UserGameDataSaveRequest
     {
         public int UserId;
         public int SlotId;
-        public GameData? GameData;
+        public Gaos.Dbo.Model.GameData? GameData;
 
-        public Dictionary<string, InventoryItemData[]>? InventoryItemData;
+        public Dictionary<string, Gaos.Dbo.Model.InventoryItemData[]>? InventoryItemData;
 
-        public Dictionary<string, RecipeData[]>? RecipeData;
+        public Dictionary<string, Gaos.Dbo.Model.RecipeData[]>? RecipeData;
     }
 }

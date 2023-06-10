@@ -74,7 +74,7 @@ namespace Gaos.Middleware
             }
 
             long secondsNow = DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds();
-            if (secondsNow > claims.exp)
+            if (secondsNow > claims.Exp)
             {
                 Log.Warning($"{CLASS_NAME}:{METHOD_NAME} could not decode claims");
                 context.Response.StatusCode = 401;

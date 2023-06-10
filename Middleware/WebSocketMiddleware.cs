@@ -1,7 +1,7 @@
 ﻿#pragma warning disable 8600, 8602 
 
 using Serilog;
-using gaos.WebSocket;
+using Gaos.WebSocket;
 
 namespace Gaos.Middleware
 {
@@ -37,8 +37,8 @@ namespace Gaos.Middleware
                 using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
                 Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ cp 200");
                 Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ webscoket connected");
-                WebSocket.Add(webSocket);
-                await WebSocket.HandleMessages(webSocket);
+                Gaos.WebSocket.WebSocket.Add(webSocket);
+                await Gaos.WebSocket.WebSocket.HandleMessages(webSocket);
             }
             else
             {

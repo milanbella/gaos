@@ -1,5 +1,5 @@
 ﻿#pragma warning disable 8632
-namespace gaos.Dbo.Model
+namespace Gaos.Dbo.Model
 {
     /*
     public enum PlatformType
@@ -12,6 +12,7 @@ namespace gaos.Dbo.Model
     */
 
 
+    [System.Serializable]
     public class Device
     {
         public int Id;

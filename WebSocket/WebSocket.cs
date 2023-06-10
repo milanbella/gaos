@@ -1,6 +1,6 @@
 ﻿using Serilog;
 
-namespace gaos.WebSocket
+namespace Gaos.WebSocket
 {
 
     public class WebSocket

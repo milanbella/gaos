@@ -1,6 +1,7 @@
 ﻿#pragma warning disable 8632
-namespace gaos.Routes.Model.ApiJson
+namespace Gaos.Routes.Model.ApiJson
 {
+    [System.Serializable]
     public class TokenClaimsRequest
     {
     }

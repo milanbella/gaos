@@ -9,13 +9,14 @@ namespace Gaos.Model.Token
         GuestUser,
     }
 
+    [System.Serializable]
     public class TokenClaims
     {
-        public string sub;
-        public long exp;
+        public string Sub;
+        public long Exp;
 
-        public UserType userType;
+        public UserType UserType;
 
-        public int deviceId;
+        public int DeviceId;
     }
 }
