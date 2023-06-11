@@ -39,54 +39,59 @@ namespace Gaos.Middleware
 
             string path = context.Request.Path.Value;
 
-            if (path == null || !path.StartsWith("/api"))
+             
+
+            if (path != null && path.StartsWith("/api"))
+            {
+
+                string? authHeader = context.Request.Headers["Authorization"];
+
+                if (authHeader == null)
+                {
+                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} missing Authorization header");
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Unauthorized");
+                    return;
+                }
+
+                string? jwt = ExtractBrearerToken(authHeader);
+                if (jwt == null)
+                {
+                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} no bearer token in Authorization header ");
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Unauthorized");
+                    return;
+                }
+
+                Gaos.Model.Token.TokenClaims claims = token.GetClaimsFormJWT(jwt);
+
+                if (claims == null)
+                {
+                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} could not decode claims");
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Unauthorized");
+                    return;
+                }
+
+                long secondsNow = DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds();
+                if (secondsNow > claims.Exp)
+                {
+                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} could not decode claims");
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Unauthorized - token expired");
+                    return;
+
+                }
+
+                context.Items.Add(HTTP_CONTEXT_KEY_TOKEN_CLAIMS, claims);
+
+
+                await _next(context);
+            }
+            else
             {
                 await _next(context);
-                return;
             }
-
-            string? authHeader = context.Request.Headers["Authorization"];
-
-            if (authHeader == null)
-            {
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Unauthorized");
-                return;
-            }
-
-            string? jwt = ExtractBrearerToken(authHeader); 
-            if (jwt == null)
-            {
-                Log.Warning($"{CLASS_NAME}:{METHOD_NAME} no bearer token in Authorization header ");
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Unauthorized");
-                return;
-            }
-
-            Gaos.Model.Token.TokenClaims claims = token.GetClaimsFormJWT(jwt);
-
-            if (claims == null)
-            {
-                Log.Warning($"{CLASS_NAME}:{METHOD_NAME} could not decode claims");
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Unauthorized");
-                return;
-            }
-
-            long secondsNow = DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds();
-            if (secondsNow > claims.Exp)
-            {
-                Log.Warning($"{CLASS_NAME}:{METHOD_NAME} could not decode claims");
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Unauthorized - token expired");
-                return;
-
-            }
-
-            context.Items.Add(HTTP_CONTEXT_KEY_TOKEN_CLAIMS, claims);
-
-
-            await _next(context);
         }
     }
 
