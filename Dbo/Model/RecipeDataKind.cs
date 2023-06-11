@@ -4,7 +4,7 @@ namespace Gaos.Dbo.Model
     [System.Serializable]
     public class RecipeDataKind
     {
-        public int Id;
-        public string? Name;
+        public int Id { get; set; }
+        public string? Name { get; set; }
     }
 }

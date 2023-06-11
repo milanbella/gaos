@@ -5,10 +5,10 @@ namespace Gaos.Routes.Model.UserJson
     [System.Serializable]
     public class RegisterResponse
     {
-        public bool? IsError;
+        public bool? IsError { get; set; }
 
-        public string? ErrorMessage;
+        public string? ErrorMessage { get; set; }
 
-        public string? Jwt;
+        public string? Jwt { get; set; }
     }
 }

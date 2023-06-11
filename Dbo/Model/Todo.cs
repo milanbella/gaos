@@ -4,8 +4,8 @@ namespace Gaos.Dbo.Model
     [System.Serializable]
     public class Todo
     {
-        public int Id;
-        public string? Name;
-        public bool IsComplete;
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public bool IsComplete { get; set; }
     }
 }

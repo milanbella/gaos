@@ -7,16 +7,16 @@ namespace Gaos.Routes.Model.DeviceJson
     [System.Serializable]
     public class DeviceGetRegistrationResponse
     {
-        public bool? IsError;
+        public bool? IsError { get; set; }
 
-        public string? ErrorMessage;
+        public string? ErrorMessage { get; set; }
 
-        public bool? IsFound;
+        public bool? IsFound { get; set; }
 
-        public int? DeviceId;
-        public string? Identification;
-        public string? PlatformType;
-        public string? BuildVersion;
+        public int? DeviceId { get; set; }
+        public string? Identification { get; set; }
+        public string? PlatformType { get; set; }
+        public string? BuildVersion { get; set; }
 
     }
 }

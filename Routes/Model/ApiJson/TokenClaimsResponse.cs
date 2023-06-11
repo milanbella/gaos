@@ -5,11 +5,11 @@ namespace Gaos.Routes.Model.ApiJson
     [System.Serializable]
     public class TokenClaimsResponse
     {
-        public bool? IsError;
+        public bool? IsError { get; set; }
 
-        public string? ErrorMessage;
+        public string? ErrorMessage { get; set; }
 
-        public Gaos.Model.Token.TokenClaims? TokenClaims;
+        public Gaos.Model.Token.TokenClaims? TokenClaims { get; set; }
 
 
     }

@@ -4,7 +4,7 @@ namespace Gaos.Routes.Model.GameDataJson
     [System.Serializable]
     public class UserGameDataSaveResponse
     {
-        public bool? IsError;
-        public string? ErrorMessage;
+        public bool? IsError { get; set; }
+        public string? ErrorMessage { get; set; }
     }
 }

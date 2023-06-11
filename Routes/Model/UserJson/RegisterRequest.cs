@@ -6,14 +6,14 @@ namespace Gaos.Routes.Model.UserJson
     [System.Serializable]
     public class RegisterRequest
     {
-        public string? UserName;
+        public string? UserName { get; set; }
 
-        public string? Email;
+        public string? Email { get; set; }
 
-        public string? Password;
+        public string? Password { get; set; }
 
-        public string? PasswordVerify;
-        public int? DeviceId;
+        public string? PasswordVerify { get; set; }
+        public int? DeviceId { get; set; }
 
     }
 

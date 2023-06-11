@@ -7,10 +7,10 @@ namespace Gaos.Routes.Model.UserJson
     [System.Serializable]
     public class LoginRequest
     {
-        public string? UserName;
+        public string? UserName { get; set; }
 
-        public string? Password;
+        public string? Password { get; set; }
 
-        public int? DeviceId;
+        public int? DeviceId { get; set; }
     }
 }

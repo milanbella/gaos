@@ -5,6 +5,6 @@ namespace Gaos.Routes.Model.DeviceJson
     [System.Serializable]
     public class DeviceGetRegistrationByIdRequest
     {
-        public int DeviceId;
+        public int DeviceId { get; set; }
     }
 }

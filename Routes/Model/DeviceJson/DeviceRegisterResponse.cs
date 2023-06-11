@@ -4,13 +4,13 @@ namespace Gaos.Routes.Model.DeviceJson
     [System.Serializable]
     public class DeviceRegisterResponse
     {
-        public bool? IsError;
-        public string? ErrorMessage;
+        public bool? IsError { get; set; }
+        public string? ErrorMessage { get; set; }
 
-        public int DeviceId;
-        public string? Identification;
-        public string? PlatformType;
-        public string? BuildVersion;
+        public int DeviceId { get; set; }
+        public string? Identification { get; set; }
+        public string? PlatformType { get; set; }
+        public string? BuildVersion { get; set; }
 
     }
 }

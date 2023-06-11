@@ -6,13 +6,13 @@ namespace Gaos.Routes.Model.GameDataJson
     [System.Serializable]
     public class UserGameDataGetResponse
     {
-        public bool? IsError;
-        public string? ErrorMessage;
+        public bool? IsError { get; set; }
+        public string? ErrorMessage { get; set; }
 
-        public Gaos.Dbo.Model.GameData? GameData;
+        public Gaos.Dbo.Model.GameData? GameData { get; set; }
 
-        public Dictionary<string, Gaos.Dbo.Model.InventoryItemData[]>? InventoryItemData;
+        public Dictionary<string, Gaos.Dbo.Model.InventoryItemData[]>? InventoryItemData { get; set; }
 
-        public Dictionary<string, Gaos.Dbo.Model.RecipeData[]>? RecipeData;
+        public Dictionary<string, Gaos.Dbo.Model.RecipeData[]>? RecipeData { get; set; }
     }
 }

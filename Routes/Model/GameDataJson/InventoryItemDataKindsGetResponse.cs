@@ -6,8 +6,8 @@ namespace Gaos.Routes.Model.GameDataJson
     [System.Serializable]
     public class InventoryItemDataKindsGetResponse
     {
-        public bool? IsError;
-        public string? ErrorMessage;
-        public InventoryItemDataKind[]? InventoryItemDataKinds;
+        public bool? IsError { get; set; }
+        public string? ErrorMessage { get; set; }
+        public InventoryItemDataKind[]? InventoryItemDataKinds { get; set; }
     }
 }

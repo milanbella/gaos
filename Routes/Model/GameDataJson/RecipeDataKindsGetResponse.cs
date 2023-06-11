@@ -6,9 +6,9 @@ namespace Gaos.Routes.Model.GameDataJson
     [System.Serializable]
     public class RecipeDataKindsGetResponse
     {
-        public bool? IsError;
-        public string? ErrorMessage;
+        public bool? IsError { get; set; }
+        public string? ErrorMessage { get; set; }
 
-        public RecipeDataKind[]? RecipeDataKinds;
+        public RecipeDataKind[]? RecipeDataKinds { get; set; }
     }
 }

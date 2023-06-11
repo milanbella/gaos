@@ -12,11 +12,11 @@ namespace Gaos.Model.Token
     [System.Serializable]
     public class TokenClaims
     {
-        public string Sub;
-        public long Exp;
+        public string Sub { get; set; }
+        public long Exp { get; set; }
 
-        public UserType UserType;
+        public UserType UserType { get; set; }
 
-        public int DeviceId;
+        public int DeviceId { get; set; }
     }
 }

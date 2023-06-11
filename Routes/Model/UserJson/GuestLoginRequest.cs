@@ -5,7 +5,7 @@ namespace Gaos.Routes.Model.UserJson
     [System.Serializable]
     public class GuestLoginRequest
     {
-        public string? UserName;
-        public int? DeviceId;
+        public string? UserName { get; set; }
+        public int? DeviceId { get; set; }
     }
 }

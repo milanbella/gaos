@@ -15,16 +15,16 @@ namespace Gaos.Dbo.Model
     [System.Serializable]
     public class Device
     {
-        public int Id;
-        public string? Identification;
+        public int Id { get; set; }
+        public string? Identification { get; set; }
 
-        public string? PlatformType;
+        public string? PlatformType { get; set; }
 
-        public int? BuildVersionId;
-        public BuildVersion? BuildVersion;
+        public int? BuildVersionId { get; set; }
+        public BuildVersion? BuildVersion { get; set; }
 
-        public string? BuildVersionReported;
+        public string? BuildVersionReported { get; set; }
 
-        public System.DateTime RegisteredAt;
+        public System.DateTime RegisteredAt { get; set; }
     }
 }
