@@ -48,6 +48,7 @@ builder.Services.AddDbContext<Db>(opt =>
     .EnableDetailedErrors()
 );
 
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 Log.Logger = new LoggerConfiguration()
@@ -72,6 +73,13 @@ builder.Services.AddScoped<Gaos.Auth.Token>(provider => {
     Db db = provider.GetService<Db>();
     return new Gaos.Auth.Token(builder.Configuration,  db);
 }); 
+
+
+// Set the JSON serializer options
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = null;
+});
 
 
 var app = builder.Build();
