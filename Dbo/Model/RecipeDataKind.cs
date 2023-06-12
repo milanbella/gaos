@@ -1,6 +1,14 @@
 ﻿#pragma warning disable 8632
 namespace Gaos.Dbo.Model
 {
+    enum RecipeDataKindEnum
+    {
+        BasicRecipeObjects = 1,
+        ProcessedRecipeObjects,
+        RefinedRecipeObjects,
+        AssembledRecipeObjects,
+    };
+
     [System.Serializable]
     public class RecipeDataKind
     {

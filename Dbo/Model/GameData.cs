@@ -46,5 +46,6 @@ namespace Gaos.Dbo.Model
         public bool IsPlayerInBiologicalBiome { get; set; }
         public float Credits { get; set; }
         public string? InventoryTitle { get; set; }
+        public string? RecipeTitle { get; set; }
     }
 }

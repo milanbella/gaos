@@ -48,7 +48,7 @@ namespace Gaos.Routes
                     .ToDictionary(g => g.Key, g => g.ToList());
 
 
-                    foreach (string enumKind in Enum.GetNames(typeof(Gaos.Seed.InventoryItemDataKindEnum)))
+                    foreach (string enumKind in Enum.GetNames(typeof(Gaos.Dbo.Model.InventoryItemDataKindEnum)))
                     {
                         enumKindToInventoryItemDataDict[enumKind] = InventoryItemDataGroupsByKind.TryGetValue(enumKind, out var foundValue) ? foundValue.Select(v => v.InventoryItemData).ToArray() : new InventoryItemData[0];
                     }
@@ -68,7 +68,7 @@ namespace Gaos.Routes
                     .GroupBy(joined => joined.RecipeDataKind)
                     .ToDictionary(g => g.Key, g => g.ToList());
 
-                    foreach (string enumKind in Enum.GetNames(typeof(Gaos.Seed.RecipeDataKindEnum)))
+                    foreach (string enumKind in Enum.GetNames(typeof(Gaos.Dbo.Model.RecipeDataKindEnum)))
                     {
                         enumKindToRecipeDataDict[enumKind] = RecipeDataDataGroupsByKind.TryGetValue(enumKind, out var foundValue) ? foundValue.Select(v => v.RecipeData).ToArray() : new RecipeData[0];
                     }
@@ -97,38 +97,305 @@ namespace Gaos.Routes
 
             });
 
-            group.MapPost("/userGameDataSave", (UserGameDataSaveRequest request, Db db) => 
+            group.MapPost("/userGameDataSave", (UserGameDataSaveRequest request, Db db, HttpContext context) => 
             {
                 const string METHOD_NAME = "userGameDataSave()";
                 try 
-                { 
+                {
+                    UserGameDataGetResponse response;
+
+                    // Check if slot id in range
+
+                    if (!(request.SlotId >= Gaos.Seed.Slot.MIN_SLOT_ID && request.SlotId <= Gaos.Seed.Slot.MAX_SLOT_ID))
+                    {
+                        response = new UserGameDataGetResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "invalid slot id",
+                        };
+                        return Results.Json(response);
+                    }
+
+                    // Ensure user slot exists
+
+                    Gaos.Dbo.Model.UserSlot? userSlot = db.UserSlot.Where(us => us.UserId == request.UserId && us.SlotId == request.SlotId).FirstOrDefault();
+                    if (userSlot == null)
+                    {
+                        // Create user slot
+                        userSlot = new Gaos.Dbo.Model.UserSlot
+                        {
+                            UserId = request.UserId,
+                            SlotId = request.SlotId,
+                        };
+                        db.UserSlot.Add(userSlot);
+                        db.SaveChanges();
+                        userSlot = db.UserSlot.Where(us => us.UserId == request.UserId && us.SlotId == request.SlotId).FirstOrDefault();
+                        if (userSlot == null)
+                        {
+                            response = new UserGameDataGetResponse
+                            {
+                                IsError = true,
+                                ErrorMessage = "internal error - user slot was not created",
+                            };
+                            return Results.Json(response);
+                        }
+                    }
+
+                    // Save game data
+
                     if (request.GameData != null)
                     {
-                        GameData gameData = request.GameData;
-                        db.GameData.Update(gameData);
-                    }
-
-                    foreach (string key in request.InventoryItemData.Keys)
-                    {
-                        InventoryItemData[] inventoryItemData = request.InventoryItemData[key];
-                        foreach (InventoryItemData iid in inventoryItemData)
+                        Gaos.Dbo.Model.GameData gameData = db.GameData.Where(gd => gd.UserSlotId == userSlot.Id).FirstOrDefault();
+                        if (gameData == null)
                         {
-                            db.InventoryItemData.Update(iid);
+                            gameData = request.GameData;
+                            gameData.UserSlotId = userSlot.Id;
+                            db.GameData.Update(gameData);
+                            db.SaveChanges();
+                        }
+                        else
+                        {
+                            gameData = request.GameData;
+                            gameData.UserSlotId = userSlot.Id;
+                            db.GameData.Update(gameData);
+                            db.SaveChanges();
                         }
                     }
 
-                    foreach (string key in request.RecipeData.Keys)
+                    // Save inventory item data - BasicInventoryObjects
+
+                    if (request.BasicInventoryObjects != null)
                     {
-                        RecipeData[] recipeData = request.RecipeData[key];
-                        foreach (RecipeData rd in recipeData)
+                        using (var transaction = db.Database.BeginTransaction())
                         {
-                            db.RecipeData.Update(rd);
+                            try
+                            {
+                                // Remove all inventory item data for this user slot
+                                db.InventoryItemData.RemoveRange(db.InventoryItemData.Where(iid => iid.UserSlotId == userSlot.Id && iid.InventoryItemDataKindId == (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.BasicInventoryObjects));
+
+                                foreach (InventoryItemData iid in request.BasicInventoryObjects)
+                                {
+                                    iid.UserSlotId = userSlot.Id;
+                                    iid.InventoryItemDataKindId = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.BasicInventoryObjects;
+                                    db.InventoryItemData.Add(iid);
+                                }
+                                db.SaveChanges();
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, saving BasicInventoryObjects: {ex.Message}");
+                                transaction.Rollback();
+                                throw new Exception("could no save BasicInventoryObjects");
+                            }
+
                         }
                     }
+
+                    // Save inventory item data - ProcessedInventoryObjects
+
+                    if (request.ProcessedInventoryObjects != null)
+                    { 
+                        using (var transaction = db.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                // Remove all inventory item data for this user slot
+                                db.InventoryItemData.RemoveRange(db.InventoryItemData.Where(iid => iid.UserSlotId == userSlot.Id && iid.InventoryItemDataKindId == (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.ProcessedInventoryObjects));
+
+                                foreach (InventoryItemData iid in request.ProcessedInventoryObjects)
+                                {
+                                    iid.UserSlotId = userSlot.Id;
+                                    iid.InventoryItemDataKindId = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.ProcessedInventoryObjects;
+                                    db.InventoryItemData.Add(iid);
+                                }
+                                db.SaveChanges();
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, savin ProcessedInventoryObjects: {ex.Message}");
+                                transaction.Rollback();
+                                throw new Exception("could no save ProcessedInventoryObjects");
+                            }
+                        }
+                    }
+
+                    // Save inventory item data - RefinedInventoryObjects
+
+
+                    if (request.RefinedInventoryObjects != null)
+                    {
+                        using (var transaction = db.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                // Remove all inventory item data for this user slot
+                                db.InventoryItemData.RemoveRange(db.InventoryItemData.Where(iid => iid.UserSlotId == userSlot.Id && iid.InventoryItemDataKindId == (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.RefinedInventoryObjects));
+
+                                foreach (InventoryItemData iid in request.RefinedInventoryObjects)
+                                {
+                                    iid.UserSlotId = userSlot.Id;
+                                    iid.InventoryItemDataKindId = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.RefinedInventoryObjects;
+                                    db.InventoryItemData.Add(iid);
+                                }
+                                db.SaveChanges();
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, saving RefinedInventoryObjects: {ex.Message}");
+                                transaction.Rollback();
+                                throw new Exception("could no save RefinedInventoryObjects");
+                            }
+                        }
+                    }
+
+                    // Save inventory item data - AssembledInventoryObjects
+
+                    if (request.AssembledInventoryObjects != null)
+                    {
+                        using (var transaction = db.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                // Remove all inventory item data for this user slot
+                                db.InventoryItemData.RemoveRange(db.InventoryItemData.Where(iid => iid.UserSlotId == userSlot.Id && iid.InventoryItemDataKindId == (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.AssembledInventoryObjects));
+
+                                foreach (InventoryItemData iid in request.AssembledInventoryObjects)
+                                {
+                                    iid.UserSlotId = userSlot.Id;
+                                    iid.InventoryItemDataKindId = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.AssembledInventoryObjects;
+                                    db.InventoryItemData.Add(iid);
+                                }
+                                db.SaveChanges();
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, saving AssembledInventoryObjects: {ex.Message}");
+                                transaction.Rollback();
+                                throw new Exception("could no save AssembledInventoryObjects");
+                            }
+                        }
+                    }
+
+                    // Save recipe data - BasicRecipeObjects
+
+                    if (request.BasicRecipeObjects != null)
+                    {
+                        using (var transaction = db.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                // Remove all recipe data for this user slot
+                                db.RecipeData.RemoveRange(db.RecipeData.Where(rd => rd.UserSlotId == userSlot.Id && rd.RecipeDataKindId == (int)Gaos.Dbo.Model.RecipeDataKindEnum.BasicRecipeObjects));
+                                foreach (RecipeData rd in request.BasicRecipeObjects)
+                                {
+                                    rd.UserSlotId = userSlot.Id;
+                                    rd.RecipeDataKindId = (int)Gaos.Dbo.Model.RecipeDataKindEnum.BasicRecipeObjects;
+                                    db.RecipeData.Add(rd);
+                                }
+                                db.SaveChanges();
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, saving BasicRecipeObjects: {ex.Message}");
+                                transaction.Rollback();
+                                throw new Exception("could no save BasicRecipeObjects");
+                            }
+                        }
+                    }
+
+                    // Save recipe data - ProcessedRecipeObjects
+
+                    if (request.ProcessedRecipeObjects != null)
+                    {
+                        using (var transaction = db.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                // Remove all recipe data for this user slot
+                                db.RecipeData.RemoveRange(db.RecipeData.Where(rd => rd.UserSlotId == userSlot.Id && rd.RecipeDataKindId == (int)Gaos.Dbo.Model.RecipeDataKindEnum.ProcessedRecipeObjects));
+                                foreach (RecipeData rd in request.ProcessedRecipeObjects)
+                                {
+                                    rd.UserSlotId = userSlot.Id;
+                                    rd.RecipeDataKindId = (int)Gaos.Dbo.Model.RecipeDataKindEnum.ProcessedRecipeObjects;
+                                    db.RecipeData.Add(rd);
+                                }
+                                db.SaveChanges();
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, saving ProcessedRecipeObjects: {ex.Message}");
+                                transaction.Rollback();
+                                throw new Exception("could no save ProcessedRecipeObjects");
+                            }
+                        }
+                    }
+
+                    // Save recipe data - RefinedRecipeObjects
+
+                    if (request.RefinedRecipeObjects != null)
+                    {
+                        using (var transaction = db.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                // Remove all recipe data for this user slot
+                                db.RecipeData.RemoveRange(db.RecipeData.Where(rd => rd.UserSlotId == userSlot.Id && rd.RecipeDataKindId == (int)Gaos.Dbo.Model.RecipeDataKindEnum.RefinedRecipeObjects));
+                                foreach (RecipeData rd in request.RefinedRecipeObjects)
+                                {
+                                    rd.UserSlotId = userSlot.Id;
+                                    rd.RecipeDataKindId = (int)Gaos.Dbo.Model.RecipeDataKindEnum.RefinedRecipeObjects;
+                                    db.RecipeData.Add(rd);
+                                }
+                                db.SaveChanges();
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, saving RefinedRecipeObjects: {ex.Message}");
+                                transaction.Rollback();
+                                throw new Exception("could no save RefinedRecipeObjects");
+                            }
+                        }
+                    }
+
+                    // Save recipe data - AssembledRecipeObjects
+
+                    if (request.AssembledRecipeObjects != null)
+                    {
+                        using (var transaction = db.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                // Remove all recipe data for this user slot
+                                db.RecipeData.RemoveRange(db.RecipeData.Where(rd => rd.UserSlotId == userSlot.Id && rd.RecipeDataKindId == (int)Gaos.Dbo.Model.RecipeDataKindEnum.AssembledRecipeObjects));
+                                foreach (RecipeData rd in request.AssembledRecipeObjects)
+                                {
+                                    rd.UserSlotId = userSlot.Id;
+                                    rd.RecipeDataKindId = (int)Gaos.Dbo.Model.RecipeDataKindEnum.AssembledRecipeObjects;
+                                    db.RecipeData.Add(rd);
+                                }
+                                db.SaveChanges();
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, saving AssembledRecipeObjects: {ex.Message}");
+                                transaction.Rollback();
+                                throw new Exception("could no save AssembledRecipeObjects");
+                            }
+                        }
+                    }
+
 
                     db.SaveChanges();
 
-                    UserGameDataGetResponse response = new UserGameDataGetResponse
+                    response = new UserGameDataGetResponse
                     {
                         IsError = false,
                         ErrorMessage = "",

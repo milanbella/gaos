@@ -1,14 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 namespace Gaos.Seed
 {
-    enum InventoryItemDataKindEnum
-    {
-        BasicInventoryObjects,
-        ProcessedInventoryObjects,
-        RefinedInventoryObjects,
-        AssembledInventoryObjects,
-    };
-
     public class InventoryItemDataKind
     {
 
@@ -16,10 +8,10 @@ namespace Gaos.Seed
         {
             // seed Dbo.User
             modelBuilder.Entity<Gaos.Dbo.Model.InventoryItemDataKind>().HasData(
-                new Gaos.Dbo.Model.InventoryItemDataKind { Id = 1, Name = InventoryItemDataKindEnum.BasicInventoryObjects.ToString() },
-                new Gaos.Dbo.Model.InventoryItemDataKind { Id = 2, Name = InventoryItemDataKindEnum.ProcessedInventoryObjects.ToString() },
-                new Gaos.Dbo.Model.InventoryItemDataKind { Id = 3, Name = InventoryItemDataKindEnum.RefinedInventoryObjects.ToString() },
-                new Gaos.Dbo.Model.InventoryItemDataKind { Id = 4, Name = InventoryItemDataKindEnum.AssembledInventoryObjects.ToString() }
+                new Gaos.Dbo.Model.InventoryItemDataKind { Id = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.BasicInventoryObjects, Name = Gaos.Dbo.Model.InventoryItemDataKindEnum.BasicInventoryObjects.ToString() },
+                new Gaos.Dbo.Model.InventoryItemDataKind { Id = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.ProcessedInventoryObjects, Name = Gaos.Dbo.Model.InventoryItemDataKindEnum.ProcessedInventoryObjects.ToString() },
+                new Gaos.Dbo.Model.InventoryItemDataKind { Id = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.RefinedInventoryObjects, Name = Gaos.Dbo.Model.InventoryItemDataKindEnum.RefinedInventoryObjects.ToString() },
+                new Gaos.Dbo.Model.InventoryItemDataKind { Id = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.AssembledInventoryObjects, Name = Gaos.Dbo.Model.InventoryItemDataKindEnum.AssembledInventoryObjects.ToString() }
             );
         } 
     }

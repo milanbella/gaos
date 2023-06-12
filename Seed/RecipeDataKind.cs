@@ -1,14 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 namespace Gaos.Seed
 {
-    enum RecipeDataKindEnum
-    {
-        BasicRecipeObjects,
-        ProcessedRecipeObjects,
-        RefinedRecipeObjects,
-        AssembledRecipeObjects,
-    };
-
     public class RecipeDataKind
     {
 
@@ -16,10 +8,10 @@ namespace Gaos.Seed
         {
             // seed Dbo.User
             modelBuilder.Entity<Gaos.Dbo.Model.RecipeDataKind>().HasData(
-                new Gaos.Dbo.Model.RecipeDataKind { Id = 1, Name = RecipeDataKindEnum.BasicRecipeObjects.ToString() },
-                new Gaos.Dbo.Model.RecipeDataKind { Id = 2, Name = RecipeDataKindEnum.ProcessedRecipeObjects.ToString() },
-                new Gaos.Dbo.Model.RecipeDataKind { Id = 3, Name = RecipeDataKindEnum.RefinedRecipeObjects.ToString() },
-                new Gaos.Dbo.Model.RecipeDataKind { Id = 4, Name = RecipeDataKindEnum.AssembledRecipeObjects.ToString() }
+                new Gaos.Dbo.Model.RecipeDataKind { Id = (int)Gaos.Dbo.Model.RecipeDataKindEnum.BasicRecipeObjects, Name = Gaos.Dbo.Model.RecipeDataKindEnum.BasicRecipeObjects.ToString() },
+                new Gaos.Dbo.Model.RecipeDataKind { Id = (int)Gaos.Dbo.Model.RecipeDataKindEnum.ProcessedRecipeObjects, Name = Gaos.Dbo.Model.RecipeDataKindEnum.ProcessedRecipeObjects.ToString() },
+                new Gaos.Dbo.Model.RecipeDataKind { Id = (int)Gaos.Dbo.Model.RecipeDataKindEnum.RefinedRecipeObjects, Name = Gaos.Dbo.Model.RecipeDataKindEnum.RefinedRecipeObjects.ToString() },
+                new Gaos.Dbo.Model.RecipeDataKind { Id = (int)Gaos.Dbo.Model.RecipeDataKindEnum.AssembledRecipeObjects, Name = Gaos.Dbo.Model.RecipeDataKindEnum.AssembledRecipeObjects.ToString() }
             );
         } 
     }

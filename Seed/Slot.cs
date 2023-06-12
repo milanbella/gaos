@@ -4,6 +4,8 @@ namespace Gaos.Seed
 {
     public class Slot
     {
+        public static int MIN_SLOT_ID = 1;
+        public static int MAX_SLOT_ID = 4;
         public static void Seed(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Gaos.Dbo.Model.Slot>().HasData(

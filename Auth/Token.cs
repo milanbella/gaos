@@ -156,7 +156,18 @@ namespace Gaos.Auth
                 } else {
                     claims.UserType = userTypeEnum;
                 }
-                claims.DeviceId = (int)payload["device_id"];
+
+                long deviceIdLong = (long)payload["device_id"];
+                int deviceIdInt;
+                try { 
+                    deviceIdInt = Convert.ToInt32(deviceIdLong);
+                } 
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME} cannot convert device id, long -> int");
+                    throw new Exception("cannot convert device id, long -> int");
+                }
+                claims.DeviceId = deviceIdInt;
 
                 return claims;
             }
