@@ -48,7 +48,7 @@ namespace Gaos.Middleware
 
                 if (authHeader == null)
                 {
-                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} missing Authorization header");
+                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} {path} - Unauthorized: missing Authorization header");
                     context.Response.StatusCode = 401;
                     await context.Response.WriteAsync("Unauthorized");
                     return;
@@ -57,7 +57,7 @@ namespace Gaos.Middleware
                 string? jwt = ExtractBrearerToken(authHeader);
                 if (jwt == null)
                 {
-                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} no bearer token in Authorization header ");
+                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} {path} - Unauthorized: no bearer token in Authorization header");
                     context.Response.StatusCode = 401;
                     await context.Response.WriteAsync("Unauthorized");
                     return;
@@ -67,20 +67,19 @@ namespace Gaos.Middleware
 
                 if (claims == null)
                 {
-                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} could not decode claims");
+                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} {path} - Unauthorized: could not decode claims");
                     context.Response.StatusCode = 401;
                     await context.Response.WriteAsync("Unauthorized");
                     return;
                 }
 
-                long secondsNow = DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds();
+                long secondsNow = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 if (secondsNow > claims.Exp)
                 {
-                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} could not decode claims");
+                    Log.Warning($"{CLASS_NAME}:{METHOD_NAME} {path} - Unauthorized: token expired");
                     context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync("Unauthorized - token expired");
+                    await context.Response.WriteAsync("Unauthorized");
                     return;
-
                 }
 
                 context.Items.Add(HTTP_CONTEXT_KEY_TOKEN_CLAIMS, claims);

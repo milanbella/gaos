@@ -74,6 +74,7 @@ namespace Gaos.Auth
                 { "user_type", userType.ToString()},
                 { "device_id", deviceId}
             };
+            long exp = (long)payload["exp"];
 
             // Create and sign the JWT.
             string jwt = Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
