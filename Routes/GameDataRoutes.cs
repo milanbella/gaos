@@ -33,7 +33,7 @@ namespace Gaos.Routes
                     .FirstOrDefault();
 
                     // InventoryItemData
-                    Dictionary<string, InventoryItemData[]>  enumKindToInventoryItemDataDict = new Dictionary<string, InventoryItemData[]>();
+                    Dictionary<string, InventoryItemData[]>  enumKindToInventoryItemData = new Dictionary<string, InventoryItemData[]>();
 
                     var InventoryItemDataGroupsByKind = db.InventoryItemData
                     .Join(db.UserSlot,
@@ -50,11 +50,12 @@ namespace Gaos.Routes
 
                     foreach (string enumKind in Enum.GetNames(typeof(Gaos.Dbo.Model.InventoryItemDataKindEnum)))
                     {
-                        enumKindToInventoryItemDataDict[enumKind] = InventoryItemDataGroupsByKind.TryGetValue(enumKind, out var foundValue) ? foundValue.Select(v => v.InventoryItemData).ToArray() : new InventoryItemData[0];
+                        enumKindToInventoryItemData[enumKind] = InventoryItemDataGroupsByKind.TryGetValue(enumKind, out var foundValue) ? foundValue.Select(v => v.InventoryItemData).ToArray() : new InventoryItemData[0];
                     }
 
+
                     // RecipeData
-                    Dictionary<string, RecipeData[]>  enumKindToRecipeDataDict = new Dictionary<string, RecipeData[]>();
+                    Dictionary<string, RecipeData[]>  enumKindToRecipeData = new Dictionary<string, RecipeData[]>();
 
                     var RecipeDataDataGroupsByKind = db.RecipeData
                     .Join(db.UserSlot,
@@ -70,7 +71,7 @@ namespace Gaos.Routes
 
                     foreach (string enumKind in Enum.GetNames(typeof(Gaos.Dbo.Model.RecipeDataKindEnum)))
                     {
-                        enumKindToRecipeDataDict[enumKind] = RecipeDataDataGroupsByKind.TryGetValue(enumKind, out var foundValue) ? foundValue.Select(v => v.RecipeData).ToArray() : new RecipeData[0];
+                        enumKindToRecipeData[enumKind] = RecipeDataDataGroupsByKind.TryGetValue(enumKind, out var foundValue) ? foundValue.Select(v => v.RecipeData).ToArray() : new RecipeData[0];
                     }
 
                     UserGameDataGetResponse response = new UserGameDataGetResponse
@@ -78,9 +79,18 @@ namespace Gaos.Routes
                         IsError = false,
                         ErrorMessage = "",
                         GameData = gameData,
-                        InventoryItemData = enumKindToInventoryItemDataDict,
-                        RecipeData = enumKindToRecipeDataDict
+
+                        BasicInventoryObjects = enumKindToInventoryItemData[Gaos.Dbo.Model.InventoryItemDataKindEnum.BasicInventoryObjects.ToString()], 
+                        ProcessedInventoryObjects = enumKindToInventoryItemData[Gaos.Dbo.Model.InventoryItemDataKindEnum.ProcessedInventoryObjects.ToString()], 
+                        RefinedInventoryObjects = enumKindToInventoryItemData[Gaos.Dbo.Model.InventoryItemDataKindEnum.RefinedInventoryObjects.ToString()], 
+                        AssembledInventoryObjects = enumKindToInventoryItemData[Gaos.Dbo.Model.InventoryItemDataKindEnum.AssembledInventoryObjects.ToString()], 
+
+                        BasicRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.BasicRecipeObjects.ToString()],
+                        ProcessedRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.ProcessedRecipeObjects.ToString()],
+                        RefinedRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.RefinedRecipeObjects.ToString()],
+                        AssembledRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.AssembledRecipeObjects.ToString()],
                     };
+
                     return Results.Json(response);
 
                 }
@@ -102,13 +112,13 @@ namespace Gaos.Routes
                 const string METHOD_NAME = "userGameDataSave()";
                 try 
                 {
-                    UserGameDataGetResponse response;
+                    UserGameDataSaveResponse response;
 
                     // Check if slot id in range
 
                     if (!(request.SlotId >= Gaos.Seed.Slot.MIN_SLOT_ID && request.SlotId <= Gaos.Seed.Slot.MAX_SLOT_ID))
                     {
-                        response = new UserGameDataGetResponse
+                        response = new UserGameDataSaveResponse
                         {
                             IsError = true,
                             ErrorMessage = "invalid slot id",
@@ -132,7 +142,7 @@ namespace Gaos.Routes
                         userSlot = db.UserSlot.Where(us => us.UserId == request.UserId && us.SlotId == request.SlotId).FirstOrDefault();
                         if (userSlot == null)
                         {
-                            response = new UserGameDataGetResponse
+                            response = new UserGameDataSaveResponse
                             {
                                 IsError = true,
                                 ErrorMessage = "internal error - user slot was not created",
@@ -148,6 +158,7 @@ namespace Gaos.Routes
                         Gaos.Dbo.Model.GameData gameData = db.GameData.Where(gd => gd.UserSlotId == userSlot.Id).FirstOrDefault();
                         if (gameData == null)
                         {
+                            Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ cp 3000");
                             gameData = request.GameData;
                             gameData.UserSlotId = userSlot.Id;
                             db.GameData.Update(gameData);
@@ -173,6 +184,7 @@ namespace Gaos.Routes
                                 // Remove all inventory item data for this user slot
                                 db.InventoryItemData.RemoveRange(db.InventoryItemData.Where(iid => iid.UserSlotId == userSlot.Id && iid.InventoryItemDataKindId == (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.BasicInventoryObjects));
 
+                                Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ cp 4000");
                                 foreach (InventoryItemData iid in request.BasicInventoryObjects)
                                 {
                                     iid.UserSlotId = userSlot.Id;
@@ -184,6 +196,7 @@ namespace Gaos.Routes
                             }
                             catch (Exception ex)
                             {
+                                Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ cp 5000");
                                 Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, saving BasicInventoryObjects: {ex.Message}");
                                 transaction.Rollback();
                                 throw new Exception("could no save BasicInventoryObjects");
@@ -395,7 +408,7 @@ namespace Gaos.Routes
 
                     db.SaveChanges();
 
-                    response = new UserGameDataGetResponse
+                    response = new UserGameDataSaveResponse
                     {
                         IsError = false,
                         ErrorMessage = "",
@@ -405,7 +418,7 @@ namespace Gaos.Routes
                 catch (Exception ex)
                 {
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
-                    UserGameDataGetResponse response = new UserGameDataGetResponse
+                    UserGameDataSaveResponse response = new UserGameDataSaveResponse
                     {
                         IsError = true,
                         ErrorMessage = "internal error",

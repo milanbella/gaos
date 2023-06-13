@@ -10,10 +10,6 @@ namespace Gaos.Routes.Model.GameDataJson
         public int SlotId { get; set; }
         public Gaos.Dbo.Model.GameData? GameData { get; set; }
 
-        public Dictionary<string, Gaos.Dbo.Model.InventoryItemData[]>? InventoryItemData { get; set; }
-
-        public Dictionary<string, Gaos.Dbo.Model.RecipeData[]>? RecipeData { get; set; }
-
         public Gaos.Dbo.Model.InventoryItemData[]? BasicInventoryObjects { get; set; }
         public Gaos.Dbo.Model.InventoryItemData[]? ProcessedInventoryObjects { get; set; }
         public Gaos.Dbo.Model.InventoryItemData[]? RefinedInventoryObjects { get; set; }
