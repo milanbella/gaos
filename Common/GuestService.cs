@@ -3,9 +3,9 @@ using Gaos.Dbo;
 
 namespace Gaos.Common
 {
-    public class Guest
+    public class GuestService
     {
-        private static string CLASS_NAME = typeof(Guest).Name;
+        private static string CLASS_NAME = typeof(GuestService).Name;
 
         private string GuestNamesFilePath = "py/guest_names.txt";
 
@@ -14,7 +14,7 @@ namespace Gaos.Common
         private bool NamesLoaded = false;
         private List<string> NamesList = new List<string>();
 
-        public Guest(Db db, string guestNamesFilePath)
+        public GuestService(Db db, string guestNamesFilePath)
         {
             Db = db;
             GuestNamesFilePath = guestNamesFilePath;

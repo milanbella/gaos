@@ -7,6 +7,7 @@ using Serilog;
 using Gaos.Middleware;
 using System.Diagnostics;
 using System.Net.WebSockets;
+using Microsoft.AspNetCore.Http;
 
 
 
@@ -63,15 +64,22 @@ if (builder.Configuration["guest_names_file_path"] == null)
 }
 string guestNamesFilePath = builder.Configuration.GetValue<string>("guest_names_file_path");
 
-builder.Services.AddScoped<Gaos.Common.Guest>(provider => {
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<Gaos.Auth.TokenService>(provider => {
     Db db = provider.GetService<Db>();
-    return new Gaos.Common.Guest(db, guestNamesFilePath);
+    return new Gaos.Auth.TokenService(builder.Configuration,  db);
 }); 
 
-
-builder.Services.AddScoped<Gaos.Auth.Token>(provider => {
+builder.Services.AddScoped<Gaos.Common.GuestService>(provider => {
     Db db = provider.GetService<Db>();
-    return new Gaos.Auth.Token(builder.Configuration,  db);
+    return new Gaos.Common.GuestService(db, guestNamesFilePath);
+}); 
+
+builder.Services.AddScoped<Gaos.Common.UserService>(provider => {
+    HttpContext context = provider.GetService<IHttpContextAccessor>()?.HttpContext;
+    Gaos.Auth.TokenService tokenService = provider.GetService<Gaos.Auth.TokenService>();
+    return new Gaos.Common.UserService(context, tokenService);
 }); 
 
 

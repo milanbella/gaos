@@ -9,8 +9,6 @@ namespace Gaos.Middleware
     {
         public static string CLASS_NAME = typeof(AuthMiddleware).Name;
 
-        public static string HTTP_CONTEXT_KEY_TOKEN_CLAIMS = "token_claims";
-
         private readonly RequestDelegate _next;
 
         private string? ExtractBrearerToken(string authHeader)
@@ -33,7 +31,7 @@ namespace Gaos.Middleware
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, Token token)
+        public async Task Invoke(HttpContext context, TokenService token)
         {
             const string METHOD_NAME = "Invoke()";
 
@@ -82,8 +80,7 @@ namespace Gaos.Middleware
                     return;
                 }
 
-                context.Items.Add(HTTP_CONTEXT_KEY_TOKEN_CLAIMS, claims);
-
+                context.Items.Add(Gaos.Common.Context.HTTP_CONTEXT_KEY_TOKEN_CLAIMS, claims);
 
                 await _next(context);
             }

@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using Jose;
 using Serilog;
 using Gaos.Dbo;
+using Gaos.Model.Token;
 
 namespace Gaos.Auth
 {
@@ -25,9 +26,9 @@ namespace Gaos.Auth
     }
     */
 
-    public class Token
+    public class TokenService
     {
-        public static string CLASS_NAME = typeof(Token).Name;
+        public static string CLASS_NAME = typeof(TokenService).Name;
 
         private static RSA? privateKey = null;
         private static RSA? publicKey = null;
@@ -35,7 +36,7 @@ namespace Gaos.Auth
 
         private Db db;
 
-        public Token(IConfiguration configuration, Db db)
+        public TokenService(IConfiguration configuration, Db db)
         {
             this.Configuration = configuration;
             this.db = db;
@@ -63,7 +64,7 @@ namespace Gaos.Auth
 
         }
 
-        private string GenerateJWT(RSA privateKey, string username, int deviceId, Gaos.Model.Token.UserType userType = Gaos.Model.Token.UserType.RegisteredUser)
+        private string GenerateJWT(RSA privateKey, string username, int userId, int deviceId, Gaos.Model.Token.UserType userType = Gaos.Model.Token.UserType.RegisteredUser)
         {
 
             // Set JWT payload.
@@ -71,6 +72,7 @@ namespace Gaos.Auth
             {
                 { "sub", username },
                 { "exp", DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds() },
+                { "user_id", userId },
                 { "user_type", userType.ToString()},
                 { "device_id", deviceId}
             };
@@ -93,11 +95,11 @@ namespace Gaos.Auth
 
             if (privateKey == null) { 
                 privateKey = RSAKeys.ReadPrivateKey(GetPkcs12KeyStoreFilePath(), GetKeyStorePassword());
-                jwtStr = GenerateJWT(privateKey, username, deviceId, userType);
+                jwtStr = GenerateJWT(privateKey, username, userId, deviceId, userType);
             } 
             else
             {
-                jwtStr =  GenerateJWT(privateKey, username, deviceId, userType);
+                jwtStr =  GenerateJWT(privateKey, username, userId, deviceId, userType);
 
             }
 
@@ -149,6 +151,18 @@ namespace Gaos.Auth
                 claims.Sub = (string)payload["sub"]; 
                 claims.Exp = (long)payload["exp"];
 
+                long userIdLong = (long)payload["user_id"];
+                int userIdInt;
+                try { 
+                    userIdInt = Convert.ToInt32(userIdLong);
+                } 
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME} cannot convert user id, long -> int");
+                    throw new Exception("cannot convert user id, long -> int");
+                }
+                claims.UserId = userIdInt;
+
                 string userType = (string)payload["user_type"];
                 Gaos.Model.Token.UserType userTypeEnum;
                 if (!Enum.TryParse(userType, out userTypeEnum)) {
@@ -184,5 +198,6 @@ namespace Gaos.Auth
             }
 
         }
+
     }
 }

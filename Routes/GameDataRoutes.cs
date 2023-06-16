@@ -13,13 +13,25 @@ namespace Gaos.Routes
         public static RouteGroupBuilder GroupGameData(this RouteGroupBuilder group)
         {
 
-            group.MapPost("/userGameDataGet", (UserGameDataGetRequest request, Db db) => 
+            group.MapPost("/userGameDataGet", (UserGameDataGetRequest request, Db db, Gaos.Common.UserService userService) => 
             {
                 const string METHOD_NAME = "userGameDataGet()";
                 try 
-                { 
+                {
+                    UserGameDataGetResponse response;
                     int userId = request.UserId;
                     int slotId = request.SlotId;
+
+                    if (userId != userService.GetUserId())
+                    {
+                        response = new UserGameDataGetResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "request.UserId does not match user id of authorized user"
+                        };
+                        Log.Warning($"{CLASS_NAME}:{METHOD_NAME}: request.UserId does not match user id of authorized user");
+                        return Results.Json(response);
+                    }
 
 
                     // GameData
@@ -74,7 +86,7 @@ namespace Gaos.Routes
                         enumKindToRecipeData[enumKind] = RecipeDataDataGroupsByKind.TryGetValue(enumKind, out var foundValue) ? foundValue.Select(v => v.RecipeData).ToArray() : new RecipeData[0];
                     }
 
-                    UserGameDataGetResponse response = new UserGameDataGetResponse
+                    response = new UserGameDataGetResponse
                     {
                         IsError = false,
                         ErrorMessage = "",
@@ -107,7 +119,7 @@ namespace Gaos.Routes
 
             });
 
-            group.MapPost("/userGameDataSave", (UserGameDataSaveRequest request, Db db, HttpContext context) => 
+            group.MapPost("/userGameDataSave", (UserGameDataSaveRequest request, Db db, Gaos.Common.UserService userService) => 
             {
                 const string METHOD_NAME = "userGameDataSave()";
                 try 
@@ -123,6 +135,17 @@ namespace Gaos.Routes
                             IsError = true,
                             ErrorMessage = "invalid slot id",
                         };
+                        return Results.Json(response);
+                    }
+
+                    if (request.UserId != userService.GetUserId())
+                    {
+                        response = new UserGameDataSaveResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "request.UserId does not match user id of authorized user"
+                        };
+                        Log.Warning($"{CLASS_NAME}:{METHOD_NAME}: request.UserId does not match user id of authorized user");
                         return Results.Json(response);
                     }
 

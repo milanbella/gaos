@@ -22,7 +22,7 @@ namespace Gaos.Routes
                 const string METHOD_NAME = "tokenClaims";
                 try 
                 { 
-                    Gaos.Model.Token.TokenClaims claims = context.Items[AuthMiddleware.HTTP_CONTEXT_KEY_TOKEN_CLAIMS] as Gaos.Model.Token.TokenClaims;
+                    Gaos.Model.Token.TokenClaims claims = context.Items[Gaos.Common.Context.HTTP_CONTEXT_KEY_TOKEN_CLAIMS] as Gaos.Model.Token.TokenClaims;
                     TokenClaimsResponse  response = new TokenClaimsResponse
                     {
                         IsError = false,

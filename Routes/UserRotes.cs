@@ -20,7 +20,7 @@ namespace Gaos.Routes
         {
             group.MapGet("/hello", (Db db) => "hello");
 
-            group.MapPost("/login", async (LoginRequest loginRequest, Db db, Token tokenService) =>
+            group.MapPost("/login", async (LoginRequest loginRequest, Db db, TokenService tokenService) =>
             {
                 const string METHOD_NAME = "user/login";
 
@@ -132,7 +132,7 @@ namespace Gaos.Routes
                 }
             });
 
-            group.MapPost("/guestLogin", async (GuestLoginRequest guestLoginRequest, Db db, Gaos.Common.Guest commonGuest, Token tokenService) =>
+            group.MapPost("/guestLogin", async (GuestLoginRequest guestLoginRequest, Db db, Gaos.Common.GuestService commonGuest, TokenService tokenService) =>
             {
                 const string METHOD_NAME = "user/guestLogin";
 
@@ -271,7 +271,7 @@ namespace Gaos.Routes
                 }
             });
 
-            group.MapPost("/register", async (RegisterRequest registerRequest, Db db, Token tokenService) =>
+            group.MapPost("/register", async (RegisterRequest registerRequest, Db db, TokenService tokenService) =>
             {
                 const string METHOD_NAME = "user/register";
                 using (var transaction = db.Database.BeginTransaction())
