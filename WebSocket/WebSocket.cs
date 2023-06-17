@@ -55,7 +55,7 @@ namespace Gaos.WebSocket
                     if (result.EndOfMessage)
                     {
                         string message = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count);
-                        RouteMessage(message);
+                        await RouteMessage(socket, message);
                         continue;
                     }
                     else
@@ -74,7 +74,7 @@ namespace Gaos.WebSocket
             }
         }
 
-        public static async Task IgnoreMessage(System.Net.WebSockets.WebSocket socket)
+        private static async Task IgnoreMessage(System.Net.WebSockets.WebSocket socket)
         {
             const string METHOD_NAME = "IgnoreMessage()";
 
@@ -115,12 +115,27 @@ namespace Gaos.WebSocket
 
         }
 
-        public static void RouteMessage(string message)
+        public static async Task SendMessage(System.Net.WebSockets.WebSocket socket, string message)
+        {
+            const string METHOD_NAME = "SendMessage()";
+            try
+            {
+                var buffer = System.Text.Encoding.UTF8.GetBytes(message);
+                await socket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), System.Net.WebSockets.WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+            catch(Exception e)
+            {
+                Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: {e.Message}");
+            }
+        }
+
+        public static async Task RouteMessage(System.Net.WebSockets.WebSocket socket, string message)
         {
             const string METHOD_NAME = "RouteMessage()";
             try
             {
                 Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ received message: {message}");
+                await SendMessage(socket, "pong"); //@@@@@@@@@@@@@@@@@@@@@@
             } 
             catch (Exception e)
             {
