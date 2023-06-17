@@ -5,7 +5,7 @@ namespace Gaos.Dbo.Model
     {
         BasicInventoryObjects = 1,
         ProcessedInventoryObjects,
-        RefinedInventoryObjects,
+        EnhancedInventoryObjects,
         AssembledInventoryObjects,
     };
 

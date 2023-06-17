@@ -94,12 +94,12 @@ namespace Gaos.Routes
 
                         BasicInventoryObjects = enumKindToInventoryItemData[Gaos.Dbo.Model.InventoryItemDataKindEnum.BasicInventoryObjects.ToString()], 
                         ProcessedInventoryObjects = enumKindToInventoryItemData[Gaos.Dbo.Model.InventoryItemDataKindEnum.ProcessedInventoryObjects.ToString()], 
-                        RefinedInventoryObjects = enumKindToInventoryItemData[Gaos.Dbo.Model.InventoryItemDataKindEnum.RefinedInventoryObjects.ToString()], 
+                        EnhancedInventoryObjects = enumKindToInventoryItemData[Gaos.Dbo.Model.InventoryItemDataKindEnum.EnhancedInventoryObjects.ToString()], 
                         AssembledInventoryObjects = enumKindToInventoryItemData[Gaos.Dbo.Model.InventoryItemDataKindEnum.AssembledInventoryObjects.ToString()], 
 
                         BasicRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.BasicRecipeObjects.ToString()],
                         ProcessedRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.ProcessedRecipeObjects.ToString()],
-                        RefinedRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.RefinedRecipeObjects.ToString()],
+                        EnhancedRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.EnhancedRecipeObjects.ToString()],
                         AssembledRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.AssembledRecipeObjects.ToString()],
                     };
 
@@ -257,7 +257,7 @@ namespace Gaos.Routes
                         }
                     }
 
-                    // Save inventory item data - RefinedInventoryObjects
+                    // Save inventory item data - EnhancedInventoryObjects
 
 
                     if (request.RefinedInventoryObjects != null)
@@ -267,12 +267,12 @@ namespace Gaos.Routes
                             try
                             {
                                 // Remove all inventory item data for this user slot
-                                db.InventoryItemData.RemoveRange(db.InventoryItemData.Where(iid => iid.UserSlotId == userSlot.Id && iid.InventoryItemDataKindId == (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.RefinedInventoryObjects));
+                                db.InventoryItemData.RemoveRange(db.InventoryItemData.Where(iid => iid.UserSlotId == userSlot.Id && iid.InventoryItemDataKindId == (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.EnhancedInventoryObjects));
 
                                 foreach (InventoryItemData iid in request.RefinedInventoryObjects)
                                 {
                                     iid.UserSlotId = userSlot.Id;
-                                    iid.InventoryItemDataKindId = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.RefinedInventoryObjects;
+                                    iid.InventoryItemDataKindId = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.EnhancedInventoryObjects;
                                     db.InventoryItemData.Add(iid);
                                 }
                                 db.SaveChanges();
@@ -372,7 +372,7 @@ namespace Gaos.Routes
                         }
                     }
 
-                    // Save recipe data - RefinedRecipeObjects
+                    // Save recipe data - EnhancedRecipeObjects
 
                     if (request.RefinedRecipeObjects != null)
                     {
@@ -381,11 +381,11 @@ namespace Gaos.Routes
                             try
                             {
                                 // Remove all recipe data for this user slot
-                                db.RecipeData.RemoveRange(db.RecipeData.Where(rd => rd.UserSlotId == userSlot.Id && rd.RecipeDataKindId == (int)Gaos.Dbo.Model.RecipeDataKindEnum.RefinedRecipeObjects));
+                                db.RecipeData.RemoveRange(db.RecipeData.Where(rd => rd.UserSlotId == userSlot.Id && rd.RecipeDataKindId == (int)Gaos.Dbo.Model.RecipeDataKindEnum.EnhancedRecipeObjects));
                                 foreach (RecipeData rd in request.RefinedRecipeObjects)
                                 {
                                     rd.UserSlotId = userSlot.Id;
-                                    rd.RecipeDataKindId = (int)Gaos.Dbo.Model.RecipeDataKindEnum.RefinedRecipeObjects;
+                                    rd.RecipeDataKindId = (int)Gaos.Dbo.Model.RecipeDataKindEnum.EnhancedRecipeObjects;
                                     db.RecipeData.Add(rd);
                                 }
                                 db.SaveChanges();

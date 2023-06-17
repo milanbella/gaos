@@ -5,7 +5,7 @@ namespace Gaos.Dbo.Model
     {
         BasicRecipeObjects = 1,
         ProcessedRecipeObjects,
-        RefinedRecipeObjects,
+        EnhancedRecipeObjects,
         AssembledRecipeObjects,
     };
 
