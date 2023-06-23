@@ -92,7 +92,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 
 var app = builder.Build();
 
-if (false) { 
+if (true) { 
     app.UseWebSockets();
     app.UseMiddleware<WebSocketMiddleware>();
 }

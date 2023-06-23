@@ -36,7 +36,7 @@ namespace Gaos.Middleware
             {
                 using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
                 Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ cp 200");
-                Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ webscoket connected");
+                Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ webscoket connected");
                 Gaos.WebSocket.WebSocket.Add(webSocket);
                 await Gaos.WebSocket.WebSocket.HandleMessages(webSocket);
             }

@@ -134,7 +134,7 @@ namespace Gaos.WebSocket
             const string METHOD_NAME = "RouteMessage()";
             try
             {
-                Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ received message: {message}");
+                Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ received message: {message}");
                 await SendMessage(socket, "pong"); //@@@@@@@@@@@@@@@@@@@@@@
             } 
             catch (Exception e)
