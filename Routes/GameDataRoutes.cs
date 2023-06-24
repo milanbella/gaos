@@ -260,7 +260,7 @@ namespace Gaos.Routes
                     // Save inventory item data - EnhancedInventoryObjects
 
 
-                    if (request.RefinedInventoryObjects != null)
+                    if (request.EnhancedInventoryObjects != null)
                     {
                         using (var transaction = db.Database.BeginTransaction())
                         {
@@ -269,7 +269,7 @@ namespace Gaos.Routes
                                 // Remove all inventory item data for this user slot
                                 db.InventoryItemData.RemoveRange(db.InventoryItemData.Where(iid => iid.UserSlotId == userSlot.Id && iid.InventoryItemDataKindId == (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.EnhancedInventoryObjects));
 
-                                foreach (InventoryItemData iid in request.RefinedInventoryObjects)
+                                foreach (InventoryItemData iid in request.EnhancedInventoryObjects)
                                 {
                                     iid.UserSlotId = userSlot.Id;
                                     iid.InventoryItemDataKindId = (int)Gaos.Dbo.Model.InventoryItemDataKindEnum.EnhancedInventoryObjects;
@@ -374,7 +374,7 @@ namespace Gaos.Routes
 
                     // Save recipe data - EnhancedRecipeObjects
 
-                    if (request.RefinedRecipeObjects != null)
+                    if (request.EnhancedRecipeObjects != null)
                     {
                         using (var transaction = db.Database.BeginTransaction())
                         {
@@ -382,7 +382,7 @@ namespace Gaos.Routes
                             {
                                 // Remove all recipe data for this user slot
                                 db.RecipeData.RemoveRange(db.RecipeData.Where(rd => rd.UserSlotId == userSlot.Id && rd.RecipeDataKindId == (int)Gaos.Dbo.Model.RecipeDataKindEnum.EnhancedRecipeObjects));
-                                foreach (RecipeData rd in request.RefinedRecipeObjects)
+                                foreach (RecipeData rd in request.EnhancedRecipeObjects)
                                 {
                                     rd.UserSlotId = userSlot.Id;
                                     rd.RecipeDataKindId = (int)Gaos.Dbo.Model.RecipeDataKindEnum.EnhancedRecipeObjects;
