@@ -23,26 +23,21 @@ namespace Gaos.Middleware
             const string METHOD_NAME = "Invoke()";
 
             string path = context.Request.Path.Value;
-            Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ cp 90: {path}");
 
             if (path == null || !path.StartsWith("/ws"))
             {
                 await _next(context);
                 return;
             }
-                Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ cp 100");
 
             if (context.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ cp 200");
-                Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ webscoket connected");
                 Gaos.WebSocket.WebSocket.Add(webSocket);
                 await Gaos.WebSocket.WebSocket.HandleMessages(webSocket);
             }
             else
             {
-                Log.Information($"{CLASS_NAME}:{METHOD_NAME}: @@@@@@@@@@@@@@@@@@@@@ cp 300");
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
         }
