@@ -298,6 +298,203 @@ namespace Gaos.Routes
                 }
             });
 
+            group.MapPost("/createChatRoom", async (CreateChatRoomRequest createChatRoomRequest, Db db, Gaos.Common.UserService userService) =>
+            {
+                const string METHOD_NAME = "chatRoom/createChatRoom";
+                CreateChatRoomResponse response;
+                try
+                {
+                    if (createChatRoomRequest.ChatRoomName == null || createChatRoomRequest.ChatRoomName == "")
+                    {
+                        response = new CreateChatRoomResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "ChatRoomName is empty",
+                        };
+                        return Results.Json(response);
+                    }
+
+                    using (var transaction = db.Database.BeginTransaction())
+                    {
+                        try
+                        {
+                            Gaos.Dbo.Model.ChatRoom chatRoom = new Gaos.Dbo.Model.ChatRoom
+                            {
+                                Name = createChatRoomRequest.ChatRoomName,
+                                OwnerId = userService.GetUserId(),
+                            };
+
+                            // Save chat room
+                            db.ChatRoom.Add(chatRoom);
+
+                            // Add owner as a member
+                            ChatRoomMember chatRoomMember = new ChatRoomMember
+                            {
+                                ChatRoomId = chatRoom.Id,
+                                UserId = userService.GetUserId(),
+                            };
+                            db.ChatRoomMember.Add(chatRoomMember);
+
+                            await db.SaveChangesAsync();
+
+                            await transaction.CommitAsync();
+
+                            // Return response
+                            response = new CreateChatRoomResponse
+                            {
+                                IsError = false,
+                                ChatRoomId = chatRoom.Id,
+                            };
+                            return Results.Json(response);
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                            response = new CreateChatRoomResponse
+                            {
+                                IsError = true,
+                                ErrorMessage = "internal error",
+                            };
+                            return Results.Json(response);
+                        }
+                    }
+
+
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    response = new CreateChatRoomResponse
+                    {
+                        IsError = true,
+                        ErrorMessage = "internal error",
+                    };
+                    return Results.Json(response);
+                }
+            });
+
+            group.MapPost("/deleteChatRoom", async (DeleteChatRoomRequest deleteChatRoomRequest, Db db, Gaos.Common.UserService userService) =>
+            {
+                const string METHOD_NAME = "chatRoom/deleteChatRoom";
+                DeleteChatRoomResponse response;
+                try
+                {
+                    // Remove all messages from the chat room using raw SQL
+                    await db.Database.ExecuteSqlRawAsync($"DELETE FROM ChatRoomMessage WHERE ChatRoomId = {deleteChatRoomRequest.ChatRoomId}");
+                    using (var transaction = db.Database.BeginTransaction())
+                    {
+                        try
+                        {
+                            // Remove all messages from the chat room using raw SQL
+                            await db.Database.ExecuteSqlRawAsync($"DELETE FROM ChatRoomMessage WHERE ChatRoomId = {deleteChatRoomRequest.ChatRoomId}");
+
+                            // Remove all members from the chat room using raw SQL
+                            await db.Database.ExecuteSqlRawAsync($"DELETE FROM ChatRoomMember WHERE ChatRoomId = {deleteChatRoomRequest.ChatRoomId}");
+
+                            // Remove chat room using raw SQL
+                            await db.Database.ExecuteSqlRawAsync($"DELETE FROM ChatRoom WHERE Id = {deleteChatRoomRequest.ChatRoomId}");
+
+                            transaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                            response = new DeleteChatRoomResponse
+                            {
+                                IsError = true,
+                                ErrorMessage = "internal error",
+                            };
+                            return Results.Json(response);
+                        }
+                    }
+
+                    // Return response
+                    response = new DeleteChatRoomResponse
+                    {
+                        IsError = false,
+                    };
+                    return Results.Json(response);
+                    
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    response = new DeleteChatRoomResponse
+                    {
+                        IsError = true,
+                        ErrorMessage = "internal error",
+                    };
+                    return Results.Json(response);
+                }
+            });
+
+            group.MapPost("/addMember", async (AddMemberRequest addMemberRequest, Db db, Gaos.Common.UserService userService) =>
+            {
+                const string METHOD_NAME = "chatRoom/addMember";
+                AddMemberResponse response;
+                try
+                {
+                    // Verify chat room exists
+                    Gaos.Dbo.Model.ChatRoom chatRoom = await db.ChatRoom.FirstOrDefaultAsync(x => x.Id == addMemberRequest.ChatRoomId);
+                    if (chatRoom == null)
+                    {
+                        response = new AddMemberResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "chat room does not exist",
+                        };
+                        return Results.Json(response);
+                    }
+
+                    // Get all members of the chat room
+                    int[] chatRoomMembers = await db.ChatRoomMember.Where(x => x.ChatRoomId == addMemberRequest.ChatRoomId).Select(x => x.UserId).ToArrayAsync();
+
+                    bool userIsMember = chatRoomMembers.Contains(userService.GetUserId());
+                    bool userIsOwner = chatRoom.OwnerId == userService.GetUserId();
+
+                    if (!userIsMember && !userIsOwner)
+                    {
+                        response = new AddMemberResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "user is not a member of the chat room",
+                        };
+                        return Results.Json(response);
+                    }
+
+                    // Add member to chat room
+                    ChatRoomMember chatRoomMember = new ChatRoomMember
+                    {
+                        ChatRoomId = addMemberRequest.ChatRoomId,
+                        UserId = addMemberRequest.UserId,
+                    };
+                    db.ChatRoomMember.Add(chatRoomMember);
+                    await db.SaveChangesAsync();
+
+                    // Return response
+                    response = new AddMemberResponse
+                    {
+                        IsError = false,
+                    };
+                    return Results.Json(response);
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    response = new AddMemberResponse
+                    {
+                        IsError = true,
+                        ErrorMessage = "internal error",
+                    };
+                    return Results.Json(response);
+                }
+            });
+
 
 
             return group;
