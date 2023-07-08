@@ -19,6 +19,9 @@
         public DbSet<InventoryItemDataKind> InventoryItemDataKind => Set<InventoryItemDataKind>();
         public DbSet<RecipeData> RecipeData => Set<RecipeData>();
         public DbSet<RecipeDataKind> RecipeDataKind => Set<RecipeDataKind>();
+        public DbSet<ChatRoom> ChatRoom => Set<ChatRoom>();
+        public DbSet<ChatRoomMember> ChatRoomMember => Set<ChatRoomMember>();
+        public DbSet<ChatRoomMessage> ChatRoomMessage => Set<ChatRoomMessage>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -73,6 +76,22 @@
 
             // RecipeDataKind
             modelBuilder.Entity<RecipeDataKind>().HasKey(e => e.Id);
+
+            // ChatRoom
+            modelBuilder.Entity<ChatRoom>().HasKey(e => e.Id);
+            modelBuilder.Entity<ChatRoom>().HasOne(e => e.Owner).WithMany().HasForeignKey(e => e.OwnerId);
+
+            // ChatRoomMember
+            modelBuilder.Entity<ChatRoomMember>().HasKey(e => e.Id);
+            modelBuilder.Entity<ChatRoomMember>().HasOne(e => e.ChatRoom).WithMany().HasForeignKey(e => e.ChatRoomId);
+            modelBuilder.Entity<ChatRoomMember>().HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
+            modelBuilder.Entity<ChatRoomMember>().HasIndex(e => new { e.ChatRoomId, e.UserId }).IsUnique(true);
+
+            // ChatRoomMessage
+            modelBuilder.Entity<ChatRoomMessage>().HasKey(e => e.Id);
+            modelBuilder.Entity<ChatRoomMessage>().HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
+            modelBuilder.Entity<ChatRoomMessage>().HasOne(e => e.ChatRoom).WithMany().HasForeignKey(e => e.ChatRoomId);
+            modelBuilder.Entity<ChatRoomMessage>().HasIndex(e => new { e.ChatRoomId, e.MessageId }).IsUnique(true);
 
             Gaos.Seed.SeedAll.Seed(modelBuilder);
         }

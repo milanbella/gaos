@@ -79,7 +79,8 @@ builder.Services.AddScoped<Gaos.Common.GuestService>(provider => {
 builder.Services.AddScoped<Gaos.Common.UserService>(provider => {
     HttpContext context = provider.GetService<IHttpContextAccessor>()?.HttpContext;
     Gaos.Auth.TokenService tokenService = provider.GetService<Gaos.Auth.TokenService>();
-    return new Gaos.Common.UserService(context, tokenService);
+    Gaos.Dbo.Db db = provider.GetService<Gaos.Dbo.Db>();
+    return new Gaos.Common.UserService(context, tokenService, db);
 }); 
 
 
@@ -105,4 +106,5 @@ app.MapGroup("/user").GroupUser();
 app.MapGroup("/device").GroupDevice();
 app.MapGroup("/api").GroupApi();
 app.MapGroup("/api/gameData").GroupGameData();
+app.MapGroup("/api/chatRoom").GroupChatRoom();
 app.Run();

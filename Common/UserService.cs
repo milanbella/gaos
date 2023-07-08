@@ -9,21 +9,25 @@ namespace Gaos.Common
         private static string CLASS_NAME = typeof(UserService).Name;
         private Gaos.Auth.TokenService TokenService= null;
         private HttpContext Context = null;
+        private  Gaos.Dbo.Db Db = null;
 
-        public UserService(HttpContext context, Auth.TokenService tokenService)
+        private Gaos.Dbo.Model.User? User = null;
+
+        public UserService(HttpContext context, Auth.TokenService tokenService, Gaos.Dbo.Db db)
         {
             TokenService = tokenService;
             Context = context;
+            Db = db;
         }
 
-        public Gaos.Model.Token.TokenClaims? GetTokenClaims()
+        public Gaos.Model.Token.TokenClaims GetTokenClaims()
         {
-            const string METHOD_NAME = "getTokenClaims()";
+            const string METHOD_NAME = "GetTokenClaims()";
             Gaos.Model.Token.TokenClaims? claims;
             if (Context.Items.ContainsKey(Gaos.Common.Context.HTTP_CONTEXT_KEY_TOKEN_CLAIMS) == false)
             {
-                Log.Warning($"{CLASS_NAME}:{METHOD_NAME} no token claims");
-                claims = null;
+                Log.Error($"{CLASS_NAME}:{METHOD_NAME} no token claims");
+                throw new Exception("no token claims");
             }
             else
             {
@@ -34,17 +38,28 @@ namespace Gaos.Common
 
         public int GetUserId()
         {
-            const string METHOD_NAME = "getUserId()";
-            Gaos.Model.Token.TokenClaims? claims = GetTokenClaims();
-            if (claims != null)
-            {
-                return claims.UserId;
+            Gaos.Model.Token.TokenClaims claims = GetTokenClaims();
+            return claims.UserId;
 
+        }
+        public Gaos.Dbo.Model.User GetUser()
+        {
+            const string METHOD_NAME = "GetUser()";
+            if (User == null)
+            {
+                int userId = GetUserId();
+                User = Db.User.FirstOrDefault(x => x.Id == userId);
+                if (User == null)
+                {
+                    Log.Error($"{CLASS_NAME}:{METHOD_NAME} no such user");
+                    throw new Exception("no such user");
+                    
+                }
+                return User;
             }
             else
             {
-                Log.Warning($"{CLASS_NAME}:{METHOD_NAME} no user");
-                return -1;
+                return User;
             }
 
         }
