@@ -495,6 +495,71 @@ namespace Gaos.Routes
                 }
             });
 
+            group.MapPost("/removeMember", async (RemoveMemberRequest removeMemberRequest, Db db, Gaos.Common.UserService userService) =>
+            {
+                const string METHOD_NAME = "chatRoom/removeMember";
+                AddMemberResponse response;
+                try
+                {
+                    // Verify chat room exists
+                    Gaos.Dbo.Model.ChatRoom chatRoom = await db.ChatRoom.FirstOrDefaultAsync(x => x.Id == removeMemberRequest.ChatRoomId);
+                    if (chatRoom == null)
+                    {
+                        response = new AddMemberResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "chat room does not exist",
+                        };
+                        return Results.Json(response);
+                    }
+
+                    ChatRoomMember chatRoomMember = await db.ChatRoomMember.FirstOrDefaultAsync(x => x.ChatRoomId == removeMemberRequest.ChatRoomId && x.UserId == removeMemberRequest.UserId);
+                    if (chatRoomMember == null)
+                    {
+                        response = new AddMemberResponse
+                        {
+                            IsError = false,
+                        };
+                        return Results.Json(response);
+                    }
+
+                    int userId = userService.GetUserId();
+
+                    if (chatRoom.OwnerId != userId && chatRoomMember.UserId != userId)
+                    {
+                        response = new AddMemberResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "unauthorized (chat room owner can removen any member, member can remove itself)",
+                        };
+                        return Results.Json(response);
+                    }
+
+                    // Remove member from chat room
+                    db.ChatRoomMember.Remove(chatRoomMember);
+                    await db.SaveChangesAsync();
+
+                    // Return response
+                    response = new AddMemberResponse
+                    {
+                        IsError = false,
+                    };
+                    return Results.Json(response);
+
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    response = new AddMemberResponse
+                    {
+                        IsError = true,
+                        ErrorMessage = "internal error",
+                    };
+                    return Results.Json(response);
+                }
+            });
+
 
 
             return group;
