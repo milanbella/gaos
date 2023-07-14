@@ -4,7 +4,7 @@ namespace Gaos.Seed
     public class RecipeDataKind
     {
 
-        public static void Seed(ModelBuilder modelBuilder)
+        public static void Seed(ModelBuilder modelBuilder, IConfiguration configuration, IWebHostEnvironment environment)
         {
             // seed Dbo.User
             modelBuilder.Entity<Gaos.Dbo.Model.RecipeDataKind>().HasData(

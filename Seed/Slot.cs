@@ -6,7 +6,7 @@ namespace Gaos.Seed
     {
         public static int MIN_SLOT_ID = 1;
         public static int MAX_SLOT_ID = 4;
-        public static void Seed(ModelBuilder modelBuilder)
+        public static void Seed(ModelBuilder modelBuilder, IConfiguration configuration, IWebHostEnvironment environment)
         {
             modelBuilder.Entity<Gaos.Dbo.Model.Slot>().HasData(
                 new Gaos.Dbo.Model.Slot { Id = 1, Name = "Slot 1" },

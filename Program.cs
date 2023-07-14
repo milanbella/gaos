@@ -107,4 +107,5 @@ app.MapGroup("/device").GroupDevice();
 app.MapGroup("/api").GroupApi();
 app.MapGroup("/api/gameData").GroupGameData();
 app.MapGroup("/api/chatRoom").GroupChatRoom();
+app.MapGroup("/api/friends").GroupFriends();
 app.Run();

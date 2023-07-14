@@ -6,7 +6,14 @@
 
     public class Db : DbContext
     {
-        public Db(DbContextOptions<Db> options) : base(options) { }
+        private IConfiguration Configuration;
+        private IWebHostEnvironment Environment;
+        //public Db(DbContextOptions<Db> options) : base(options) { }
+        public Db(DbContextOptions<Db> options, IConfiguration configuration, IWebHostEnvironment environment) : base(options) 
+        { 
+            this.Configuration = configuration;
+            this.Environment = environment;
+        }
 
         public DbSet<User> User => Set<User>();
         public DbSet<JWT> JWT => Set<JWT>();
@@ -93,7 +100,7 @@
             modelBuilder.Entity<ChatRoomMessage>().HasOne(e => e.ChatRoom).WithMany().HasForeignKey(e => e.ChatRoomId);
             modelBuilder.Entity<ChatRoomMessage>().HasIndex(e => new { e.ChatRoomId, e.MessageId }).IsUnique(true);
 
-            Gaos.Seed.SeedAll.Seed(modelBuilder);
+            Gaos.Seed.SeedAll.Seed(modelBuilder, Configuration, Environment);
         }
     }
 }
