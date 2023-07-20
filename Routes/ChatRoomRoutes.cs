@@ -180,7 +180,7 @@ namespace Gaos.Routes
                     }
 
                     // Read messages
-                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesRequest.ChatRoomId && x.MessageId > readMessagesRequest.LastMessageId).OrderBy(x => x.MessageId).ToArrayAsync();
+                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesRequest.ChatRoomId && x.MessageId > readMessagesRequest.LastMessageId).Take(readMessagesRequest.Count).OrderBy(x => x.MessageId).ToArrayAsync();
 
                     ResponseMessage[] messages = new ResponseMessage[chatRoomMessages.Length];
                     for (int i = 0; i < chatRoomMessages.Length; i++)
@@ -251,17 +251,17 @@ namespace Gaos.Routes
                     }
 
                     int lastMessageId;
-                    if (readMessagesBackwardsRequest.LastMessageId == null || readMessagesBackwardsRequest.LastMessageId <= 0)
+                    if (readMessagesBackwardsRequest.LastMessageId <= 0)
                     {
                         lastMessageId = Int32.MaxValue;
                     }
                     else
                     {
-                        lastMessageId = readMessagesBackwardsRequest.LastMessageId.Value;
+                        lastMessageId = readMessagesBackwardsRequest.LastMessageId;
                     }
 
                     // Read messages
-                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId && x.MessageId < lastMessageId).OrderByDescending(x => x.MessageId).ToArrayAsync();
+                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId && x.MessageId < lastMessageId).Take(readMessagesBackwardsRequest.Count).OrderByDescending(x => x.MessageId).ToArrayAsync();
 
                     ResponseMessage[] messages = new ResponseMessage[chatRoomMessages.Length];
                     for (int i = 0; i < chatRoomMessages.Length; i++)
@@ -298,6 +298,59 @@ namespace Gaos.Routes
                 }
             });
 
+            group.MapPost("/existsChatRoom", async (ExistsChatRoomRequest existsChatRoomRequest, Db db, Gaos.Common.UserService userService) =>
+            {
+                const string METHOD_NAME = "chatRoom/existsChatRoom";
+                ExistsChatRoomResponse response;
+                try
+                {
+                    if (existsChatRoomRequest.ChatRoomName == null || existsChatRoomRequest.ChatRoomName == "")
+                    {
+                        response = new ExistsChatRoomResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "parameter ChatRoomName is empty",
+                        };
+                        return Results.Json(response);
+                    }
+
+                    // Verify that ChatRoomName exists 
+                    var chatRoomData = await db.ChatRoom.Where(x => x.Name == existsChatRoomRequest.ChatRoomName).Select(x => new { x.Id, x.Name }).FirstOrDefaultAsync();
+
+                    if (chatRoomData == null)
+                    {
+                        response = new ExistsChatRoomResponse
+                        {
+                            IsError = false,
+                            IsExists = false,
+                            ChatRoomId = -1,
+                        };
+                        return Results.Json(response);
+                    }
+                    else
+                    {
+                        response = new ExistsChatRoomResponse
+                        {
+                            IsError = false,
+                            IsExists = true,
+                            ChatRoomId = chatRoomData.Id,
+                        };
+                        return Results.Json(response);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    response = new ExistsChatRoomResponse
+                    {
+                        IsError = true,
+                        ErrorMessage = "internal error",
+                    };
+                    return Results.Json(response);
+                }
+
+            });
+
             group.MapPost("/createChatRoom", async (CreateChatRoomRequest createChatRoomRequest, Db db, Gaos.Common.UserService userService) =>
             {
                 const string METHOD_NAME = "chatRoom/createChatRoom";
@@ -309,7 +362,7 @@ namespace Gaos.Routes
                         response = new CreateChatRoomResponse
                         {
                             IsError = true,
-                            ErrorMessage = "ChatRoomName is empty",
+                            ErrorMessage = "parameter ChatRoomName is empty",
                         };
                         return Results.Json(response);
                     }
