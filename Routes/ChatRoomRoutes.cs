@@ -33,7 +33,7 @@ namespace Gaos.Routes
                         response = new WriteMessageResponse
                         {
                             IsError = true,
-                            ErrorMessage = "Message is empty",
+                            ErrorMessage = "parameter Message is empty",
 
                         };
                         return Results.Json(response);
@@ -47,7 +47,7 @@ namespace Gaos.Routes
                         response = new WriteMessageResponse
                         {
                             IsError = true,
-                            ErrorMessage = "ChatRoomId - no such chat room",
+                            ErrorMessage = "parameter ChatRoomId - no such chat room",
 
                         };
                         return Results.Json(response);
@@ -261,7 +261,7 @@ namespace Gaos.Routes
                     }
 
                     // Read messages
-                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId && x.MessageId < lastMessageId).Take(readMessagesBackwardsRequest.Count).OrderByDescending(x => x.MessageId).ToArrayAsync();
+                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId && x.MessageId < lastMessageId).Take(readMessagesBackwardsRequest.Count).OrderBy(x => x.MessageId).ToArrayAsync();
 
                     ResponseMessage[] messages = new ResponseMessage[chatRoomMessages.Length];
                     for (int i = 0; i < chatRoomMessages.Length; i++)
