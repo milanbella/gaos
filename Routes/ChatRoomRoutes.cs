@@ -59,15 +59,18 @@ namespace Gaos.Routes
                         try
                         {
                             // Read minimal and maximal message id
-                            int? minMessageId = await db.ChatRoomMessage.Where(x => x.ChatRoomId == writeMessageRequest.ChatRoomId).MinAsync(x => x.MessageId);
-                            if (minMessageId == null)
+                            int minMessageId;
+                            int maxMessageId;
+                            int count = await db.ChatRoomMessage.CountAsync(x => x.ChatRoomId == writeMessageRequest.ChatRoomId);
+                            if (count == 0)
                             {
                                 minMessageId = 0;
-                            }
-                            int? maxMessageId = await db.ChatRoomMessage.Where(x => x.ChatRoomId == writeMessageRequest.ChatRoomId).MaxAsync(x => x.MessageId);
-                            if (maxMessageId == null)
-                            {
                                 maxMessageId = 0;
+                            }
+                            else
+                            { 
+                                minMessageId = await db.ChatRoomMessage.Where(x => x.ChatRoomId == writeMessageRequest.ChatRoomId).MinAsync(x => x.MessageId);
+                                maxMessageId = await db.ChatRoomMessage.Where(x => x.ChatRoomId == writeMessageRequest.ChatRoomId).MaxAsync(x => x.MessageId);
                             }
 
                             // Remove messages if there are more than MAX_NUMBER_OF_MESSAGES_IN_ROOM 
@@ -379,6 +382,7 @@ namespace Gaos.Routes
 
                             // Save chat room
                             db.ChatRoom.Add(chatRoom);
+                            await db.SaveChangesAsync();
 
                             // Add owner as a member
                             ChatRoomMember chatRoomMember = new ChatRoomMember
