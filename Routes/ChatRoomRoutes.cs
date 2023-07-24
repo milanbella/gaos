@@ -183,7 +183,7 @@ namespace Gaos.Routes
                     }
 
                     // Read messages
-                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesRequest.ChatRoomId && x.MessageId > readMessagesRequest.LastMessageId).Take(readMessagesRequest.Count).OrderBy(x => x.MessageId).ToArrayAsync();
+                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesRequest.ChatRoomId && x.MessageId > readMessagesRequest.LastMessageId).OrderBy(x => x.MessageId).Take(readMessagesRequest.Count).ToArrayAsync();
 
                     ResponseMessage[] messages = new ResponseMessage[chatRoomMessages.Length];
                     for (int i = 0; i < chatRoomMessages.Length; i++)
@@ -264,7 +264,7 @@ namespace Gaos.Routes
                     }
 
                     // Read messages
-                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId && x.MessageId < lastMessageId).Take(readMessagesBackwardsRequest.Count).OrderBy(x => x.MessageId).ToArrayAsync();
+                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId && x.MessageId < lastMessageId).OrderBy(x => x.MessageId).Take(readMessagesBackwardsRequest.Count).ToArrayAsync();
 
                     ResponseMessage[] messages = new ResponseMessage[chatRoomMessages.Length];
                     for (int i = 0; i < chatRoomMessages.Length; i++)
