@@ -11,5 +11,8 @@ namespace Gaos.Routes.Model.ChatRoomJson
         public string? ErrorMessage { get; set; }
 
         public ResponseMessage[]? Messages { get; set; }
+        public int MinMessageId { get; set; }
+        public int MaxMessageId { get; set; }
+        public int MessageCount { get; set; }
     }
 }

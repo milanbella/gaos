@@ -61,8 +61,8 @@ namespace Gaos.Routes
                             // Read minimal and maximal message id
                             int minMessageId;
                             int maxMessageId;
-                            int count = await db.ChatRoomMessage.CountAsync(x => x.ChatRoomId == writeMessageRequest.ChatRoomId);
-                            if (count == 0)
+                            int MessageCount = await db.ChatRoomMessage.CountAsync(x => x.ChatRoomId == writeMessageRequest.ChatRoomId);
+                            if (MessageCount == 0)
                             {
                                 minMessageId = 0;
                                 maxMessageId = 0;
@@ -118,6 +118,9 @@ namespace Gaos.Routes
                             response = new WriteMessageResponse
                             {
                                 IsError = false,
+                                MinMessageId = minMessageId,
+                                MaxMessageId = maxMessageId,
+                                MessageCount = MessageCount,
                             };
                             return Results.Json(response);
 
@@ -182,29 +185,65 @@ namespace Gaos.Routes
                         return Results.Json(response);
                     }
 
-                    // Read messages
-                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesRequest.ChatRoomId && x.MessageId > readMessagesRequest.LastMessageId).OrderBy(x => x.MessageId).Take(readMessagesRequest.Count).ToArrayAsync();
-
-                    ResponseMessage[] messages = new ResponseMessage[chatRoomMessages.Length];
-                    for (int i = 0; i < chatRoomMessages.Length; i++)
+                    using (var transaction = db.Database.BeginTransaction())
                     {
-                        messages[i] = new ResponseMessage
+                        try
                         {
-                            MessageId = chatRoomMessages[i].MessageId,
-                            Message = chatRoomMessages[i].Message,
-                            CreatedAt = chatRoomMessages[i].CreatedAt,
-                            UserId = chatRoomMessages[i].UserId,
-                            UserName = chatRoomMessages[i].ChatRoomMemberName,
-                        };
+                            // Read minimal and maximal message id
+                            int minMessageId;
+                            int maxMessageId;
+                            int messageCount = await db.ChatRoomMessage.CountAsync(x => x.ChatRoomId == readMessagesRequest.ChatRoomId);
+                            if (messageCount == 0)
+                            {
+                                minMessageId = 0;
+                                maxMessageId = 0;
+                            }
+                            else
+                            { 
+                                minMessageId = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesRequest.ChatRoomId).MinAsync(x => x.MessageId);
+                                maxMessageId = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesRequest.ChatRoomId).MaxAsync(x => x.MessageId);
+                            }
+
+                            // Read messages
+                            ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesRequest.ChatRoomId && x.MessageId > readMessagesRequest.LastMessageId).OrderBy(x => x.MessageId).Take(readMessagesRequest.Count).ToArrayAsync();
+
+                            ResponseMessage[] messages = new ResponseMessage[chatRoomMessages.Length];
+                            for (int i = 0; i < chatRoomMessages.Length; i++)
+                            {
+                                messages[i] = new ResponseMessage
+                                {
+                                    MessageId = chatRoomMessages[i].MessageId,
+                                    Message = chatRoomMessages[i].Message,
+                                    CreatedAt = chatRoomMessages[i].CreatedAt,
+                                    UserId = chatRoomMessages[i].UserId,
+                                    UserName = chatRoomMessages[i].ChatRoomMemberName,
+                                };
+                            }
+
+                            // Return response
+                            response = new ReadMessagesResponse
+                            {
+                                IsError = false,
+                                Messages = messages,
+                                MinMessageId = minMessageId,
+                                MaxMessageId = maxMessageId,
+                                MessageCount = messageCount,
+                            };
+                            return Results.Json(response);
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                            response = new ReadMessagesResponse
+                            {
+                                IsError = true,
+                                ErrorMessage = "internal error",
+                            };
+                            return Results.Json(response);
+                        }
                     }
 
-                    // Return response
-                    response = new ReadMessagesResponse
-                    {
-                        IsError = false,
-                        Messages = messages,
-                    };
-                    return Results.Json(response);
 
                     
                 }
@@ -253,39 +292,75 @@ namespace Gaos.Routes
                         return Results.Json(response);
                     }
 
-                    int lastMessageId;
-                    if (readMessagesBackwardsRequest.LastMessageId <= 0)
+                    using (var transaction = db.Database.BeginTransaction())
                     {
-                        lastMessageId = Int32.MaxValue;
-                    }
-                    else
-                    {
-                        lastMessageId = readMessagesBackwardsRequest.LastMessageId;
-                    }
+                        try
+                        { 
+                            // Read minimal and maximal message id
+                            int minMessageId;
+                            int maxMessageId;
+                            int messageCount = await db.ChatRoomMessage.CountAsync(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId);
+                            if (messageCount == 0)
+                            {
+                                minMessageId = 0;
+                                maxMessageId = 0;
+                            }
+                            else
+                            { 
+                                minMessageId = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId).MinAsync(x => x.MessageId);
+                                maxMessageId = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId).MaxAsync(x => x.MessageId);
+                            }
 
-                    // Read messages
-                    ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId && x.MessageId < lastMessageId).OrderBy(x => x.MessageId).Take(readMessagesBackwardsRequest.Count).ToArrayAsync();
+                            int lastMessageId;
+                            if (readMessagesBackwardsRequest.LastMessageId <= 0)
+                            {
+                                lastMessageId = Int32.MaxValue;
+                            }
+                            else
+                            {
+                                lastMessageId = readMessagesBackwardsRequest.LastMessageId;
+                            }
 
-                    ResponseMessage[] messages = new ResponseMessage[chatRoomMessages.Length];
-                    for (int i = 0; i < chatRoomMessages.Length; i++)
-                    {
-                        messages[i] = new ResponseMessage
+                            // Read messages
+                            ChatRoomMessage[] chatRoomMessages = await db.ChatRoomMessage.Where(x => x.ChatRoomId == readMessagesBackwardsRequest.ChatRoomId && x.MessageId < lastMessageId).OrderBy(x => x.MessageId).Take(readMessagesBackwardsRequest.Count).ToArrayAsync();
+
+                            ResponseMessage[] messages = new ResponseMessage[chatRoomMessages.Length];
+                            for (int i = 0; i < chatRoomMessages.Length; i++)
+                            {
+                                messages[i] = new ResponseMessage
+                                {
+                                    MessageId = chatRoomMessages[i].MessageId,
+                                    Message = chatRoomMessages[i].Message,
+                                    CreatedAt = chatRoomMessages[i].CreatedAt,
+                                    UserId = chatRoomMessages[i].UserId,
+                                    UserName = chatRoomMessages[i].ChatRoomMemberName,
+                                };
+                            }
+
+                            // Return response
+                            response = new ReadMessagesBackwardsResponse
+                            {
+                                IsError = false,
+                                Messages = messages,
+                                MinMessageId = minMessageId,
+                                MaxMessageId = maxMessageId,
+                                MessageCount = messageCount,
+                            };
+                            return Results.Json(response);
+                        }
+                        catch (Exception ex)
                         {
-                            MessageId = chatRoomMessages[i].MessageId,
-                            Message = chatRoomMessages[i].Message,
-                            CreatedAt = chatRoomMessages[i].CreatedAt,
-                            UserId = chatRoomMessages[i].UserId,
-                            UserName = chatRoomMessages[i].ChatRoomMemberName,
-                        };
+                            transaction.Rollback();
+                            Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                            response = new ReadMessagesBackwardsResponse
+                            {
+                                IsError = true,
+                                ErrorMessage = "internal error",
+                            };
+                            return Results.Json(response);
+                        }
                     }
 
-                    // Return response
-                    response = new ReadMessagesBackwardsResponse
-                    {
-                        IsError = false,
-                        Messages = messages,
-                    };
-                    return Results.Json(response);
 
                     
                 }
