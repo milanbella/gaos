@@ -110,6 +110,7 @@ namespace Gaos.Routes
                         {
                             IsError = false,
                             ErrorMessage = null,
+                            UserName = user.Name,
                             UserId = user.Id,
                             IsGuest = false,
                             Jwt = jwtStr,

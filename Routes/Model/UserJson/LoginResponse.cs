@@ -7,8 +7,9 @@ namespace Gaos.Routes.Model.UserJson
         public bool? IsError { get; set; }
 
         public string? ErrorMessage { get; set; }
+        public string? UserName { get; set; }
 
-        public int? UserId { get; set; }
+        public int UserId { get; set; }
 
         public bool? IsGuest { get; set; }
 
