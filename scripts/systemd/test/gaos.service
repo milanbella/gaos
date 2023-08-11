@@ -10,8 +10,8 @@ RestartSec=10
 KillSignal=SIGINT
 SyslogIdentifier=log.gaos
 User=gaos
-Environment=ASPNETCORE_ENVIRONMENT=Test
 TimeoutStopSec=30
+Environment=ASPNETCORE_ENVIRONMENT=Test
 
 [Install]
 WantedBy=multi-user.target
