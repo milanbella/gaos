@@ -1,1 +1,0 @@
-dotnet dev-certs https --export-path certs/development.pfx 
