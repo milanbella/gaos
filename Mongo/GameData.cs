@@ -19,7 +19,7 @@ namespace gaos.Mongo
 
         public async Task SaveGameDataAsync(int userId, int slotId, string gameDataJson)
         {
-            IMongoCollection<BsonDocument> collection = MongoService.GetCollectionForGameData();
+            IMongoCollection<BsonDocument> collection = await MongoService.GetCollectionForGameData();
 
 
             BsonDocument gameDataBson = BsonDocument.Parse(gameDataJson);
@@ -41,7 +41,7 @@ namespace gaos.Mongo
         public async Task<string> GetGameDataAsync(int userId, int slotId)
         {
 
-            IMongoCollection<BsonDocument> collection = MongoService.GetCollectionForGameData();
+            IMongoCollection<BsonDocument> collection = await MongoService.GetCollectionForGameData();
 
             var filter = Builders<BsonDocument>.Filter
                 .And(

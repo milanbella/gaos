@@ -61,9 +61,35 @@ namespace gaos.Mongo
             return database;
         }
 
-        public IMongoCollection<BsonDocument> GetCollectionForGameData()
+        private async Task<bool> IsCollectionExists(IMongoDatabase database, string collectionName)
+        {
+            var filter = new BsonDocument("name", collectionName);
+            var collections = database.ListCollections(new ListCollectionsOptions { Filter = filter });
+            return await collections.AnyAsync();
+        }
+
+        private async Task CreateIndexesForGameData(IMongoDatabase database)
+        {
+            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(CollectionNameForGameData);
+
+            var indexKeysDefinition = Builders<BsonDocument>.IndexKeys.Ascending("UserId").Ascending("SlotId");
+            var indexOptions = new CreateIndexOptions { Unique = false, Name = "UserId__SlotId" };
+            var indexModel = new CreateIndexModel<BsonDocument>(indexKeysDefinition, indexOptions);
+            await collection.Indexes.CreateOneAsync(indexModel);
+        }
+
+        public async Task<IMongoCollection<BsonDocument>> GetCollectionForGameData()
         {
             IMongoDatabase database = GetDatabaseForGameData();
+
+            bool isCollectionExists = await IsCollectionExists(database, CollectionNameForGameData);
+
+
+
+            if (!isCollectionExists)
+            {
+                await CreateIndexesForGameData(database);
+            }
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(CollectionNameForGameData);
             return collection;
         }
