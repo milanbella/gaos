@@ -4,7 +4,6 @@ using System.Security.Cryptography;
 using Jose;
 using Serilog;
 using Gaos.Dbo;
-using Gaos.Model.Token;
 
 namespace Gaos.Auth
 {
