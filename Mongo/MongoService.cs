@@ -3,7 +3,7 @@ using Serilog;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-namespace gaos.Mongo
+namespace Gaos.Mongo
 {
     public class MongoService
     {

@@ -81,7 +81,18 @@ builder.Services.AddScoped<Gaos.Common.UserService>(provider => {
     Gaos.Auth.TokenService tokenService = provider.GetService<Gaos.Auth.TokenService>();
     Gaos.Dbo.Db db = provider.GetService<Gaos.Dbo.Db>();
     return new Gaos.Common.UserService(context, tokenService, db);
-}); 
+});
+
+builder.Services.AddScoped<Gaos.Mongo.MongoService>(provider =>
+{
+    return new Gaos.Mongo.MongoService(builder.Configuration);
+});
+
+builder.Services.AddScoped<Gaos.Mongo.GameData>(provider =>
+{
+    Gaos.Mongo.MongoService mongoService = provider.GetService<Gaos.Mongo.MongoService>();
+    return new Gaos.Mongo.GameData(mongoService);
+});
 
 
 // Set the JSON serializer options

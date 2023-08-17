@@ -13,7 +13,7 @@ namespace Gaos.Routes
         public static RouteGroupBuilder GroupGameData(this RouteGroupBuilder group)
         {
 
-            group.MapPost("/userGameDataGet", (UserGameDataGetRequest request, Db db, Gaos.Common.UserService userService) => 
+            group.MapPost("/userGameDataGet", async (UserGameDataGetRequest request, Db db, Gaos.Common.UserService userService, Gaos.Mongo.GameData gameDataService) => 
             {
                 const string METHOD_NAME = "userGameDataGet()";
                 try 
@@ -86,6 +86,10 @@ namespace Gaos.Routes
                         enumKindToRecipeData[enumKind] = RecipeDataDataGroupsByKind.TryGetValue(enumKind, out var foundValue) ? foundValue.Select(v => v.RecipeData).ToArray() : new RecipeData[0];
                     }
 
+                    // GaDataJson
+
+                    string gameDataJson = await gameDataService.GetGameDataAsync(userId, slotId);
+
                     response = new UserGameDataGetResponse
                     {
                         IsError = false,
@@ -101,6 +105,8 @@ namespace Gaos.Routes
                         ProcessedRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.ProcessedRecipeObjects.ToString()],
                         EnhancedRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.EnhancedRecipeObjects.ToString()],
                         AssembledRecipeObjects = enumKindToRecipeData[Gaos.Dbo.Model.RecipeDataKindEnum.AssembledRecipeObjects.ToString()],
+
+                        GameDataJson = gameDataJson,
                     };
 
                     return Results.Json(response);
@@ -119,7 +125,7 @@ namespace Gaos.Routes
 
             });
 
-            group.MapPost("/userGameDataSave", (UserGameDataSaveRequest request, Db db, Gaos.Common.UserService userService) => 
+            group.MapPost("/userGameDataSave", async (UserGameDataSaveRequest request, Db db, Gaos.Common.UserService userService, Gaos.Mongo.GameData gameDataService) => 
             {
                 const string METHOD_NAME = "userGameDataSave()";
                 try 
@@ -426,6 +432,20 @@ namespace Gaos.Routes
                                 throw new Exception("could no save AssembledRecipeObjects");
                             }
                         }
+                    }
+
+                    if (request.GameDataJson != null)
+                    {
+                        try
+                        {
+                            await gameDataService.SaveGameDataAsync(userService.GetUserId(), userSlot.Id, request.GameDataJson);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error, saving GameDataJson: {ex.Message}");
+                            throw new Exception("could no save GameDataJson");
+                        }   
+
                     }
 
 

@@ -2,7 +2,7 @@
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-namespace gaos.Mongo
+namespace Gaos.Mongo
 {
     public class GameData
     {
@@ -38,7 +38,7 @@ namespace gaos.Mongo
 
         // Get the game data to from database from the specified slot for the specified user.
 
-        public async Task<string> GetGameDataAsync(int userId, int slotId)
+        public async Task<string?> GetGameDataAsync(int userId, int slotId)
         {
 
             IMongoCollection<BsonDocument> collection = await MongoService.GetCollectionForGameData();

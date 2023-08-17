@@ -33,10 +33,10 @@ namespace Gaos.Dbo.Model
         public int FossilFuelsPlanet0 { get; set; }
         public int RareElementsPlanet0 { get; set; }
         public int GemstonesPlanet0 { get; set; }
-        public string? PlayerOxygen { get; set; }
-        public string? PlayerWater { get; set; }
-        public string? PlayerEnergy { get; set; }
-        public string? PlayerHunger { get; set; }
+        public float? PlayerOxygen { get; set; }
+        public float? PlayerWater { get; set; }
+        public float? PlayerEnergy { get; set; }
+        public float? PlayerHunger { get; set; }
         public int PlayerLevel { get; set; }
         public int PlayerCurrentExp { get; set; }
         public int PlayerMaxExp { get; set; }
@@ -51,5 +51,22 @@ namespace Gaos.Dbo.Model
         public bool ThirdGoal { get; set; }
         public bool IsPlayerInBiologicalBiome { get; set; }
         public float Credits { get; set; }
+        public string? MenuButtonTypeOn { get; set; }
+        public bool isDraggingBuilding { get; set; }
+        public int Planet0CurrentElectricity { get; set; }
+        public int Planet0CurrentConsumption { get; set; }
+        public int Planet0MaxElectricity { get; set; }
+        public int Planet0BiofuelGenerator { get; set; }
+        public int Planet0WaterPump { get; set; }
+        public int Planet0PlantField { get; set; }
+        public int Planet0Boiler { get; set; }
+        public int Planet0SteamGenerator { get; set; }
+        public string? BuildingStatisticProcess { get; set; }
+        public string? BuildingStatisticType { get; set; }
+        public string? BuildingStatisticInterval { get; set; }
+        public bool BuildingIntervalTypeChanged { get; set; }
+        public bool BuildingStatisticTypeChanged { get; set; }
+        public int ItemCreationID { get; set; }
+        public string? slotEquipped { get; set; }
     }
 }

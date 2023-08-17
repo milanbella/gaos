@@ -21,5 +21,7 @@ namespace Gaos.Routes.Model.GameDataJson
         public Gaos.Dbo.Model.RecipeData[]? ProcessedRecipeObjects { get; set; }
         public Gaos.Dbo.Model.RecipeData[]? EnhancedRecipeObjects { get; set; }
         public Gaos.Dbo.Model.RecipeData[]? AssembledRecipeObjects  { get; set; }
+
+        public string? GameDataJson { get; set; }
     }
 }
