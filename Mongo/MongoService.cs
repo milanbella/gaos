@@ -28,10 +28,10 @@ namespace Gaos.Mongo
 
             if (Configuration["mongodb_connection_string"] == null)
             {
-                Log.Error($"{CLASS_NAME}:{METHOD_NAME} missing configuration value: mongodb_database_name");
-                throw new Exception("missing configuration value: mongodb_database_name");
+                Log.Error($"{CLASS_NAME}:{METHOD_NAME} missing configuration value: mongodb_connection_string");
+                throw new Exception("missing configuration value: mongodb_connection_string");
             }
-            DbConnectionString = Configuration["mongodb_database_name"];
+            DbConnectionString = Configuration["mongodb_connection_string"];
 
             if (Configuration["mongodb_database_name"] == null)
             {
@@ -50,7 +50,7 @@ namespace Gaos.Mongo
         private IMongoDatabase GetDatabaseForGameData()
         {
             MongoClient client = GetClient();
-            IMongoDatabase database = client.GetDatabase(DbNameForGameData);
+            IMongoDatabase database = client.GetDatabase($"{DbNameForGameData}");
             return database;
         }
 
