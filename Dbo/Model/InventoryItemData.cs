@@ -11,7 +11,7 @@ namespace Gaos.Dbo.Model
         public InventoryItemDataKind? InventoryItemDataKind { get; set; }
 
         public string? ItemName { get; set; }
-        public int? ID { get; set; }
+        public int? ID_ { get; set; }
         public float? stackLimit { get; set; }
         public string? ItemType { get; set; }
         public string? ItemClass { get; set; }
