@@ -9,9 +9,6 @@ namespace Gaos.Seed
         {
             User.Seed(modelBuilder, configuration, environment);
             JWT.Seed(modelBuilder, configuration, environment);
-            Slot.Seed(modelBuilder, configuration, environment);
-            InventoryItemDataKind.Seed(modelBuilder, configuration, environment);
-            RecipeDataKind.Seed(modelBuilder, configuration, environment);
         }
     }
 }

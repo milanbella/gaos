@@ -63,7 +63,7 @@ namespace Gaos.Common
 
             int index = new Random().Next(0, NamesList.Count - 1);
 
-            string name =  $"${NamesList[index]}{new Random().Next(10000, 99999)}";
+            string name =  $"{NamesList[index]}{new Random().Next(10000, 99999)}";
             return name;
         }
 

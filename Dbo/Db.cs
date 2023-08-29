@@ -19,13 +19,6 @@
         public DbSet<JWT> JWT => Set<JWT>();
         public DbSet<BuildVersion> BuildVersion => Set<BuildVersion>();
         public DbSet<Device> Device => Set<Device>();
-        public DbSet<Slot> Slot => Set<Slot>();
-        public DbSet<UserSlot> UserSlot => Set<UserSlot>();
-        public DbSet<GameData> GameData => Set<GameData>();
-        public DbSet<InventoryItemData> InventoryItemData => Set<InventoryItemData>();
-        public DbSet<InventoryItemDataKind> InventoryItemDataKind => Set<InventoryItemDataKind>();
-        public DbSet<RecipeData> RecipeData => Set<RecipeData>();
-        public DbSet<RecipeDataKind> RecipeDataKind => Set<RecipeDataKind>();
         public DbSet<ChatRoom> ChatRoom => Set<ChatRoom>();
         public DbSet<ChatRoomMember> ChatRoomMember => Set<ChatRoomMember>();
         public DbSet<ChatRoomMessage> ChatRoomMessage => Set<ChatRoomMessage>();
@@ -56,33 +49,6 @@
                 .HasIndex(e => new { e.Identification, e.PlatformType }).IsUnique(true);
             modelBuilder.Entity<Device>().HasOne(e => e.BuildVersion).WithMany().HasForeignKey(e => e.BuildVersionId);
 
-
-            // Slot
-            modelBuilder.Entity<Slot>().HasKey(e => e.Id);
-
-            // UserSlot
-            modelBuilder.Entity<UserSlot>().HasKey(e => e.Id);
-            modelBuilder.Entity<UserSlot>().HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
-            modelBuilder.Entity<UserSlot>().HasOne(e => e.Slot).WithMany().HasForeignKey(e => e.SlotId);
-            modelBuilder.Entity<UserSlot>().HasIndex(e => new { e.UserId, e.SlotId }).IsUnique(true);
-
-            // GameData
-            modelBuilder.Entity<GameData>().HasKey(e => e.Id);
-            modelBuilder.Entity<GameData>().HasOne(e => e.UserSlot).WithMany().HasForeignKey(e => e.UserSlotId);
-
-            // InventoryItemData
-            modelBuilder.Entity<InventoryItemData>().HasKey(e => e.Id);
-            modelBuilder.Entity<InventoryItemData>().HasOne(e => e.UserSlot).WithMany().HasForeignKey(e => e.UserSlotId);
-
-            // InventoryItemDataKind
-            modelBuilder.Entity<InventoryItemDataKind>().HasKey(e => e.Id);
-
-            // RecipeData
-            modelBuilder.Entity<RecipeData>().HasKey(e => e.Id);
-            modelBuilder.Entity<RecipeData>().HasOne(e => e.UserSlot).WithMany().HasForeignKey(e => e.UserSlotId);
-
-            // RecipeDataKind
-            modelBuilder.Entity<RecipeDataKind>().HasKey(e => e.Id);
 
             // ChatRoom
             modelBuilder.Entity<ChatRoom>().HasKey(e => e.Id);
