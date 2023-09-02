@@ -208,6 +208,16 @@ namespace Gaos.Routes
                                         json = JsonSerializer.Serialize(response);
                                         return Results.Content(json, "application/json", Encoding.UTF8, 401);
                                     }
+
+                                    // Add role "player" to  new guest
+
+                                    UserRole userRole = new UserRole
+                                    {
+                                        UserId = guest.Id,
+                                        RoleId = Gaos.Common.Context.ROLE_PLAYER_ID,
+                                    };
+                                    await db.UserRole.AddAsync(userRole);
+                                    await db.SaveChangesAsync();
                                 }
                                 else
                                 {
@@ -380,6 +390,7 @@ namespace Gaos.Routes
                             return Results.Json(response);
                         } 
 
+
                         EncodedPassword encodedPassword = Password.getEncodedPassword(registerRequest.Password);
 
                         // Search for guest user with this device
@@ -397,10 +408,18 @@ namespace Gaos.Routes
                                 PasswordHash = encodedPassword.PasswordHash,
                                 PasswordSalt = encodedPassword.Salt,
                                 DeviceId = device.Id,
-
                             };
                             await db.User.AddAsync(user);
                             await db.SaveChangesAsync();
+
+                            UserRole userRole = new UserRole
+                            {
+                                UserId = user.Id,
+                                RoleId = Gaos.Common.Context.ROLE_PLAYER_ID,
+                            };
+                            await db.UserRole.AddAsync(userRole);
+                            await db.SaveChangesAsync();
+
                             jwtStr = tokenService.GenerateJWT(registerRequest.UserName, user.Id, device.Id, Gaos.Model.Token.UserType.RegisteredUser);
                         }
                         else
@@ -413,6 +432,7 @@ namespace Gaos.Routes
                             guest.PasswordSalt = encodedPassword.Salt;
                             guest.DeviceId = device.Id;
                             await db.SaveChangesAsync();
+
                             jwtStr = tokenService.GenerateJWT(registerRequest.UserName, guest.Id, device.Id, Gaos.Model.Token.UserType.RegisteredUser);
                         }
 
