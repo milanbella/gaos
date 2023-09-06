@@ -1,14 +1,5 @@
 #set -xe
-GAO_PATH=../../gao
 
-rm -rf $GAO_PATH/Assets/Scripts/Gaos/Model
-cp -r ../Model $GAO_PATH/Assets/Scripts/Gaos/Model
-
-rm -rf $GAO_PATH/Assets/Scripts/Gaos/Dbo/Model
-cp -r ../Dbo/Model $GAO_PATH/Assets/Scripts/Gaos/Dbo/Model
-
-rm -rf $GAO_PATH/Assets/Scripts/Gaos/Routes/Model
-cp -r ../Routes/Model $GAO_PATH/Assets/Scripts/Gaos/Routes/Model
 
 function edit_model_file()
 {
@@ -53,13 +44,30 @@ function edit_model_folders()
   done
 }
 
-#edit_model_folder $GAO_PATH/Assets/Scripts/Gaos/Dbo/Model
+function copy_models_to()
+{
+  local root_path=$1
 
-edit_model_folders \
-  $GAO_PATH/Assets/Scripts/Gaos/Model \
-  $GAO_PATH/Assets/Scripts/Gaos/Dbo/Model \
-  $GAO_PATH/Assets/Scripts/Gaos/Routes/Model
+  rm -rf $root_path/Model
+  cp -r ../Model $root_path/Model
+
+  rm -rf $root_path/Dbo/Model
+  cp -r ../Dbo/Model $root_path/Dbo/Model
+
+  rm -rf $root_path/Routes/Model
+  cp -r ../Routes/Model $root_path/Routes/Model
+
+  edit_model_folders \
+    $root_path/Model \
+    $root_path/Dbo/Model \
+    $root_path/Routes/Model
+}
 
 
+# copy models to gao
+copy_models_to ../../gao/Assets/Scripts/Gaos
+
+# copy models to gaoa
+copy_models_to ../../gaoa/gaoa
 
 

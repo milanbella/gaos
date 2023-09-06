@@ -182,10 +182,11 @@ namespace Gaos.Routes
                             if (guest == null)
                             {
 
-                                // Create new guest
                                 if (guestName == null || guestName.Trim().Length == 0)
                                 {
-                                    guestName = commonGuest.GenerateGuestName();
+                                    // Generate guest name
+                                    guestName = commonGuest.GenerateGuestName(); // Note: GenerateGuestName() also queries against db to ensure that generated name is not already taken
+
                                     // Create new guest
                                     guest = new User()
                                     {
@@ -233,6 +234,8 @@ namespace Gaos.Routes
                                         };
                                         await db.User.AddAsync(guest);
                                         await db.SaveChangesAsync();
+
+                                        guest = await db.User.FirstOrDefaultAsync(g => g.Name == guestName);
                                         if (guest == null)
                                         {
                                             Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: can't create guest");
@@ -246,8 +249,89 @@ namespace Gaos.Routes
                                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
                                         }
 
+                                        UserRole userRole = new UserRole
+                                        {
+                                            UserId = guest.Id,
+                                            RoleId = Gaos.Common.Context.ROLE_PLAYER_ID,
+                                        };
+                                        await db.UserRole.AddAsync(userRole);
+                                        await db.SaveChangesAsync();
+
+                                    }
+                                    else
+                                    {
+                                        // This guest is comming from another device
+                                        // We let him play on this device 
+
+                                        // Update guest's device id
+                                        guest.DeviceId = device.Id;
+                                        db.User.Update(guest);
+                                        await db.SaveChangesAsync();
+
+
                                     }
                                 }
+                            }
+                            else
+                            {
+                                if (guestName == null || guestName.Trim().Length == 0)
+                                {
+                                    // We accept the guest associated with this device
+                                    ;
+                                }
+                                else
+                                {   // Different guest want to play on this device
+                                    // We let him play on this device 
+                                    guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.Name == guestName);
+                                    if (guest == null)
+                                    {
+                                        // Create new guest
+                                        guest = new User()
+                                        {
+                                            Name = guestName,
+                                            IsGuest = true,
+                                            DeviceId = device.Id,
+                                        };
+                                        await db.User.AddAsync(guest);
+                                        await db.SaveChangesAsync();
+
+                                        guest = await db.User.FirstOrDefaultAsync(g => g.Name == guestName);
+                                        if (guest == null)
+                                        {
+                                            Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: can't create guest");
+                                            response = new GuestLoginResponse
+                                            {
+                                                IsError = true,
+                                                ErrorMessage = "internal error - can't create guest",
+
+                                            };
+                                            json = JsonSerializer.Serialize(response);
+                                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
+                                        }
+
+                                        UserRole userRole = new UserRole
+                                        {
+                                            UserId = guest.Id,
+                                            RoleId = Gaos.Common.Context.ROLE_PLAYER_ID,
+                                        };
+                                        await db.UserRole.AddAsync(userRole);
+                                        await db.SaveChangesAsync();
+
+                                    }
+                                    else
+                                    {
+                                        // This guest is comming from another device
+                                        // We let him play on this device 
+                                        ;
+
+                                        // Update guest's device id
+                                        guest.DeviceId = device.Id;
+                                        db.User.Update(guest);
+                                        await db.SaveChangesAsync();
+                                    }
+
+                                }
+
                             }
                         }
 
@@ -303,16 +387,28 @@ namespace Gaos.Routes
 
                         }
 
+                        User guest = null;
+
                         bool userExists = await db.User.AnyAsync(u => u.Name == registerRequest.UserName);
                         if (userExists)
                         {
-                            response = new RegisterResponse
+                            guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.Name == registerRequest.UserName);
+                            if (guest != null)
                             {
-                                IsError = true,
-                                ErrorMessage = "user already exists",
+                                // this  guest wants to register as regular user
+                                ;
 
-                            };
-                            return Results.Json(response);
+                            }
+                            else
+                            {
+                                response = new RegisterResponse
+                                {
+                                    IsError = true,
+                                    ErrorMessage = "user already exists",
+
+                                };
+                                return Results.Json(response);
+                            }
 
                         }
 
@@ -393,8 +489,11 @@ namespace Gaos.Routes
 
                         EncodedPassword encodedPassword = Password.getEncodedPassword(registerRequest.Password);
 
-                        // Search for guest user with this device
-                        User guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
+                        if (guest == null)
+                        {
+                            // Search for guest user with this device
+                            guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
+                        }
                         User user;
                         string jwtStr;
 
@@ -406,7 +505,7 @@ namespace Gaos.Routes
                                 IsGuest = false,
                                 Email = registerRequest.Email,
                                 PasswordHash = encodedPassword.PasswordHash,
-                                PasswordSalt = encodedPassword.Salt,
+                                PasswordSalt = encodedPassword.PasswordSalt,
                                 DeviceId = device.Id,
                             };
                             await db.User.AddAsync(user);
@@ -429,7 +528,7 @@ namespace Gaos.Routes
                             guest.IsGuest = false;
                             guest.Email = registerRequest.Email;
                             guest.PasswordHash = encodedPassword.PasswordHash;
-                            guest.PasswordSalt = encodedPassword.Salt;
+                            guest.PasswordSalt = encodedPassword.PasswordSalt;
                             guest.DeviceId = device.Id;
                             await db.SaveChangesAsync();
 

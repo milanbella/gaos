@@ -8,7 +8,7 @@ namespace Gaos.Auth
 {
     public class EncodedPassword
     {
-        public string? Salt { get; set; }
+        public string? PasswordSalt { get; set; }
         public string? PasswordHash { get; set; }
 
     }
@@ -68,7 +68,7 @@ namespace Gaos.Auth
 
             EncodedPassword encodedPassword = new EncodedPassword
             {
-                Salt = saltStr,
+                PasswordSalt = saltStr,
                 PasswordHash = passwordHash,
             };
 
