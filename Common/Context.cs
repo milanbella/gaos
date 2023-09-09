@@ -8,5 +8,7 @@
         public static int ROLE_PLAYER_ID = 1;
         public static string ROLE_ADMIN_NAME = "Admin";
         public static int ROLE_ADMIN_ID = 2;
+
+        public static int TOKEN_EXPIRATION_HOURS = 100 * 365 * 24; // 100 years
     }
 }

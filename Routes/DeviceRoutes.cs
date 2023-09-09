@@ -8,6 +8,7 @@ using Gaos.Auth;
 using Gaos.Dbo;
 using Gaos.Routes.Model.DeviceJson;
 using Gaos.Dbo.Model;
+using Gaos.Common;
 
 namespace Gaos.Routes
 {
@@ -20,7 +21,7 @@ namespace Gaos.Routes
         {
             group.MapGet("/hello", (Db db) => "hello");
 
-            group.MapPost("/register", async (DeviceRegisterRequest deviceRegisterRequest, Db db) =>
+            group.MapPost("/register", async (DeviceRegisterRequest deviceRegisterRequest, Db db, UserService userSerice) =>
             {
                 const string METHOD_NAME = "device/register";
                 try
@@ -54,6 +55,7 @@ namespace Gaos.Routes
 
                     BuildVersion buildVersion = await db.BuildVersion.FirstOrDefaultAsync(b => b.Version == deviceRegisterRequest.BuildVersion);
                     Device device = await db.Device.FirstOrDefaultAsync(d => d.Identification == deviceRegisterRequest.Identification && d.PlatformType == platformType);
+                    (Dbo.Model.User?, Dbo.Model.JWT?) user_jwt = (null, null);
 
                     if (device == null)
                     {
@@ -68,6 +70,8 @@ namespace Gaos.Routes
                         await db.SaveChangesAsync();
 
                     } else {
+                        user_jwt  = userSerice.GetDeviceUser(device.Id);
+
                         device.Identification = deviceRegisterRequest.Identification;
                         device.PlatformType = platformType;
                         device.BuildVersionId = (buildVersion != null) ? buildVersion.Id : null;
@@ -84,6 +88,8 @@ namespace Gaos.Routes
                         Identification = device.Identification,
                         PlatformType = device.PlatformType.ToString(),
                         BuildVersion = ( buildVersion != null ) ? buildVersion.Version : "unknown",
+                        User = user_jwt.Item1,
+                        JWT = user_jwt.Item2,
                     };
                     return Results.Json(response);
                 }

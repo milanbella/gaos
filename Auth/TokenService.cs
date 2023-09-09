@@ -63,14 +63,14 @@ namespace Gaos.Auth
 
         }
 
-        private string GenerateJWT(RSA privateKey, string username, int userId, int deviceId, Gaos.Model.Token.UserType userType = Gaos.Model.Token.UserType.RegisteredUser)
+        private string GenerateJWT(RSA privateKey, string username, int userId, int deviceId, long validitySeconds, Gaos.Model.Token.UserType userType)  
         {
 
             // Set JWT payload.
             var payload = new Dictionary<string, object>
             {
                 { "sub", username },
-                { "exp", DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds() },
+                { "exp", validitySeconds },
                 { "user_id", userId },
                 { "user_type", userType.ToString()},
                 { "device_id", deviceId}
@@ -83,7 +83,7 @@ namespace Gaos.Auth
             return jwt;
         }
 
-        public string GenerateJWT(string username, int userId, int deviceId, Gaos.Model.Token.UserType userType = Gaos.Model.Token.UserType.RegisteredUser)
+        public string GenerateJWT(string username, int userId, int deviceId, long validitySeconds,  Gaos.Model.Token.UserType userType)
         {
             const string METHOD_NAME = "GenerateJWT()";
             string jwtStr;
@@ -94,13 +94,15 @@ namespace Gaos.Auth
 
             if (privateKey == null) { 
                 privateKey = RSAKeys.ReadPrivateKey(GetPkcs12KeyStoreFilePath(), GetKeyStorePassword());
-                jwtStr = GenerateJWT(privateKey, username, userId, deviceId, userType);
+                jwtStr = GenerateJWT(privateKey, username, userId, deviceId, validitySeconds, userType);
             } 
             else
             {
-                jwtStr =  GenerateJWT(privateKey, username, userId, deviceId, userType);
+                jwtStr =  GenerateJWT(privateKey, username, userId, deviceId, validitySeconds, userType);
 
             }
+            
+            var currentTime = DateTime.Now;
 
             if (userType == Gaos.Model.Token.UserType.RegisteredUser)
             {
@@ -108,6 +110,8 @@ namespace Gaos.Auth
                 {
                     Token = jwtStr,
                     UserId = userId,
+                    CreatedAt = currentTime,
+                    ExpiresAt = currentTime.AddSeconds(validitySeconds),
                     DeviceId = deviceId,
                 };
                 db.JWT.Add(jwt);

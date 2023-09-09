@@ -12,5 +12,8 @@ namespace Gaos.Routes.Model.DeviceJson
         public string? PlatformType { get; set; }
         public string? BuildVersion { get; set; }
 
+        public Dbo.Model.User? User { get; set; }
+        public Dbo.Model.JWT? JWT { get; set; }
+
     }
 }

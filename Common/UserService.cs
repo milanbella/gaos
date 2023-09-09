@@ -42,6 +42,7 @@ namespace Gaos.Common
             return claims.UserId;
 
         }
+
         public Gaos.Dbo.Model.User GetUser()
         {
             const string METHOD_NAME = "GetUser()";
@@ -60,6 +61,24 @@ namespace Gaos.Common
             else
             {
                 return User;
+            }
+
+        }
+
+        public (Gaos.Dbo.Model.User?, Gaos.Dbo.Model.JWT?) GetDeviceUser(int deviceId)
+        {
+            const string METHOD_NAME = "GetDeviceUser()";
+
+            Gaos.Dbo.Model.User? user = null;
+
+            Gaos.Dbo.Model.JWT? jwt = Db.JWT.FirstOrDefault(x => x.DeviceId == deviceId);
+            if (jwt != null) {
+                user = Db.User.FirstOrDefault(x => x.Id == jwt.UserId);
+                return (user, jwt);
+            }
+            else
+            {
+                return (user, jwt);
             }
 
         }

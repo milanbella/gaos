@@ -8,6 +8,7 @@ using Gaos.Auth;
 using Gaos.Dbo;
 using Gaos.Routes.Model.UserJson;
 using Gaos.Dbo.Model;
+using Gaos.Common;
 
 namespace Gaos.Routes
 {
@@ -102,7 +103,7 @@ namespace Gaos.Routes
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
                         }
 
-                        var jwtStr = tokenService.GenerateJWT(loginRequest.UserName, user.Id, deviceId);
+                        var jwtStr = tokenService.GenerateJWT(loginRequest.UserName, user.Id, deviceId, DateTimeOffset.UtcNow.AddHours(Gaos.Common.Context.TOKEN_EXPIRATION_HOURS).ToUnixTimeSeconds(), Gaos.Model.Token.UserType.RegisteredUser);
 
                         transaction.Commit();
 
@@ -181,6 +182,7 @@ namespace Gaos.Routes
                             guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
                             if (guest == null)
                             {
+                                // This device has no guest
 
                                 if (guestName == null || guestName.Trim().Length == 0)
                                 {
@@ -274,68 +276,13 @@ namespace Gaos.Routes
                             }
                             else
                             {
-                                if (guestName == null || guestName.Trim().Length == 0)
-                                {
-                                    // We accept the guest associated with this device
-                                    ;
-                                }
-                                else
-                                {   // Different guest want to play on this device
-                                    // We let him play on this device 
-                                    guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.Name == guestName);
-                                    if (guest == null)
-                                    {
-                                        // Create new guest
-                                        guest = new User()
-                                        {
-                                            Name = guestName,
-                                            IsGuest = true,
-                                            DeviceId = device.Id,
-                                        };
-                                        await db.User.AddAsync(guest);
-                                        await db.SaveChangesAsync();
-
-                                        guest = await db.User.FirstOrDefaultAsync(g => g.Name == guestName);
-                                        if (guest == null)
-                                        {
-                                            Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: can't create guest");
-                                            response = new GuestLoginResponse
-                                            {
-                                                IsError = true,
-                                                ErrorMessage = "internal error - can't create guest",
-
-                                            };
-                                            json = JsonSerializer.Serialize(response);
-                                            return Results.Content(json, "application/json", Encoding.UTF8, 401);
-                                        }
-
-                                        UserRole userRole = new UserRole
-                                        {
-                                            UserId = guest.Id,
-                                            RoleId = Gaos.Common.Context.ROLE_PLAYER_ID,
-                                        };
-                                        await db.UserRole.AddAsync(userRole);
-                                        await db.SaveChangesAsync();
-
-                                    }
-                                    else
-                                    {
-                                        // This guest is comming from another device
-                                        // We let him play on this device 
-                                        ;
-
-                                        // Update guest's device id
-                                        guest.DeviceId = device.Id;
-                                        db.User.Update(guest);
-                                        await db.SaveChangesAsync();
-                                    }
-
-                                }
+                                // This device already has the guest
+                                ;
 
                             }
                         }
 
-                        var jwtStr = tokenService.GenerateJWT(guestLoginRequest.UserName, guest.Id, device.Id, Gaos.Model.Token.UserType.GuestUser);
+                        var jwtStr = tokenService.GenerateJWT(guestLoginRequest.UserName, guest.Id, device.Id, DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds(), Gaos.Model.Token.UserType.GuestUser);
 
                         transaction.Commit();
 
@@ -387,30 +334,21 @@ namespace Gaos.Routes
 
                         }
 
-                        User guest = null;
 
                         bool userExists = await db.User.AnyAsync(u => u.Name == registerRequest.UserName);
                         if (userExists)
                         {
-                            guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.Name == registerRequest.UserName);
-                            if (guest != null)
+                            response = new RegisterResponse
                             {
-                                // this  guest wants to register as regular user
-                                ;
+                                IsError = true,
+                                ErrorMessage = "user already exists",
 
-                            }
-                            else
-                            {
-                                response = new RegisterResponse
-                                {
-                                    IsError = true,
-                                    ErrorMessage = "user already exists",
-
-                                };
-                                return Results.Json(response);
-                            }
-
+                            };
+                            return Results.Json(response);
                         }
+
+                        User guest = null;
+                        guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == registerRequest.DeviceId);
 
                         if (registerRequest.Email == null || registerRequest.Email.Trim().Length == 0)
                         {
@@ -489,15 +427,10 @@ namespace Gaos.Routes
 
                         EncodedPassword encodedPassword = Password.getEncodedPassword(registerRequest.Password);
 
-                        if (guest == null)
-                        {
-                            // Search for guest user with this device
-                            guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
-                        }
                         User user;
                         string jwtStr;
 
-                        if (guest != null)
+                        if (guest == null)
                         {
                             user = new User
                             {
@@ -519,7 +452,7 @@ namespace Gaos.Routes
                             await db.UserRole.AddAsync(userRole);
                             await db.SaveChangesAsync();
 
-                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, user.Id, device.Id, Gaos.Model.Token.UserType.RegisteredUser);
+                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, user.Id, device.Id, DateTimeOffset.UtcNow.AddHours(Gaos.Common.Context.TOKEN_EXPIRATION_HOURS).ToUnixTimeSeconds(), Gaos.Model.Token.UserType.RegisteredUser);
                         }
                         else
                         {
@@ -532,7 +465,7 @@ namespace Gaos.Routes
                             guest.DeviceId = device.Id;
                             await db.SaveChangesAsync();
 
-                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, guest.Id, device.Id, Gaos.Model.Token.UserType.RegisteredUser);
+                            jwtStr = tokenService.GenerateJWT(registerRequest.UserName, guest.Id, device.Id, DateTimeOffset.UtcNow.AddHours(Gaos.Common.Context.TOKEN_EXPIRATION_HOURS).ToUnixTimeSeconds(), Gaos.Model.Token.UserType.RegisteredUser);
                         }
 
 
