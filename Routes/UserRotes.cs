@@ -17,6 +17,14 @@ namespace Gaos.Routes
     {
 
         public static string CLASS_NAME = typeof(UserRoutes).Name;
+
+
+        public static bool VerifyEmailFormat(string email)
+        {
+            string pattern = @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$";
+            return System.Text.RegularExpressions.Regex.IsMatch(email, pattern);
+        }       
+
         public static RouteGroupBuilder GroupUser(this RouteGroupBuilder group)
         {
             group.MapGet("/hello", (Db db) => "hello");
@@ -328,6 +336,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "userName is empty",
+                                ErrorKind = RegisterResponseErrorKind.UserNameIsEmptyError,
 
                             };
                             return Results.Json(response);
@@ -342,6 +351,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "user already exists",
+                                ErrorKind = RegisterResponseErrorKind.UsernameExistsError,
 
                             };
                             return Results.Json(response);
@@ -356,6 +366,20 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "email is empty",
+                                ErrorKind = RegisterResponseErrorKind.EmailIsEmptyError,
+
+                            };
+                            return Results.Json(response);
+
+                        }
+
+                        if (!VerifyEmailFormat(registerRequest.Email))
+                        {
+                            response = new RegisterResponse
+                            {
+                                IsError = true,
+                                ErrorMessage = "incorrect email",
+                                ErrorKind = RegisterResponseErrorKind.IncorrectEmailError,
 
                             };
                             return Results.Json(response);
@@ -369,6 +393,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "email already exists",
+                                ErrorKind = RegisterResponseErrorKind.EmailExistsError,
 
                             };
                             return Results.Json(response);
@@ -381,6 +406,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "password is empty",
+                                ErrorKind = RegisterResponseErrorKind.PasswordIsEmptyError,
 
                             };
                             return Results.Json(response);
@@ -395,6 +421,7 @@ namespace Gaos.Routes
                                 {
                                     IsError = true,
                                     ErrorMessage = "passwords do not match",
+                                    ErrorKind = RegisterResponseErrorKind.PasswordsDoNotMatchError,
                                 };
                                 return Results.Json(response);
                             }
@@ -407,6 +434,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "deviceId is empty",
+                                ErrorKind = RegisterResponseErrorKind.InternalError,
 
                             };
                             return Results.Json(response);
@@ -418,7 +446,8 @@ namespace Gaos.Routes
                             response = new RegisterResponse
                             {
                                 IsError = true,
-                                ErrorMessage = "nu such deviceId",
+                                ErrorMessage = "no such deviceId",
+                                ErrorKind = RegisterResponseErrorKind.InternalError,
 
                             };
                             return Results.Json(response);
@@ -466,6 +495,8 @@ namespace Gaos.Routes
                             await db.SaveChangesAsync();
 
                             jwtStr = tokenService.GenerateJWT(registerRequest.UserName, guest.Id, device.Id, DateTimeOffset.UtcNow.AddHours(Gaos.Common.Context.TOKEN_EXPIRATION_HOURS).ToUnixTimeSeconds(), Gaos.Model.Token.UserType.RegisteredUser);
+
+                            user = guest;
                         }
 
 
@@ -475,6 +506,7 @@ namespace Gaos.Routes
                         response = new RegisterResponse
                         {
                             IsError = false,
+                            User = user,
                             Jwt = jwtStr,
                         };
                         return Results.Json(response);
@@ -487,6 +519,7 @@ namespace Gaos.Routes
                         {
                             IsError = true,
                             ErrorMessage = "internal error",
+                            ErrorKind = RegisterResponseErrorKind.InternalError,
                         };
                         return Results.Json(response);
                     }

@@ -1,4 +1,6 @@
-﻿namespace Gaos.Dbo.Model
+﻿#pragma warning disable CS8632
+
+namespace Gaos.Dbo.Model
 {
     [System.Serializable]
     public class Role

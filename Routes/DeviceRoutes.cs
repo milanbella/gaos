@@ -91,6 +91,13 @@ namespace Gaos.Routes
                         User = user_jwt.Item1,
                         JWT = user_jwt.Item2,
                     };
+
+                    if (response.User != null)
+                    {
+                        response.User.PasswordHash = null;
+                        response.User.PasswordSalt = null;
+                    }
+
                     return Results.Json(response);
                 }
                 catch (Exception ex)
