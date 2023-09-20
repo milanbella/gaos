@@ -1,4 +1,4 @@
-﻿#pragma warning disable 8625
+﻿#pragma warning disable 8625, 8603
 
 using Microsoft.AspNetCore.Http;
 using Serilog;
@@ -67,8 +67,6 @@ namespace Gaos.Common
 
         public (Gaos.Dbo.Model.User?, Gaos.Dbo.Model.JWT?) GetDeviceUser(int deviceId)
         {
-            const string METHOD_NAME = "GetDeviceUser()";
-
             Gaos.Dbo.Model.User? user = null;
 
             Gaos.Dbo.Model.JWT? jwt = Db.JWT.FirstOrDefault(x => x.DeviceId == deviceId);

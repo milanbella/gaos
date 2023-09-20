@@ -16,8 +16,6 @@ namespace Gaos.Mongo
         private readonly string DbNameForChat = "gaos"; 
 
         private readonly string CollectionNameForGameData = "GameData"; 
-        private readonly string CollectionNameForChat = "Chat"; 
-
 
 
         public MongoService(IConfiguration configuration)

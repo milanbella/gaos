@@ -20,8 +20,6 @@ namespace Gaos.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            const string METHOD_NAME = "Invoke()";
-
             string path = context.Request.Path.Value;
 
             if (path == null || !path.StartsWith("/ws"))

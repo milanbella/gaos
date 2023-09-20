@@ -46,6 +46,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "missing user name (you may use also email instead of user name)",
+                                ErrorKind = LoginResponseErrorKind.InternalError,
                             };
                             var json = JsonSerializer.Serialize(response);
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
@@ -64,6 +65,7 @@ namespace Gaos.Routes
                                 {
                                     IsError = true,
                                     ErrorMessage = "incorrect user name (you may use also email instead of user name)",
+                                    ErrorKind = LoginResponseErrorKind.IncorrectUserNameOrEmailError,
 
                                 };
                                 var json = JsonSerializer.Serialize(response);
@@ -78,6 +80,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "deviceId is empty",
+                                ErrorKind = LoginResponseErrorKind.InternalError,
 
                             };
                             var json = JsonSerializer.Serialize(response);
@@ -92,6 +95,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "nu such deviceId",
+                                ErrorKind = LoginResponseErrorKind.InternalError,
 
                             };
                             var json = JsonSerializer.Serialize(response);
@@ -105,6 +109,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "incorrect password",
+                                ErrorKind = LoginResponseErrorKind.IncorrectPasswordError,    
 
                             };
                             var json = JsonSerializer.Serialize(response);
