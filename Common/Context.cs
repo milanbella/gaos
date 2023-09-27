@@ -3,6 +3,7 @@
     public class Context
     {
         public static string HTTP_CONTEXT_KEY_TOKEN_CLAIMS = "token_claims";
+        public static string HTTP_CONTEXT_KEY_SESSION_ID = "session_id";
 
         public static string ROLE_PLAYER_NAME = "Player";
         public static int ROLE_PLAYER_ID = 1;

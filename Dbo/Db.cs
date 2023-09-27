@@ -16,11 +16,13 @@
         }
 
         public DbSet<User> User => Set<User>();
+        public DbSet<UserEmail> UserEmail => Set<UserEmail>();
         public DbSet<Role> Role => Set<Role>();
         public DbSet<UserRole> UserRole => Set<UserRole>();
         public DbSet<JWT> JWT => Set<JWT>();
         public DbSet<BuildVersion> BuildVersion => Set<BuildVersion>();
         public DbSet<Device> Device => Set<Device>();
+        public DbSet<Session> Session => Set<Session>();
         public DbSet<ChatRoom> ChatRoom => Set<ChatRoom>();
         public DbSet<ChatRoomMember> ChatRoomMember => Set<ChatRoomMember>();
         public DbSet<ChatRoomMessage> ChatRoomMessage => Set<ChatRoomMessage>();
@@ -30,16 +32,19 @@
 
             // User
             modelBuilder.Entity<User>().HasKey(e => e.Id);
-            modelBuilder.Entity<User>()
-                .HasIndex(e => e.Name).IsUnique(true);
-            modelBuilder.Entity<User>()
-                .HasIndex(e => e.Email).IsUnique(true);
+            modelBuilder.Entity<User>().HasIndex(e => e.Name).IsUnique(true);
+            modelBuilder.Entity<User>().HasIndex(e => e.Email).IsUnique(true);
             modelBuilder.Entity<User>().HasOne(e => e.Device).WithMany().HasForeignKey(e => e.DeviceId);
+            modelBuilder.Entity<User>().HasIndex(e => e.EmailVerificationCode).IsUnique(true);
+
+            // UserEmail
+            modelBuilder.Entity<UserEmail>().HasKey(e => e.Id);
+            modelBuilder.Entity<UserEmail>().HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
+            modelBuilder.Entity<UserEmail>().HasIndex(e => e.EmailVerificationCode).IsUnique(true);
 
             // Role
             modelBuilder.Entity<Role>().HasKey(e => e.Id);
-            modelBuilder.Entity<Role>()
-                .HasIndex(e => e.Name).IsUnique(true);
+            modelBuilder.Entity<Role>().HasIndex(e => e.Name).IsUnique(true);
 
             // UserRole
             modelBuilder.Entity<UserRole>().HasKey(e => e.Id);
@@ -61,6 +66,9 @@
             modelBuilder.Entity<Device>()
                 .HasIndex(e => new { e.Identification, e.PlatformType }).IsUnique(true);
             modelBuilder.Entity<Device>().HasOne(e => e.BuildVersion).WithMany().HasForeignKey(e => e.BuildVersionId);
+
+            // Session
+            modelBuilder.Entity<Session>().HasKey(e => e.Id);
 
 
             // ChatRoom

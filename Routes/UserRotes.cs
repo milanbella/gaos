@@ -1,6 +1,7 @@
 ﻿#pragma warning disable 8600, 8602, 8604
 
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Text;
 using System.Text.Json;
 using Serilog;
@@ -23,7 +24,7 @@ namespace Gaos.Routes
         {
             string pattern = @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$";
             return System.Text.RegularExpressions.Regex.IsMatch(email, pattern);
-        }       
+        }
 
         public static RouteGroupBuilder GroupUser(this RouteGroupBuilder group)
         {
@@ -35,8 +36,8 @@ namespace Gaos.Routes
 
                 using (var transaction = db.Database.BeginTransaction())
                 {
-                    try 
-                    { 
+                    try
+                    {
                         User user = null;
                         LoginResponse response = null;
 
@@ -100,7 +101,7 @@ namespace Gaos.Routes
                             };
                             var json = JsonSerializer.Serialize(response);
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
-                        } 
+                        }
                         int deviceId = device.Id;
 
                         if (!Password.verifyPassword(user.PasswordSalt, user.PasswordHash, loginRequest.Password))
@@ -109,7 +110,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "incorrect password",
-                                ErrorKind = LoginResponseErrorKind.IncorrectPasswordError,    
+                                ErrorKind = LoginResponseErrorKind.IncorrectPasswordError,
 
                             };
                             var json = JsonSerializer.Serialize(response);
@@ -153,8 +154,8 @@ namespace Gaos.Routes
 
                 using (var transaction = db.Database.BeginTransaction())
                 {
-                    try 
-                    { 
+                    try
+                    {
                         User guest = null;
                         GuestLoginResponse response = null;
                         string guestName = guestLoginRequest.UserName;
@@ -175,8 +176,8 @@ namespace Gaos.Routes
                             json = JsonSerializer.Serialize(response);
                             return Results.Content(json, "application/json", Encoding.UTF8, 401);
 
-                        } 
-                        else 
+                        }
+                        else
                         {
                             device = await db.Device.FirstOrDefaultAsync(d => d.Id == guestLoginRequest.DeviceId);
                             if (device == null)
@@ -189,7 +190,7 @@ namespace Gaos.Routes
                                 };
                                 json = JsonSerializer.Serialize(response);
                                 return Results.Content(json, "application/json", Encoding.UTF8, 401);
-                            } 
+                            }
 
                             // Seach if guest already exists for this device
                             guest = await db.User.FirstOrDefaultAsync(u => u.IsGuest == true && u.DeviceId == device.Id);
@@ -431,7 +432,7 @@ namespace Gaos.Routes
                                 return Results.Json(response);
                             }
 
-                        }  
+                        }
 
                         if (registerRequest.DeviceId == null)
                         {
@@ -456,7 +457,7 @@ namespace Gaos.Routes
 
                             };
                             return Results.Json(response);
-                        } 
+                        }
 
 
                         EncodedPassword encodedPassword = Password.getEncodedPassword(registerRequest.Password);
@@ -474,6 +475,8 @@ namespace Gaos.Routes
                                 PasswordHash = encodedPassword.PasswordHash,
                                 PasswordSalt = encodedPassword.PasswordSalt,
                                 DeviceId = device.Id,
+                                EmailVerificationCode = Guid.NewGuid().ToString(),
+                                IsEmailVerified = false,
                             };
                             await db.User.AddAsync(user);
                             await db.SaveChangesAsync();
@@ -497,14 +500,14 @@ namespace Gaos.Routes
                             guest.PasswordHash = encodedPassword.PasswordHash;
                             guest.PasswordSalt = encodedPassword.PasswordSalt;
                             guest.DeviceId = device.Id;
+                            guest.EmailVerificationCode = Guid.NewGuid().ToString();
+                            guest.IsEmailVerified = false;
                             await db.SaveChangesAsync();
 
                             jwtStr = tokenService.GenerateJWT(registerRequest.UserName, guest.Id, device.Id, DateTimeOffset.UtcNow.AddHours(Gaos.Common.Context.TOKEN_EXPIRATION_HOURS).ToUnixTimeSeconds(), Gaos.Model.Token.UserType.RegisteredUser);
 
                             user = guest;
                         }
-
-
 
                         transaction.Commit();
 
@@ -531,6 +534,95 @@ namespace Gaos.Routes
                 }
 
             });
+
+            group.MapPost("/verifyEmail", async (VerifyEmailRequest verifyEmailRequest, Db db) =>
+            {
+                const string METHOD_NAME = "user/verifyEmail";
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        VerifyEmailResponse response;
+
+                        if (verifyEmailRequest.Code == null || verifyEmailRequest.Code.Trim().Length == 0)
+                        {
+                            response = new VerifyEmailResponse
+                            {
+                                IsError = true,
+                                ErrorMessage = "Token is empty",
+                                ErrorKind = VerifyEmailResponseErrorKind.InvalidTokenError,
+
+                            };
+                            return Results.Json(response);
+
+                        }
+
+                        string email = null;
+
+                        // Search in User table for line matching refification code
+                        User user = await db.User.FirstOrDefaultAsync(u => u.EmailVerificationCode == verifyEmailRequest.Code);
+                        if (user == null)
+                        {
+                            // Search in UserEmail table for line matching refification code
+                            UserEmail userEmail = await db.UserEmail.FirstOrDefaultAsync(u => u.EmailVerificationCode == verifyEmailRequest.Code);
+                            if (userEmail == null)
+                            {
+                                response = new VerifyEmailResponse
+                                {
+                                    IsError = true,
+                                    ErrorMessage = "Invalid code",
+                                    ErrorKind = VerifyEmailResponseErrorKind.InvalidTokenError,
+
+                                };
+                                return Results.Json(response);
+                            }
+                            else
+                            {
+                                email = userEmail.Email;
+
+                                // Update UserEmail table
+                                userEmail.IsEmailVerified = true;
+                                db.UserEmail.Update(userEmail);
+                                await db.SaveChangesAsync();
+                            }
+                        }
+                        else
+                        {
+                            email = user.Email;
+
+                            // Set IsEmailVerified to true
+                            user.IsEmailVerified = true;
+
+                            // Update User table
+                            db.User.Update(user);
+                            await db.SaveChangesAsync();
+                        }
+
+                        transaction.Commit();
+
+                        response = new VerifyEmailResponse
+                        {
+                            IsError = false,
+                            Email = email,
+                        };
+                        return Results.Json(response);
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                        VerifyEmailResponse response = new VerifyEmailResponse
+                        {
+                            IsError = true,
+                            ErrorMessage = "internal error",
+                            ErrorKind = VerifyEmailResponseErrorKind.InternalError,
+                        };
+                        return Results.Json(response);
+                    }
+                }
+
+            });
+
 
             return group;
 
