@@ -1,9 +1,7 @@
 ﻿#pragma warning disable 8600, 8602 // Disable null check warnings for fields that are initialized in the constructor
 
 using Serilog;
-using Gaos.Auth;
 using Gaos.Dbo;
-using Gaos.Middleware;
 using Gaos.Routes.Model.ApiJson;
 
 namespace Gaos.Routes

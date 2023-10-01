@@ -96,6 +96,25 @@ builder.Services.AddScoped<Gaos.Mongo.GameData>(provider =>
     return new Gaos.Mongo.GameData(mongoService);
 });
 
+builder.Services.AddScoped<Gaos.Templates.TemplateService>(provider =>
+{
+    Gaos.Templates.TemplateService templateService = provider.GetService<Gaos.Templates.TemplateService>();
+    Gaos.Dbo.Db db = provider.GetService<Gaos.Dbo.Db>();
+    return new Gaos.Templates.TemplateService(builder.Configuration, db);
+});
+
+builder.Services.AddScoped<Gaos.Lang.LanguageService>(provider =>
+{ 
+    return new Gaos.Lang.LanguageService();
+});
+
+builder.Services.AddScoped<Gaos.Email.EmailService>(provider =>
+{ 
+    Gaos.Lang.LanguageService languageService = provider.GetService<Gaos.Lang.LanguageService>();
+    Gaos.Templates.TemplateService templateService = provider.GetService<Gaos.Templates.TemplateService>();
+    return new Gaos.Email.EmailService(builder.Configuration, languageService, templateService);
+});
+
 
 // Set the JSON serializer options
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>

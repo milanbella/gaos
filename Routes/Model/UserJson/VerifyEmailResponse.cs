@@ -2,8 +2,7 @@
 {
     public enum VerifyEmailResponseErrorKind
     {
-        InvalidTokenError,
-        EmailAlreadyVerifiedError,
+        InvalidCodeError,
         InternalError,
     };
 

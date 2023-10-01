@@ -9,7 +9,7 @@ using Gaos.Auth;
 using Gaos.Dbo;
 using Gaos.Routes.Model.UserJson;
 using Gaos.Dbo.Model;
-using Gaos.Common;
+using Gaos.Email;
 
 namespace Gaos.Routes
 {
@@ -327,7 +327,7 @@ namespace Gaos.Routes
                 }
             });
 
-            group.MapPost("/register", async (RegisterRequest registerRequest, Db db, TokenService tokenService) =>
+            group.MapPost("/register", async (RegisterRequest registerRequest, Db db, TokenService tokenService, EmailService emailService) =>
             {
                 const string METHOD_NAME = "user/register";
                 using (var transaction = db.Database.BeginTransaction())
@@ -509,6 +509,10 @@ namespace Gaos.Routes
                             user = guest;
                         }
 
+                        // Send email verification email
+                        emailService.SendVerificationEmail(user.Email, user.EmailVerificationCode);
+
+
                         transaction.Commit();
 
                         response = new RegisterResponse
@@ -550,7 +554,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "Token is empty",
-                                ErrorKind = VerifyEmailResponseErrorKind.InvalidTokenError,
+                                ErrorKind = VerifyEmailResponseErrorKind.InvalidCodeError,
 
                             };
                             return Results.Json(response);
@@ -571,7 +575,7 @@ namespace Gaos.Routes
                                 {
                                     IsError = true,
                                     ErrorMessage = "Invalid code",
-                                    ErrorKind = VerifyEmailResponseErrorKind.InvalidTokenError,
+                                    ErrorKind = VerifyEmailResponseErrorKind.InvalidCodeError,
 
                                 };
                                 return Results.Json(response);
@@ -582,6 +586,7 @@ namespace Gaos.Routes
 
                                 // Update UserEmail table
                                 userEmail.IsEmailVerified = true;
+                                userEmail.EmailVerificationCode = null;
                                 db.UserEmail.Update(userEmail);
                                 await db.SaveChangesAsync();
                             }
@@ -592,6 +597,7 @@ namespace Gaos.Routes
 
                             // Set IsEmailVerified to true
                             user.IsEmailVerified = true;
+                            user.EmailVerificationCode = null;
 
                             // Update User table
                             db.User.Update(user);
