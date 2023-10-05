@@ -330,6 +330,7 @@ namespace Gaos.Routes
             group.MapPost("/register", async (RegisterRequest registerRequest, Db db, TokenService tokenService, EmailService emailService) =>
             {
                 const string METHOD_NAME = "user/register";
+                Log.Error($"{CLASS_NAME}:{METHOD_NAME}: error: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@ cp 100");
                 using (var transaction = db.Database.BeginTransaction())
                 {
                     try
@@ -510,7 +511,7 @@ namespace Gaos.Routes
                         }
 
                         // Send email verification email
-                        emailService.SendVerificationEmail(user.Email, user.EmailVerificationCode);
+                        _ = emailService.SendVerificationEmail(user.Email, user.EmailVerificationCode);
 
 
                         transaction.Commit();

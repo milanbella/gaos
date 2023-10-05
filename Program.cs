@@ -98,7 +98,6 @@ builder.Services.AddScoped<Gaos.Mongo.GameData>(provider =>
 
 builder.Services.AddScoped<Gaos.Templates.TemplateService>(provider =>
 {
-    Gaos.Templates.TemplateService templateService = provider.GetService<Gaos.Templates.TemplateService>();
     Gaos.Dbo.Db db = provider.GetService<Gaos.Dbo.Db>();
     return new Gaos.Templates.TemplateService(builder.Configuration, db);
 });

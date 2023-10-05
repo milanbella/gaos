@@ -1,12 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
-using Serilog;
+﻿using Serilog;
 using Gaos.Lang;
-using System.Net.Mime;
 using Gaos.Templates;
 using Gaos.Templates.Email;
+using MailKit.Net.Smtp;
+using MimeKit;
+using MimeKit.Text;
+using MailKit;
 
 namespace Gaos.Email
 {
@@ -14,27 +13,30 @@ namespace Gaos.Email
     {
         public static string CLASS_NAME = typeof(EmailService).Name;
 
+        private static bool IS_DEBUG = false;
+
         private IConfiguration Configuration;
         private LanguageService LanguageService;
         private TemplateService TemplateService;
 
-        public EmailService(IConfiguration configuration, LanguageService languageService, TemplateService template)
+        public EmailService(IConfiguration configuration, LanguageService languageService, TemplateService templateService)
         {
             const string METHOD_NAME = "EmailService";
 
             this.Configuration = configuration;
             this.LanguageService = languageService;
+            this.TemplateService = templateService;
 
             if (Configuration["email_smtp_server"] == null)
             {
                 Log.Error($"{CLASS_NAME}:{METHOD_NAME}: missing configuration value: email_smtp_server");
                 throw new Exception("missing configuration value: email_smtp_server");
-            }   
+            }
             if (Configuration["email_smtp_server_port"] == null)
             {
                 Log.Error($"{CLASS_NAME}:{METHOD_NAME}: missing configuration value: email_smtp_server_port");
                 throw new Exception("missing configuration value: email_smtp_server_port");
-            }   
+            }
             if (Configuration["email_smtp_user"] == null)
             {
                 Log.Error($"{CLASS_NAME}:{METHOD_NAME}: missing configuration value: email_smtp_user");
@@ -56,38 +58,55 @@ namespace Gaos.Email
                 Log.Error($"{CLASS_NAME}:{METHOD_NAME}: missing configuration value: domain_name_prefix");
                 throw new Exception("missing configuration value: domain_name_prefix");
             }
+            if (Configuration["email_info_user_full_name"] == null)
+            {
+                Log.Error($"{CLASS_NAME}:{METHOD_NAME}: missing configuration value: email_info_user_full_name");
+                throw new Exception("missing configuration value: email_info_user_full_name");
+            }
+            if (Configuration["email_info_user_email"] == null)
+            {
+                Log.Error($"{CLASS_NAME}:{METHOD_NAME}: missing configuration value: email_info_user_email");
+                throw new Exception("missing configuration value: email_info_user_email");
+            }
 
         }
 
-        private void SendHtmlEmail(string to, string subject, string hmtlBody)
+        private SmtpClient getSmtpClient()
+        {
+            if (IS_DEBUG)
+            {
+                return new SmtpClient(new ProtocolLogger(Console.OpenStandardOutput()));
+            }
+            else
+            {
+                return new SmtpClient();
+            }
+
+        }
+
+        private void SendHtmlEmail(string to, string subject, string htmlBody)
         {
             const string METHOD_NAME = "SendHtmlEmail";
 
             try
-            { 
+            {
 
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(Configuration["email_info_user_full_name"], Configuration["email_info_user_email"]));
+                message.To.Add(new MailboxAddress(String.Empty, to));
+                message.Subject = subject;
+                message.Body = new TextPart(TextFormat.Html) { Text = htmlBody };
 
-                // Create a new MailMessage
-                MailMessage mail = new MailMessage();
-                mail.From = new MailAddress(Configuration["email_smtp_user"]);
-                mail.To.Add(to);
-                mail.Subject = subject;
+                // send email
+                using (var smtp = getSmtpClient())
+                {
+                    smtp.Connect(Configuration["email_smtp_server"], int.Parse(Configuration["email_smtp_server_port"]), MailKit.Security.SecureSocketOptions.StartTls);
+                    smtp.Authenticate(Configuration["email_smtp_user"], Configuration["email_smtp_password"]);
+                    smtp.Send(message);
+                    smtp.Disconnect(true);
+                }
 
-                 AlternateView  alternativeView = AlternateView.CreateAlternateViewFromString("<html><body><h1>Hello, this is an HTML email!</h1></body></html>", null, MediaTypeNames.Text.Html);
-                alternativeView.TransferEncoding = TransferEncoding.SevenBit;
-                mail.AlternateViews.Add(alternativeView);
-
-                        // Create a SmtpClient
-                SmtpClient smtpClient = new SmtpClient(Configuration["email_smtp_server"]);
-                smtpClient.Port = int.Parse(Configuration["email_smtp_server_port"]); // Port for Gmail SMTP
-                smtpClient.Credentials = new NetworkCredential(Configuration["email_smtp_user"], Configuration["email_smtp_password"]);
-                smtpClient.EnableSsl = true; // Enable SSL
-
-                // Send the email
-                smtpClient.Send(mail);
-                Console.WriteLine("Email sent successfully.");
-
-            } 
+            }
             catch (Exception e)
             {
                 Log.Error(e, $"{CLASS_NAME}:{METHOD_NAME}: error: {e.Message}");
@@ -95,7 +114,13 @@ namespace Gaos.Email
             }
         }
 
-        public void SendVerificationEmail(string to, string verificationCode)
+        private async Task SendHtmlEmailAsync(string to, string subject, string htmlBody)
+        {
+            await Task.Run(() => SendHtmlEmail(to, subject, htmlBody));
+
+        }
+
+        public async Task SendVerificationEmail(string to, string verificationCode)
         {
             const string METHOD_NAME = "SendVerificationEmail";
 
@@ -131,9 +156,9 @@ namespace Gaos.Email
 
                 string body;
 
-                body = VerifyEmailTemplate.GenerateVerifyEmailTemplate(TemplateService, verifyEmailUrl); 
+                body = VerifyEmailTemplate.GenerateVerifyEmailTemplate(TemplateService, verifyEmailUrl);
 
-                SendHtmlEmail(to, subject, body);
+                await SendHtmlEmailAsync(to, subject, body);
             }
             catch (Exception e)
             {
