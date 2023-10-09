@@ -124,9 +124,10 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 
 var app = builder.Build();
 
+
+app.UseMiddleware<CookieMiddleware>();
 app.UseWebSockets();
 app.UseMiddleware<WebSocketMiddleware>();
-
 app.UseMiddleware<AuthMiddleware>();
 
 

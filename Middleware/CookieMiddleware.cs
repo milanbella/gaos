@@ -19,7 +19,7 @@ namespace Gaos.Middleware
         public CookieMiddleware(RequestDelegate next, IDataProtectionProvider dataProtectionProvider)
         {
             _next = next;
-            _dataProtector = dataProtectionProvider.CreateProtector("MyCookieProtection"); // Use a unique purpose string
+            _dataProtector = dataProtectionProvider.CreateProtector("CookieForSession"); // Use a unique purpose string
         }
 
         public async Task Invoke(HttpContext context, Dbo.Db db)
