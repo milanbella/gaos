@@ -99,7 +99,8 @@ builder.Services.AddScoped<Gaos.Mongo.GameData>(provider =>
 builder.Services.AddScoped<Gaos.Templates.TemplateService>(provider =>
 {
     Gaos.Dbo.Db db = provider.GetService<Gaos.Dbo.Db>();
-    return new Gaos.Templates.TemplateService(builder.Configuration, db);
+    Gaos.Lang.LanguageService languageService = provider.GetService<Gaos.Lang.LanguageService>();
+    return new Gaos.Templates.TemplateService(builder.Configuration, db, languageService);
 });
 
 builder.Services.AddScoped<Gaos.Lang.LanguageService>(provider =>
@@ -112,6 +113,12 @@ builder.Services.AddScoped<Gaos.Email.EmailService>(provider =>
     Gaos.Lang.LanguageService languageService = provider.GetService<Gaos.Lang.LanguageService>();
     Gaos.Templates.TemplateService templateService = provider.GetService<Gaos.Templates.TemplateService>();
     return new Gaos.Email.EmailService(builder.Configuration, languageService, templateService);
+});
+
+builder.Services.AddScoped<Gaos.UserVerificationCode.UserVerificationCodeService>(provider =>
+{
+    Gaos.Dbo.Db db = provider.GetService<Gaos.Dbo.Db>();
+    return new Gaos.UserVerificationCode.UserVerificationCodeService(db);
 });
 
 

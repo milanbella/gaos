@@ -10,6 +10,7 @@ using Gaos.Dbo;
 using Gaos.Routes.Model.UserJson;
 using Gaos.Dbo.Model;
 using Gaos.Email;
+using Gaos.UserVerificationCode;
 
 namespace Gaos.Routes
 {
@@ -626,6 +627,84 @@ namespace Gaos.Routes
                         };
                         return Results.Json(response);
                     }
+                }
+
+            });
+
+            group.MapPost("/recoverPassword/sendVerificationCode", async (RecoverPasswordReuqest recoverPasswordReuqest, Db db, EmailService emailService, UserVerificationCodeService userVerificationCodeService) =>
+            {
+                const string METHOD_NAME = "user/recoverPassword";
+                try
+                {
+                    RecoverPasswordResponse response;
+
+                    string userNameOrEmail = recoverPasswordReuqest.UserNameOrEmail;
+
+                    // search in User table for line matching user name or email
+                    User user = await db.User.FirstOrDefaultAsync(u => u.Name == userNameOrEmail || u.Email == userNameOrEmail);
+                    if (user == null)
+                    {
+                        // search for line matching email in UserEmail table
+                        UserEmail userEmail = await db.UserEmail.FirstOrDefaultAsync(u => u.Email == userNameOrEmail);
+                        if (userEmail == null)
+                        {
+                            response = new RecoverPasswordResponse
+                            {
+                                IsError = true,
+                                ErrorMessage = "user name or email not found",
+                                ErrorKind = RecoverPasswordResponseErrorKind.UserNameOrEmailNotFound,
+                            };
+                            return Results.Json(response);
+
+                        }
+                        else
+                        {
+
+                            user = await db.User.FirstOrDefaultAsync(u => u.Id == userEmail.UserId);
+                            if (user == null)
+                            { 
+                                response = new RecoverPasswordResponse
+                                {
+                                    IsError = true,
+                                    ErrorMessage = "user name or email not found",
+                                    ErrorKind = RecoverPasswordResponseErrorKind.UserNameOrEmailNotFound,
+                                };
+                                return Results.Json(response);
+                            }
+
+                        }
+
+                    }
+
+                    // Find all lines in UserEmail for this user
+                    List<UserEmail> userEmails = await db.UserEmail.Where(u => u.UserId == user.Id).ToListAsync();
+
+                    string verificationCode = userVerificationCodeService.GenerateCode(user.Id);
+
+                    // Send email verification email
+                    _ = emailService.SendUserVerificationCode(user.Email, verificationCode);
+
+                    foreach (UserEmail userEmail in userEmails)
+                    {
+                        _ = emailService.SendUserVerificationCode(userEmail.Email, verificationCode);
+                    }
+
+
+                    response = new RecoverPasswordResponse
+                    {
+                        IsError = false,
+                    };
+                    return Results.Json(response);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    RecoverPasswordResponse response = new RecoverPasswordResponse
+                    {
+                        IsError = true,
+                        ErrorMessage = "internal error",
+                    };
+                    return Results.Json(response);
                 }
 
             });

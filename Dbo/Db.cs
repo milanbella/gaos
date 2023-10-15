@@ -17,6 +17,7 @@
 
         public DbSet<User> User => Set<User>();
         public DbSet<UserEmail> UserEmail => Set<UserEmail>();
+        public DbSet<UserVerificationCode> UserVerificationCode => Set<UserVerificationCode>();
         public DbSet<Role> Role => Set<Role>();
         public DbSet<UserRole> UserRole => Set<UserRole>();
         public DbSet<JWT> JWT => Set<JWT>();
@@ -41,6 +42,13 @@
             modelBuilder.Entity<UserEmail>().HasKey(e => e.Id);
             modelBuilder.Entity<UserEmail>().HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
             modelBuilder.Entity<UserEmail>().HasIndex(e => e.EmailVerificationCode).IsUnique(true);
+            modelBuilder.Entity<UserEmail>().HasIndex(e => e.Email).IsUnique(true);
+
+            // UserVerificationCode
+            modelBuilder.Entity<UserVerificationCode>().HasKey(e => e.Id);
+            modelBuilder.Entity<UserVerificationCode>().HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
+            modelBuilder.Entity<UserVerificationCode>().HasIndex(e => e.Code).IsUnique(true);
+
 
             // Role
             modelBuilder.Entity<Role>().HasKey(e => e.Id);

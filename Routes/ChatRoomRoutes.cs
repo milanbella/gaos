@@ -104,7 +104,7 @@ namespace Gaos.Routes
                                 ChatRoomMemberName = user.Name,
                                 MessageId = (int)(maxMessageId + 1),
                                 Message = writeMessageRequest.Message,
-                                CreatedAt = System.DateTime.UtcNow,
+                                CreatedAt = System.DateTime.Now,
                             };
 
                             // Save message

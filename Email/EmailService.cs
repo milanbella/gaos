@@ -122,7 +122,7 @@ namespace Gaos.Email
 
         public async Task SendVerificationEmail(string to, string verificationCode)
         {
-            const string METHOD_NAME = "SendVerificationEmail";
+            const string METHOD_NAME = "SendVerificationEmail()";
 
             try
             {
@@ -157,6 +157,50 @@ namespace Gaos.Email
                 string body;
 
                 body = VerifyEmailTemplate.GenerateVerifyEmailTemplate(TemplateService, verifyEmailUrl);
+
+                await SendHtmlEmailAsync(to, subject, body);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, $"{CLASS_NAME}:{METHOD_NAME}: error: {e.Message}");
+                throw new Exception("error sending verification email");
+            }
+        }
+
+        public async Task SendUserVerificationCode(string to, string verificationCode)
+        {
+            const string METHOD_NAME = "SendUserVerificationCode()";
+
+            try
+            {
+                string subject;
+
+                Language lang = LanguageService.GetLanguage();
+                if (lang == Language.english)
+                {
+                    subject = "verification code";
+                }
+                else if (lang == Language.russian)
+                {
+                    subject = "проверочный код";
+                }
+                else if (lang == Language.chinese)
+                {
+                    subject = "验证码";
+                }
+                else if (lang == Language.slovak)
+                {
+                    subject = "overovací kód";
+                }
+                else
+                {
+                    subject = "verification code";
+                }
+
+
+                string body;
+
+                body = VerificationCodeTemplate.GenerateVerificationCodeEmailTemplate(TemplateService, verificationCode);
 
                 await SendHtmlEmailAsync(to, subject, body);
             }

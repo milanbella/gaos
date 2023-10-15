@@ -1,6 +1,7 @@
 ﻿using Scriban;
 using Scriban.Runtime;
 using Gaos.Templates;
+using Gaos.Lang;
 
 namespace Gaos.Templates.Email
 {
@@ -16,7 +17,7 @@ namespace Gaos.Templates.Email
             var context = new TemplateContext();
             context.PushGlobal(scriptObject1);
 
-            var template = templateSerivice.ParseFile("Email/VerifyEmailTemplate.sbn", true);
+            var template = templateSerivice.ParseFile("Email/VerifyEmailTemplate", true);
 
             var result = template.Render(context);
 
