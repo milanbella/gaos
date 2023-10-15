@@ -48,7 +48,7 @@ namespace Gaos.Middleware
                 }
             }
 
-            context.Items.Add(Gaos.Common.Context.HTTP_CONTEXT_KEY_TOKEN_CLAIMS, sessionId);
+            context.Items.Add(Gaos.Common.Context.HTTP_CONTEXT_KEY_SESSION_ID, sessionId);
 
             // Call the next middleware in the pipeline
             await _next(context);
