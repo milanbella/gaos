@@ -631,14 +631,14 @@ namespace Gaos.Routes
 
             });
 
-            group.MapPost("/recoverPassword/sendVerificationCode", async (RecoverPasswordReuqest recoverPasswordReuqest, Db db, EmailService emailService, UserVerificationCodeService userVerificationCodeService) =>
+            group.MapPost("/recoverPassword/sendVerificationCode", async (RecoverPasswordSendVerificationCodeReuqest request, Db db, EmailService emailService, UserVerificationCodeService userVerificationCodeService) =>
             {
-                const string METHOD_NAME = "user/recoverPassword";
+                const string METHOD_NAME = "/recoverPassword/sendVerificationCode";
                 try
                 {
-                    RecoverPasswordResponse response;
+                    RecoverPasswordSendVerificationCodeResponse response;
 
-                    string userNameOrEmail = recoverPasswordReuqest.UserNameOrEmail;
+                    string userNameOrEmail = request.UserNameOrEmail;
 
                     // search in User table for line matching user name or email
                     User user = await db.User.FirstOrDefaultAsync(u => u.Name == userNameOrEmail || u.Email == userNameOrEmail);
@@ -648,11 +648,11 @@ namespace Gaos.Routes
                         UserEmail userEmail = await db.UserEmail.FirstOrDefaultAsync(u => u.Email == userNameOrEmail);
                         if (userEmail == null)
                         {
-                            response = new RecoverPasswordResponse
+                            response = new RecoverPasswordSendVerificationCodeResponse
                             {
                                 IsError = true,
                                 ErrorMessage = "user name or email not found",
-                                ErrorKind = RecoverPasswordResponseErrorKind.UserNameOrEmailNotFound,
+                                ErrorKind = RecoverPasswordSendVerificationResponseErrorKind.UserNameOrEmailNotFound,
                             };
                             return Results.Json(response);
 
@@ -663,11 +663,11 @@ namespace Gaos.Routes
                             user = await db.User.FirstOrDefaultAsync(u => u.Id == userEmail.UserId);
                             if (user == null)
                             { 
-                                response = new RecoverPasswordResponse
+                                response = new RecoverPasswordSendVerificationCodeResponse
                                 {
                                     IsError = true,
                                     ErrorMessage = "user name or email not found",
-                                    ErrorKind = RecoverPasswordResponseErrorKind.UserNameOrEmailNotFound,
+                                    ErrorKind = RecoverPasswordSendVerificationResponseErrorKind.UserNameOrEmailNotFound,
                                 };
                                 return Results.Json(response);
                             }
@@ -690,23 +690,142 @@ namespace Gaos.Routes
                     }
 
 
-                    response = new RecoverPasswordResponse
+                    response = new RecoverPasswordSendVerificationCodeResponse
                     {
                         IsError = false,
+
+                        UserId = user.Id,
                     };
                     return Results.Json(response);
                 }
                 catch (Exception ex)
                 {
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
-                    RecoverPasswordResponse response = new RecoverPasswordResponse
+                    RecoverPasswordSendVerificationCodeResponse response = new RecoverPasswordSendVerificationCodeResponse
                     {
                         IsError = true,
                         ErrorMessage = "internal error",
+                        ErrorKind = RecoverPasswordSendVerificationResponseErrorKind.InternalError,
                     };
                     return Results.Json(response);
                 }
 
+            });
+
+            group.MapPost("/recoverPassword/verifyCode", async (RecoverPasswordVerifyCodeRequest request, Db db, UserVerificationCodeService userVerificationCodeService) =>
+            {
+                const string METHOD_NAME = "/recoverPassword/verifyCode";
+                try
+                {
+                    bool isVerified = userVerificationCodeService.VerifyCode(request.UserId, request.verificationCode, false, false);
+                    RecoverPasswordVerifyCodeReply response = new RecoverPasswordVerifyCodeReply
+                    {
+                        IsError = false,
+
+                        UserId = request.UserId,
+                        IsVerified = isVerified,
+                    };
+                    return Results.Json(response);
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    RecoverPasswordVerifyCodeReply response = new RecoverPasswordVerifyCodeReply
+                    {
+                        IsError = true,
+                        ErrorMessage = "internal error",
+                        ErrorKind = RecoverPasswordVerifyCodeReplyErrorKind.InternalError,
+                    };
+                    return Results.Json(response);
+                }
+            });
+
+            group.MapPost("/recoverPassword/changePassword", async (RecoverPasswordChangePasswordRequest request, Db db, UserVerificationCodeService userVerificationCodeService) =>
+            {
+                const string METHOD_NAME = "/recoverPassword/changePassword";
+                try
+                {
+                    RecoverPasswordChangePasswordRreply response;
+
+                    bool isVerified = userVerificationCodeService.VerifyCode(request.UserId, request.VerificattionCode, true, false);
+                    if (!isVerified)
+                    {
+
+                        response = new RecoverPasswordChangePasswordRreply
+                        {
+                            IsError = false,
+                            ErrorKind = RecoverPasswordChangePassworErrorKind.InvalidVerificationCode
+
+                        };
+                        return Results.Json(response);
+                    }
+
+                    if (request.Password == null || request.Password.Trim().Length == 0)
+                    {
+                        response = new RecoverPasswordChangePasswordRreply
+                        {
+                            IsError = true,
+                            ErrorMessage = "password is empty",
+                            ErrorKind = RecoverPasswordChangePassworErrorKind.PasswordIsEmptyError,
+
+                        };
+                        return Results.Json(response);
+
+                    }
+
+                    if (request.PasswordVerify != null && request.PasswordVerify.Trim().Length > 0)
+                    {
+                        if (!string.Equals(request.Password, request.PasswordVerify))
+                        {
+                            response = new RecoverPasswordChangePasswordRreply
+                            {
+                                IsError = true,
+                                ErrorMessage = "passwords do not match",
+                                ErrorKind = RecoverPasswordChangePassworErrorKind.PasswordsDoNotMatchError,
+                            };
+                            return Results.Json(response);
+                        }
+
+                    }
+                    EncodedPassword encodedPassword = Password.getEncodedPassword(request.Password);
+
+                    // Change password in User table
+                    User user = await db.User.FirstOrDefaultAsync(u => u.Id == request.UserId);
+                    if (user == null)
+                    {
+                        Log.Warning($"{CLASS_NAME}:{METHOD_NAME}: user not found");
+                        response = new RecoverPasswordChangePasswordRreply
+                        {
+                            IsError = true,
+                            ErrorMessage = "user not found",
+                            ErrorKind = RecoverPasswordChangePassworErrorKind.InternalError,
+                        };
+                        return Results.Json(response);
+                    }
+                    user.PasswordHash = encodedPassword.PasswordHash;
+                    user.PasswordSalt = encodedPassword.PasswordSalt;
+                    db.User.Update(user);
+                    await db.SaveChangesAsync();
+
+                    response = new RecoverPasswordChangePasswordRreply
+                    {
+                        IsError = false,
+                    };
+                    return Results.Json(response);
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
+                    RecoverPasswordChangePasswordRreply response = new RecoverPasswordChangePasswordRreply
+                    {
+                        IsError = true,
+                        ErrorMessage = "internal error",
+                        ErrorKind = RecoverPasswordChangePassworErrorKind.InternalError,
+                    };
+                    return Results.Json(response);
+                }
             });
 
 

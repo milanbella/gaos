@@ -1,7 +1,7 @@
 ﻿namespace Gaos.Routes.Model.UserJson
 {
     [System.Serializable]
-    public class RecoverPasswordReuqest
+    public class RecoverPasswordSendVerificationCodeReuqest
     {
         public string? UserNameOrEmail { get; set; }
     }

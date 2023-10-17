@@ -81,65 +81,98 @@ namespace Gaos.UserVerificationCode
             db.SaveChanges();
         }
 
-        public string GenerateCode(int userId)
+        public string _GenerateCode(int userId)
+        {
+            RemoveAllCodes(userId);
+
+            var verificationCode = new Dbo.Model.UserVerificationCode()
+            {
+                UserId = userId,
+                Code = GetUniqueRandomCode(),
+                ExpiresAt = DateTime.Now.AddMinutes(5)
+            };
+
+            db.UserVerificationCode.Add(verificationCode);
+            db.SaveChanges();
+
+            return verificationCode.Code;
+        }
+
+        public string GenerateCode(int userId, bool isInTransaction = false)
         {
             const string METHOD_NAME = "GenerateCode()";
-            using (var transaction = db.Database.BeginTransaction())
+            if (isInTransaction)
             {
-                try
+                string verificationCode =  _GenerateCode(userId);
+                return verificationCode;
+            }
+            else
+            {
+                using (var transaction = db.Database.BeginTransaction())
                 {
-                    RemoveAllCodes(userId);
-
-                    var verificationCode = new Dbo.Model.UserVerificationCode()
+                    try
                     {
-                        UserId = userId,
-                        Code = GetUniqueRandomCode(),
-                        ExpiresAt = DateTime.Now.AddMinutes(5)
-                    };
-
-                    db.UserVerificationCode.Add(verificationCode);
-                    db.SaveChanges();
-                    transaction.Commit();
-
-                    return verificationCode.Code;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    Log.Error(ex, $"{CLASS_NAME}.{METHOD_NAME} - Error: {ex.Message}");
-                    throw new Exception($"{METHOD_NAME} failed");
+                        string verificationCode =  _GenerateCode(userId);
+                        transaction.Commit();
+                        return verificationCode;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        Log.Error(ex, $"{CLASS_NAME}.{METHOD_NAME} - Error: {ex.Message}");
+                        throw new Exception($"{METHOD_NAME} failed");
+                    }
                 }
             }
         }
 
-        public bool VerifyCode(int userId, string code)
+        private bool _VerifyCode(int userId, string code, bool isRemove)
+        {
+            var userCount = db.UserVerificationCode.Where(x => x.UserId == userId && x.Code == code && x.ExpiresAt > DateTime.Now).Count();
+
+            if (userCount < 1)
+            {
+                if (isRemove)
+                {
+                    RemoveAllCodes(userId);
+                }
+                return false;
+            }
+            else
+            {
+                if (isRemove)
+                {
+                    RemoveAllCodes(userId);
+                }
+                return true;
+            }
+
+        }
+
+        public bool VerifyCode(int userId, string code, bool isRemove, bool isInTransation)
         {
             const string METHOD_NAME = "VerifyCode()";
-            using (var transaction = db.Database.BeginTransaction())
+            if (isInTransation)
             {
-                try
+                bool isVerified = _VerifyCode(userId, code, isRemove);
+                return isVerified;
+            }
+            else
+            {
+                using (var transaction = db.Database.BeginTransaction())
                 {
-                    var userCount = db.UserVerificationCode.Where(x => x.UserId == userId && x.Code == code && x.ExpiresAt > DateTime.Now).Count();
-
-                    if (userCount < 1)
+                    try
                     {
-                        RemoveAllCodes(userId);
+                        bool isVerified = _VerifyCode(userId, code, isRemove);
                         transaction.Commit();
-                        return false;
+                        return isVerified;
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        RemoveAllCodes(userId);
-                        transaction.Commit();
-                        return true;
+                        transaction.Rollback();
+                        Log.Error(ex, $"{CLASS_NAME}.{METHOD_NAME} - Error: {ex.Message}");
+                        throw new Exception($"{METHOD_NAME} failed");
                     }
-
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    Log.Error(ex, $"{CLASS_NAME}.{METHOD_NAME} - Error: {ex.Message}");
-                    throw new Exception($"{METHOD_NAME} failed");
                 }
             }
         }
