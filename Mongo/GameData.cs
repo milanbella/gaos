@@ -19,6 +19,7 @@ namespace Gaos.Mongo
 
         public async Task SaveGameDataAsync(int userId, int slotId, string gameDataJson)
         {
+            Log.Error(" @@@@@@@@@@@@@@ SaveGameDataAsync: userId=" + userId + ", slotId=" + slotId + ", gameDataJson=" + gameDataJson);
             IMongoCollection<BsonDocument> collection = await MongoService.GetCollectionForGameData();
 
 
@@ -55,6 +56,8 @@ namespace Gaos.Mongo
             {
                 return null;
             }
+
+            Log.Error(" @@@@@@@@@@@@@@ GetGameDataAsync: userId=" + userId + ", slotId=" + slotId + ", gameDataBson=" + gameDataBson.ToJson());
 
             return gameDataBson["GameData"].ToJson();
         }
