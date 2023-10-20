@@ -2,7 +2,7 @@
 {
     public enum  RecoverPasswordChangePassworErrorKind
     {
-        InvalidVerificationCode,
+        InvalidVerificationCodeError,
         InternalError,
         PasswordIsEmptyError,
         PasswordsDoNotMatchError,

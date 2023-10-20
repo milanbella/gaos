@@ -755,7 +755,7 @@ namespace Gaos.Routes
                         response = new RecoverPasswordChangePasswordRreply
                         {
                             IsError = false,
-                            ErrorKind = RecoverPasswordChangePassworErrorKind.InvalidVerificationCode
+                            ErrorKind = RecoverPasswordChangePassworErrorKind.InvalidVerificationCodeError
 
                         };
                         return Results.Json(response);
