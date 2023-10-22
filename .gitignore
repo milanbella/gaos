@@ -6,3 +6,4 @@ bin/
 .vs/
 .vscode/
 *.swp
+.idea
