@@ -1,4 +1,5 @@
-﻿namespace Gaos.Routes.Model.UserJson
+﻿#pragma warning disable 8632
+namespace Gaos.Routes.Model.UserJson
 {
     public enum VerifyEmailResponseErrorKind
     {

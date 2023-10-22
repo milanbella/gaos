@@ -1,11 +1,12 @@
-﻿namespace Gaos.Routes.Model.UserJson
+﻿#pragma warning disable 8632
+namespace Gaos.Routes.Model.UserJson
 {
     public enum RecoverPasswordVerifyCodeReplyErrorKind
     {
         InternalError,
     };
 
-    public class RecoverPasswordVerifyCodeReply
+    public class RecoverPasswordVerifyCodeResponse
     {
         public bool? IsError { get; set; }
         public string? ErrorMessage { get; set; }

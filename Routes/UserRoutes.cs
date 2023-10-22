@@ -652,7 +652,7 @@ namespace Gaos.Routes
                             {
                                 IsError = true,
                                 ErrorMessage = "user name or email not found",
-                                ErrorKind = RecoverPasswordSendVerificationResponseErrorKind.UserNameOrEmailNotFound,
+                                ErrorKind = RecoverPasswordSendVerificationCodeErrorKind.UserNameOrEmailNotFound,
                             };
                             return Results.Json(response);
 
@@ -667,7 +667,7 @@ namespace Gaos.Routes
                                 {
                                     IsError = true,
                                     ErrorMessage = "user name or email not found",
-                                    ErrorKind = RecoverPasswordSendVerificationResponseErrorKind.UserNameOrEmailNotFound,
+                                    ErrorKind = RecoverPasswordSendVerificationCodeErrorKind.UserNameOrEmailNotFound,
                                 };
                                 return Results.Json(response);
                             }
@@ -705,7 +705,7 @@ namespace Gaos.Routes
                     {
                         IsError = true,
                         ErrorMessage = "internal error",
-                        ErrorKind = RecoverPasswordSendVerificationResponseErrorKind.InternalError,
+                        ErrorKind = RecoverPasswordSendVerificationCodeErrorKind.InternalError,
                     };
                     return Results.Json(response);
                 }
@@ -717,8 +717,8 @@ namespace Gaos.Routes
                 const string METHOD_NAME = "/recoverPassword/verifyCode";
                 try
                 {
-                    bool isVerified = userVerificationCodeService.VerifyCode(request.UserId, request.verificationCode, false, false);
-                    RecoverPasswordVerifyCodeReply response = new RecoverPasswordVerifyCodeReply
+                    bool isVerified = userVerificationCodeService.VerifyCode(request.UserId, request.VerificationCode, false, false);
+                    RecoverPasswordVerifyCodeResponse response = new RecoverPasswordVerifyCodeResponse
                     {
                         IsError = false,
 
@@ -731,7 +731,7 @@ namespace Gaos.Routes
                 catch (Exception ex)
                 {
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
-                    RecoverPasswordVerifyCodeReply response = new RecoverPasswordVerifyCodeReply
+                    RecoverPasswordVerifyCodeResponse response = new RecoverPasswordVerifyCodeResponse
                     {
                         IsError = true,
                         ErrorMessage = "internal error",
@@ -746,13 +746,13 @@ namespace Gaos.Routes
                 const string METHOD_NAME = "/recoverPassword/changePassword";
                 try
                 {
-                    RecoverPasswordChangePasswordRreply response;
+                    RecoverPasswordChangePasswordResponse response;
 
                     bool isVerified = userVerificationCodeService.VerifyCode(request.UserId, request.VerificattionCode, true, false);
                     if (!isVerified)
                     {
 
-                        response = new RecoverPasswordChangePasswordRreply
+                        response = new RecoverPasswordChangePasswordResponse
                         {
                             IsError = false,
                             ErrorKind = RecoverPasswordChangePassworErrorKind.InvalidVerificationCodeError
@@ -763,7 +763,7 @@ namespace Gaos.Routes
 
                     if (request.Password == null || request.Password.Trim().Length == 0)
                     {
-                        response = new RecoverPasswordChangePasswordRreply
+                        response = new RecoverPasswordChangePasswordResponse
                         {
                             IsError = true,
                             ErrorMessage = "password is empty",
@@ -778,7 +778,7 @@ namespace Gaos.Routes
                     {
                         if (!string.Equals(request.Password, request.PasswordVerify))
                         {
-                            response = new RecoverPasswordChangePasswordRreply
+                            response = new RecoverPasswordChangePasswordResponse
                             {
                                 IsError = true,
                                 ErrorMessage = "passwords do not match",
@@ -795,7 +795,7 @@ namespace Gaos.Routes
                     if (user == null)
                     {
                         Log.Warning($"{CLASS_NAME}:{METHOD_NAME}: user not found");
-                        response = new RecoverPasswordChangePasswordRreply
+                        response = new RecoverPasswordChangePasswordResponse
                         {
                             IsError = true,
                             ErrorMessage = "user not found",
@@ -808,7 +808,7 @@ namespace Gaos.Routes
                     db.User.Update(user);
                     await db.SaveChangesAsync();
 
-                    response = new RecoverPasswordChangePasswordRreply
+                    response = new RecoverPasswordChangePasswordResponse
                     {
                         IsError = false,
                     };
@@ -818,7 +818,7 @@ namespace Gaos.Routes
                 catch (Exception ex)
                 {
                     Log.Error(ex, $"{CLASS_NAME}:{METHOD_NAME}: error: {ex.Message}");
-                    RecoverPasswordChangePasswordRreply response = new RecoverPasswordChangePasswordRreply
+                    RecoverPasswordChangePasswordResponse response = new RecoverPasswordChangePasswordResponse
                     {
                         IsError = true,
                         ErrorMessage = "internal error",

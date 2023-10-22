@@ -1,4 +1,5 @@
-﻿namespace Gaos.Routes.Model.UserJson
+﻿#pragma warning disable 8632
+namespace Gaos.Routes.Model.UserJson
 {
     public enum  RecoverPasswordChangePassworErrorKind
     {
@@ -8,7 +9,7 @@
         PasswordsDoNotMatchError,
     };
 
-    public class RecoverPasswordChangePasswordRreply
+    public class RecoverPasswordChangePasswordResponse
     {
         public bool? IsError { get; set; }
         public string? ErrorMessage { get; set; }

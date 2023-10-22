@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS8618 /
+﻿#pragma warning disable CS8618, CS8632
 namespace Gaos.Dbo.Model
 {
     public class UserVerificationCode

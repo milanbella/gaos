@@ -64,7 +64,8 @@ namespace Gaos.Routes
                             Identification = deviceRegisterRequest.Identification,
                             PlatformType = platformType,
                             BuildVersionId = (buildVersion != null) ? buildVersion.Id : null,
-                            BuildVersionReported = deviceRegisterRequest.BuildVersion
+                            BuildVersionReported = deviceRegisterRequest.BuildVersion,
+                            RegisteredAt = System.DateTime.Now,
                         };
                         db.Device.Add(device);
                         await db.SaveChangesAsync();
