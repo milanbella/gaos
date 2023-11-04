@@ -72,7 +72,21 @@ namespace Gaos.Common
             Gaos.Dbo.Model.JWT? jwt = Db.JWT.FirstOrDefault(x => x.DeviceId == deviceId);
             if (jwt != null) {
                 user = Db.User.FirstOrDefault(x => x.Id == jwt.UserId);
-                return (user, jwt);
+                var userType = (bool)user.IsGuest ? Gaos.Model.Token.UserType.GuestUser : Gaos.Model.Token.UserType.RegisteredUser;
+                var jwtStr = TokenService.GenerateJWT(
+                    user.Name, user.Id, deviceId, 
+                    DateTimeOffset.UtcNow.AddHours(Gaos.Common.Context.TOKEN_EXPIRATION_HOURS).ToUnixTimeSeconds(), 
+                    userType);
+                jwt = Db.JWT.FirstOrDefault(x => x.DeviceId == deviceId);
+                if (jwt != null)
+                {
+                    return (user, jwt);
+                }
+                else
+                {
+                    Log.Error($"{CLASS_NAME}:GetDeviceUser() no jwt");
+                    throw new Exception("no jwt");
+                }
             }
             else
             {

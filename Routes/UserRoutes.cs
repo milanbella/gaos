@@ -297,7 +297,7 @@ namespace Gaos.Routes
                             }
                         }
 
-                        var jwtStr = tokenService.GenerateJWT(guestLoginRequest.UserName, guest.Id, device.Id, DateTimeOffset.UtcNow.AddHours(100).ToUnixTimeSeconds(), Gaos.Model.Token.UserType.GuestUser);
+                        var jwtStr = tokenService.GenerateJWT(guestLoginRequest.UserName, guest.Id, device.Id, DateTimeOffset.UtcNow.AddHours(Gaos.Common.Context.TOKEN_EXPIRATION_HOURS).ToUnixTimeSeconds(), Gaos.Model.Token.UserType.GuestUser);
 
                         transaction.Commit();
 
