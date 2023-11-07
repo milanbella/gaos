@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿#pragma warning disable 8600, 8602, 8604
+
+using Serilog;
 using Gaos.Lang;
 using Gaos.Templates;
 using Gaos.Templates.Email;

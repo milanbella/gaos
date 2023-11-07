@@ -1,5 +1,6 @@
-﻿#pragma warning disable 8625, 8603
+﻿#pragma warning disable 8625, 8603, 8629, 8604
 
+using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 namespace Gaos.Common
@@ -67,11 +68,17 @@ namespace Gaos.Common
 
         public (Gaos.Dbo.Model.User?, Gaos.Dbo.Model.JWT?) GetDeviceUser(int deviceId)
         {
+            const string METHOD_NAME = "GetDeviceUser()";
             Gaos.Dbo.Model.User? user = null;
 
             Gaos.Dbo.Model.JWT? jwt = Db.JWT.FirstOrDefault(x => x.DeviceId == deviceId);
             if (jwt != null) {
                 user = Db.User.FirstOrDefault(x => x.Id == jwt.UserId);
+                if (user == null)
+                {
+                    Log.Error($"{CLASS_NAME}:{METHOD_NAME} user not found for token");
+                    throw new Exception("user not found for token");
+                }
                 var userType = (bool)user.IsGuest ? Gaos.Model.Token.UserType.GuestUser : Gaos.Model.Token.UserType.RegisteredUser;
                 var jwtStr = TokenService.GenerateJWT(
                     user.Name, user.Id, deviceId, 

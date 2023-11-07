@@ -27,7 +27,7 @@ namespace Gaos.Templates
             {
                 throw new Exception("missing configuration value: templates_fdolder_path");
             }
-            TEMPLATES_FDOLDER_PATH = Configuration["templates_fdolder_path"];
+            TEMPLATES_FDOLDER_PATH = Configuration["templates_fdolder_path"] ?? throw new InvalidOperationException();
         }
 
         private string getTemplateFullPath(string path)

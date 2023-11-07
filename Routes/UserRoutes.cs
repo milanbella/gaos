@@ -712,7 +712,7 @@ namespace Gaos.Routes
 
             });
 
-            group.MapPost("/recoverPassword/verifyCode", async (RecoverPasswordVerifyCodeRequest request, Db db, UserVerificationCodeService userVerificationCodeService) =>
+            group.MapPost("/recoverPassword/verifyCode", (RecoverPasswordVerifyCodeRequest request, Db db, UserVerificationCodeService userVerificationCodeService) =>
             {
                 const string METHOD_NAME = "/recoverPassword/verifyCode";
                 try
