@@ -18,7 +18,7 @@ namespace Gaos.Seed
 
         public static void Seed(ModelBuilder modelBuilder, IConfiguration configuration, IWebHostEnvironment environment)
         {
-            if (environment.IsDevelopment())
+            if (!environment.IsProduction())
             {
                 UserId = 0;
                 RoleId = 0;

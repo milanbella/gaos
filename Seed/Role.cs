@@ -6,7 +6,7 @@ namespace Gaos.Seed
     {
         public static void Seed(ModelBuilder modelBuilder, IConfiguration configuration, IWebHostEnvironment environment)
         {
-            if (environment.IsDevelopment())
+            if (!environment.IsProduction())
             {
                 // seed Dbo.User
                 modelBuilder.Entity<Gaos.Dbo.Model.Role>().HasData(
